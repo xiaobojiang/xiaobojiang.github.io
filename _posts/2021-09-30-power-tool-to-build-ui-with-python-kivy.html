@@ -38,7 +38,7 @@ author: "xiaobo Jiang"
 </ul>
 <p><!-- /wp:list --></p>
 <p><!-- wp:image {"id":147,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-10.png" alt="" class="wp-image-147"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image-10.png" alt="" class="wp-image-147"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p>Some key concepts in Kivy:</p>
@@ -81,7 +81,7 @@ author: "xiaobo Jiang"
 <p><strong>Clock events</strong></p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:image {"id":143,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-6.png" alt="" class="wp-image-143"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image-6.png" alt="" class="wp-image-143"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p>The <a href="https://kivy.org/doc/stable/api-kivy.clock.html">Clock object</a> allows you to schedule a function call in the future as a one-time event with schedule_once(), or as a repetitive event with schedule_interval().You can also create Triggered events with create_trigger(). Triggers have the advantage of being called only once per frame, even if you have scheduled multiple triggers for the same callback.</p>
@@ -90,13 +90,13 @@ author: "xiaobo Jiang"
 <p><strong>Input events</strong></p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:image {"id":146,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-8.png" alt="" class="wp-image-146"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image-8.png" alt="" class="wp-image-146"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p>All the mouse click, touch and scroll wheel events are part of the <a href="https://kivy.org/doc/stable/api-kivy.input.motionevent.html#kivy.input.motionevent.MotionEvent">MotionEvent</a>, extended by <a href="https://kivy.org/doc/stable/api-kivy.input.postproc.html">Input Postprocessing</a> and dispatched through the <a href="https://kivy.org/doc/stable/api-kivy.core.window.html#kivy.core.window.WindowBase.on_motion">on_motion</a> event in the <a href="https://kivy.org/doc/stable/api-kivy.core.window.html#kivy.core.window.WindowBase">Window</a> class. This event then generates the <a href="https://kivy.org/doc/stable/api-kivy.uix.widget.html#kivy.uix.widget.Widget.on_touch_down">on_touch_down()</a>, <a href="https://kivy.org/doc/stable/api-kivy.uix.widget.html#kivy.uix.widget.Widget.on_touch_move">on_touch_move()</a> and <a href="https://kivy.org/doc/stable/api-kivy.uix.widget.html#kivy.uix.widget.Widget.on_touch_up">on_touch_up()</a> events in the <a href="https://kivy.org/doc/stable/api-kivy.uix.widget.html#kivy.uix.widget.Widget">Widget</a>.For an in-depth explanation, have a look at <a href="https://kivy.org/doc/stable/api-kivy.input.html">Input management</a>.<strong>Class events</strong></p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:image {"id":148,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-11.png" alt="" class="wp-image-148"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image-11.png" alt="" class="wp-image-148"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p>Our base class <a href="https://kivy.org/doc/stable/api-kivy.event.html#kivy.event.EventDispatcher">EventDispatcher</a>, used by <a href="https://kivy.org/doc/stable/api-kivy.uix.widget.html#kivy.uix.widget.Widget">Widget</a>, uses the power of our <a href="https://kivy.org/doc/stable/api-kivy.properties.html">Properties</a> for dispatching changes. This means when a widget changes its position or size, the corresponding event is automatically fired.</p>
@@ -117,7 +117,7 @@ author: "xiaobo Jiang"
     return True</code></pre>
 <p><!-- /wp:code --></p>
 <p><!-- wp:image {"id":144,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-7.png" alt="" class="wp-image-144"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image-7.png" alt="" class="wp-image-144"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p>Kivy properties, by default, provide an on_&lt;property_name&gt; event. This event is called when the value of the property is changed.</p>
@@ -187,7 +187,7 @@ author: "xiaobo Jiang"
 <p>Kivy provides a design language specifically geared towards easy and scalable GUI Design. The language makes it simple to separate the interface design from the application logic, adhering to the <a href="http://en.wikipedia.org/wiki/Separation_of_concerns">separation of concerns principle</a>. For example:</p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:image {"id":145,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-9.png" alt="" class="wp-image-145"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image-9.png" alt="" class="wp-image-145"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p><a href="https://kivy.org/doc/stable/_images/gs-lang.png"><br></a>In the above code :</p>
@@ -215,7 +215,7 @@ author: "xiaobo Jiang"
 <p>Widgets can be anchored to the ‘top’, ‘bottom’, ‘left’, ‘right’ or ‘center’.</p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:image {"id":151,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image.gif" alt="" class="wp-image-151"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image.gif" alt="" class="wp-image-151"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p><a href="https://kivy.org/doc/stable/api-kivy.uix.boxlayout.html#module-kivy.uix.boxlayout">BoxLayout</a>:</p>
@@ -224,7 +224,7 @@ author: "xiaobo Jiang"
 <p>Widgets are arranged sequentially, in either a ‘vertical’ or a ‘horizontal’ orientation.</p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:image {"id":149,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-1.gif" alt="" class="wp-image-149"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image-1.gif" alt="" class="wp-image-149"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p><a href="https://kivy.org/doc/stable/api-kivy.uix.floatlayout.html#module-kivy.uix.floatlayout">FloatLayout</a>:</p>
@@ -233,7 +233,7 @@ author: "xiaobo Jiang"
 <p>Widgets are essentially unrestricted.</p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:image {"id":150,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-2.gif" alt="" class="wp-image-150"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image-2.gif" alt="" class="wp-image-150"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p><a href="https://kivy.org/doc/stable/api-kivy.uix.relativelayout.html#module-kivy.uix.relativelayout">RelativeLayout</a>:</p>
@@ -248,7 +248,7 @@ author: "xiaobo Jiang"
 <p>Widgets are arranged in a grid defined by the rows and cols properties.</p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:image {"id":152,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-3.gif" alt="" class="wp-image-152"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image-3.gif" alt="" class="wp-image-152"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p><a href="https://kivy.org/doc/stable/api-kivy.uix.pagelayout.html#module-kivy.uix.pagelayout">PageLayout</a>:</p>
@@ -257,7 +257,7 @@ author: "xiaobo Jiang"
 <p>Used to create simple multi-page layouts, in a way that allows easy flipping from one page to another using borders.</p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:image {"id":153,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-4.gif" alt="" class="wp-image-153"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image-4.gif" alt="" class="wp-image-153"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p><a href="https://kivy.org/doc/stable/api-kivy.uix.scatterlayout.html#module-kivy.uix.scatterlayout">ScatterLayout</a>:</p>
@@ -272,7 +272,7 @@ author: "xiaobo Jiang"
 <p>Widgets are stacked in a lr-tb (left to right then top to bottom) or tb-lr order.</p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:image {"id":154,"sizeSlug":"full","linkDestination":"none"} --></p>
-<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-5.gif" alt="" class="wp-image-154"></figure>
+<figure class="wp-block-image size-full"><img src="/assets/2021/09/image-5.gif" alt="" class="wp-image-154"></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p>When you add a widget to a layout, the following properties are used to determine the widget’s size and position, depending on the type of layout:</p>
@@ -296,7 +296,7 @@ author: "xiaobo Jiang"
 <p>In my github, I also transferred those examples into working code, please find the code in: <a href="https://github.com/xiaobojiang/kivy_playground">https://github.com/xiaobojiang/kivy_playground</a></p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:image --></p>
-<figure class="wp-block-image"><img src="{{site.baseurl}}/assets/2021/09/86cee532-155e-4342-ac37-032cb2c54e7a" alt=""></figure>
+<figure class="wp-block-image"><img src="/assets/2021/09/86cee532-155e-4342-ac37-032cb2c54e7a" alt=""></figure>
 <p><!-- /wp:image --></p>
 <p><!-- wp:paragraph --></p>
 <p>Leave a reply if you have any questions.</p>
@@ -304,7 +304,7 @@ author: "xiaobo Jiang"
 <p><!-- wp:paragraph --></p>
 <p><!-- /wp:paragraph --></p>
 <p><!-- wp:html --><br />
-<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/09/88x31.png"></a><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="/assets/2021/09/88x31.png"></a><br />
 This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
 <!-- /wp:html --></p>
 <p><!-- wp:paragraph --></p>
