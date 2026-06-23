@@ -1,0 +1,237 @@
+---
+layout: post
+title: "\U0001F680 Managing App Startup with @asynccontextmanager in FastAPI"
+date: 2025-04-16 09:21:42.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>When building a FastAPI application, it’s important to make sure critical resources like databases are properly initialized and cleaned up as part of your app’s lifecycle.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>A clean and effective way to do this is by using Python’s @asynccontextmanager with FastAPI’s lifespan support.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>🧠 What’s @asynccontextmanager</strong> <strong>and Why Use It?</strong><br />
+</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The @asynccontextmanager decorator allows you to define asynchronous setup and teardown logic in one place, using yield to separate them.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It’s perfect for preparing things like databases, caches, or background tasks before the API starts handling requests.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>✅ Example: Setting Up an SQLite Database Connection</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let’s walk through how to set up an SQLite database connection at app startup and close it cleanly at shutdown.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from fastapi import FastAPI
+from contextlib import asynccontextmanager
+import aiosqlite
+
+db_connection = None  # will be shared across the app
+
+@asynccontextmanager
+async def app_lifespan(app: FastAPI):
+    global db_connection
+    db_connection = await aiosqlite.connect("example.db")  # setup
+    yield {"db_status": "connected"}  # this state can be used elsewhere
+    await db_connection.close()  # cleanup
+
+app = FastAPI(lifespan=app_lifespan)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🛠 Using the Database in Your Routes</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can now use the global db_connection in your endpoints like this:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>@app.get("/users")
+async def get_users():
+    cursor = await db_connection.execute("SELECT * FROM users")
+    rows = await cursor.fetchall()
+    return rows</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>You could also use app.state to store the connection if you want to avoid global variables:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>@asynccontextmanager
+async def app_lifespan(app: FastAPI):
+    app.state.db = await aiosqlite.connect("example.db")
+    yield
+    await app.state.db.close()</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then access it in your route via request.app.state.db.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧼 Why This Pattern Is Great</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Keeps your <strong>setup and cleanup logic cleanly separated</strong>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Works perfectly with <strong>async resources</strong> like aiosqlite, httpx, or async ORMs</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Ensures your app doesn’t start until everything is <strong>ready</strong>
+</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🌐 Bonus: Tracking Lifespan State</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can even return a state dictionary from your yield, which is useful for debugging or passing shared config:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>yield {"db_status": "connected", "env": "prod"}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>And then access it in the app or routes using request.app.state if you stored it there.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🔧 More Use Cases</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Besides SQLite, you can use this pattern to manage:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>MCP server resource provisioning</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>PostgreSQL or MySQL connection pools</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Redis or Memcached setup</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>ML model loading</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Message broker (RabbitMQ, Kafka) clients</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>API client sessions (e.g., httpx.AsyncClient())</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:paragraph --></p>
+<p>📌 In summary, using @asynccontextmanager with FastAPI’s lifespan lets you safely and cleanly manage async resources like an SQLite database connection. It’s a powerful pattern that keeps your startup and shutdown logic organized and robust.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Full sample code can run, contextmgmt.py:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from fastapi import FastAPI, Request
+from contextlib import asynccontextmanager
+import aiosqlite
+
+@asynccontextmanager
+async def app_lifespan(app: FastAPI):
+    # Setup
+    db = await aiosqlite.connect("example.db")
+    await db.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL
+        )
+    """)
+    await db.commit()
+
+    status = {"db_status": "connected", "startup_complete": True}
+    app.state.db = db
+    app.state.lifespan_status = status
+
+    print("✅ Database connected and status initialized")
+    yield status  # Yielding the status dictionary
+
+    # Teardown
+    await db.close()
+    print("🛑 Database connection closed")
+
+app = FastAPI(lifespan=app_lifespan)
+
+# Add a new user
+@app.post("/users")
+async def create_user(request: Request, name: str):
+    db = request.app.state.db
+    await db.execute("INSERT INTO users (name) VALUES (?)", (name,))
+    await db.commit()
+    return {"message": f"User '{name}' added successfully."}
+
+# Fetch all users
+@app.get("/users")
+async def get_users(request: Request):
+    db = request.app.state.db
+    cursor = await db.execute("SELECT id, name FROM users")
+    users = await cursor.fetchall()
+    return [{"id": row[0], "name": row[1]} for row in users]
+
+# Check lifespan startup status
+@app.get("/status")
+async def get_status(request: Request):
+    return request.app.state.lifespan_status
+
+# Root endpoint
+@app.get("/")
+async def root():
+    return {"message": "FastAPI with SQLite using lifespan!"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("contextmgmt:app", host="127.0.0.1", port=8000, reload=True)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks your for time reading. Leave a comment if you have any queries or comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/04/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

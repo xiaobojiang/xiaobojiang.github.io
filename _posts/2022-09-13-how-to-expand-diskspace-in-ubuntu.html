@@ -1,0 +1,100 @@
+---
+layout: post
+title: How to expand diskspace in Ubuntu
+date: 2022-09-13 07:33:33.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Inside the new provisioned linux server, sometimes, we will find the diskspace is not fully utilized.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Check below example, current disk space arrangement</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":540,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/09/image-1024x497.png" alt="" class="wp-image-540"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>The ubuntu—vg-ubuntu—lv only takes 50% of the disk /dev/sda3, which mounts to root directory</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We would like to use whole /dev/sda3.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">First Step, pvresize</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>pvresize is</em><strong><em> a tool to resize Physical Volume which may already be in a volume group and have active logical volumes allocated on it.</em></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>gateway@gateway:~$ sudo pvresize -v /dev/sda3
+Creating directory "/etc/lvm/archive"
+Archiving volume group "ubuntu-vg" metadata (seqno 2).
+Resizing volume "/dev/sda3" to 118644736 sectors.
+No change to size of physical volume /dev/sda3.
+Updating physical volume "/dev/sda3"
+Creating directory "/etc/lvm/backup"
+Creating volume group backup "/etc/lvm/backup/ubuntu-vg" (seqno 3).
+Physical volume "/dev/sda3" changed
+1 physical volume(s) resized or updated / 0 physical volume(s) not resized</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":537,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/09/image-1024x497.png" alt="" class="wp-image-537"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Then lvresize</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>lvresize allows you to resize a logical volume.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong><em>-l</em>, <em>--extents [+|-]LogicalExtentsNumber[%{VG|LV|PVS|FREE|ORIGIN}]</em></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo lvresize -r -l+100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
+Size of logical volume ubuntu-vg/ubuntu-lv changed from &lt;28.29 GiB (7241 extents) to 56.57 GiB (14482 extents).
+Logical volume ubuntu-vg/ubuntu-lv successfully resized.
+resize2fs 1.46.5 (30-Dec-2021)
+Filesystem at /dev/mapper/ubuntu--vg-ubuntu--lv is mounted on /; on-line resizing required
+old_desc_blocks = 4, new_desc_blocks = 8
+The filesystem on /dev/mapper/ubuntu--vg-ubuntu--lv is now 14829568 (4k) blocks long.</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":539,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/09/image-1024x497.png" alt="" class="wp-image-539"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Check the new disk space arrangement</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>All the available space is utilized.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":538,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/09/image-1024x497.png" alt="" class="wp-image-538"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for reading.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Please leave a reply if you have any questions or comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/09/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

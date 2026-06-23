@@ -1,0 +1,84 @@
+---
+layout: post
+title: Accessing Files in Podman Volume in Macos
+date: 2025-10-09 02:22:37.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Podman is a really nice software to run containers in Macos, and you can easily create volumes and used in container for persistence. Here are some tricks to inspects those files in your Mac OS file system. That could be useful to file operation with your familiar OS command.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Be careful on the difference where the Linux and Mac volume persistence location:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>On Linux, Podman stores volumes under /var/lib/containers/storage/volumes/... on the host, so you can ls them directly.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>On macOS, Podman runs inside a lightweight VM (called <strong>Podman Machine</strong>) managed by QEMU. The volume mountpoints live <strong>inside that VM</strong>, not on your macOS filesystem. That’s why $(podman volume inspect … --format '{{.Mountpoint}}') doesn’t resolve on the macOS side.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>✅ Ways to inspect a Podman volume on macOS</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading"><strong>1. Use a temporary container</strong></h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>This is the most straightforward:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>podman run --rm -it -v mydata:/data alpine ls -al /data</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>You’ll see the files stored in mydata.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading"><strong>2. SSH into the Podman VM</strong></h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>podman machine ssh</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then inside the VM:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>sudo ls -al /var/lib/containers/storage/volumes/mydata/_data</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading"><strong>3. Copy data out of the volume</strong></h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you want to move files to your macOS host, just use your familiar cp command.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>That will copy everything from the volume into your current working directory on macOS.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/10/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

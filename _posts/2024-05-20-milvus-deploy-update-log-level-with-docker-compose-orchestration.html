@@ -1,0 +1,123 @@
+---
+layout: post
+title: Milvus Deploy - update log level with docker-compose orchestration
+date: 2024-05-20 03:10:25.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Devops
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Milvus is a powerful open-sourced vector database, it is a key component in AI chatbot.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>One of the annoy thing of milvus is that the default log level is info, which really produces many many logs that even can consume all your disk.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>There are two ways to setup the log level:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>one is via config yaml, we need to prepare a copy and update settings and mounted into the container.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>the other is via api, we can change it via curl -X put http://localhost:9091/loglevel -d level=warn</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Pity is that I did not find my desired way: setting this via enviromental parameter.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, I will introduce how to leverage docker compose capability to auto the level setting.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Below is code snipet of docker compose yaml:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>version: '3.5'
+
+services:
+  etcd:
+    container_name: milvus-etcd
+    image: quay.io/coreos/etcd:v3.5.5
+    restart: always
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+
+  standalone:
+    container_name: milvus-standalone
+    image: milvusdb/milvus:v2.3.2
+    command: ["milvus", "run", "standalone"]
+    restart: always
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: "s3.{{ S3_AWS_REGION }}.amazonaws.com"
+      MINIO_PORT: 80
+      MINIO_ACCESS_KEY_ID: {{ S3_ACCESS_KEY_ID }}
+      MINIO_SECRET_ACCESS_KEY: {{ S3_SECRET_ACCESS_KEY }}
+      MINIO_BUCKET_NAME: {{ S3_BUCKET_NAME }}
+      AWS_REGION: {{ S3_AWS_REGION }}
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/milvus:/var/lib/milvus
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    depends_on:
+      - "etcd" 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/log/level"]
+      interval: 6s
+      timeout: 2s
+      retries: 10
+
+  curl-runner:
+    image: curlimages/curl:latest
+    depends_on:
+      standalone:
+        condition: service_healthy
+    command: ["curl", "-X" , "PUT" , "http://standalone:9091/log/level", "-d", "level=warn"]
+
+networks:
+  default:
+    name: milvus</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Key points:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, a health check is added at milvus side, make sure that the http endpoint is alive</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, curl-runner will wait until milvus's health check passed, and execute the curl command to set the log level</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note: this works for docker-compose up -d, not applicable to docker-compose restart (health check will be skipped).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally, all is automated, try and provision a milvus container, it will work fine with your desired log level.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

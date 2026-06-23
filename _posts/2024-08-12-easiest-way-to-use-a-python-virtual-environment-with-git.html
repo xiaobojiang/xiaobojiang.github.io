@@ -1,0 +1,76 @@
+---
+layout: post
+title: Easiest way to use a python virtual environment with Git
+date: 2024-08-12 08:13:33.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:heading {"fontSize":"medium"} --><html><body></p>
+<h2 class="wp-block-heading has-medium-font-size">What is a Virtual Environment?</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Setting up a virtual environment when building a python project is an essential step in the development process. A virtual environment allows dependencies to be separated between projects. A dependency is just some sort of module that is required for your project to run properly. As the dependency modules are updated, conflicts can arise between projects if dependencies are shared and the necessary versions are not the same. A virtual environment eliminates these conflicts by allowing the dependencies to be project specific and isolated from the system.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">How to use virtual env in git repo:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>$ git clone &lt;Project A&gt; # Cloning project repository</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>$ cd &lt;Project A&gt; # Enter to project directory</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>$ python3 -m venv my_venv # If not created, creating virtualenv</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>$ source ./my_venv/bin/activate # Activating virtualenv</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>(my_venv)$ pip3 install -r ./requirements.txt # Installing dependencies</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>(my_venv)$ deactivate # When you want to leave virtual environment</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, do add lines in gitignore that those venv files do not get uploaded.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>sample lines:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/08/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

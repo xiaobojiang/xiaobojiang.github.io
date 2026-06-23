@@ -1,0 +1,160 @@
+---
+layout: post
+title: 'Lecture Note: Quantization in AI model'
+date: 2024-12-04 08:36:57.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>When LLM goes popular, we will hear this word frequently "Quantization", it can help running llama 8B similar models on you laptop, raspberry pi and even on your mobile.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Why Quantization?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Reduced Memory Usage: Lower precision (e.g., int8) requires less memory compared to float32.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Example: A model with 100 million parameters would require 400 MB in float32 but only 100 MB in int8.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":2} --></p>
+<ol start="2" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Faster Computation: Operations in lower precision are faster on modern hardware optimized for int8 inference (e.g., NVIDIA Tensor Cores, TPUs).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Energy Efficiency: Lower-precision operations consume less power, which is critical for edge devices.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Minimal Accuracy Drop: With proper techniques, quantized models often retain close to the original accuracy.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>What is Quantization?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Quantization is a technique used to reduce the memory footprint and computational requirements of machine learning models by converting their numerical precision from higher precision (e.g., 32-bit floating-point, float32) to lower precision (e.g., 8-bit integers, int8). It is particularly useful during inference, where models are deployed and must run efficiently on resource-constrained devices like smartphones, IoT devices, or even large-scale servers.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1047,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2024/12/image.png" alt="" class="wp-image-1047"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>scale and zero point are two key parameters that allow the representation of floating-point numbers in lower-precision formats like int8. They ensure that the model can approximate the original floating-point values while working in the integer domain.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Scale (s)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• A floating-point value that defines the step size between quantized integer values.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• It maps the range of integers (e.g., -128 to 127 for signed int8) to the range of floating-point values.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Zero Point (z)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• An integer that aligns the quantized integer zero (q = 0) with the corresponding floating-point zero (x = 0).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• It ensures that zero in the integer domain corresponds to zero in the floating-point domain.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Together, they define the relationship:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>x = s * (q - z)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Of source, if we use the scale and zero point to to de-quantization operation, there will be quatization error. We can do calibration after quantization.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1048,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2024/12/image-1.png" alt="" class="wp-image-1048"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Key Components of Quantization</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Weights: Convert the model’s learned parameters from float32 to int8.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Activations: Convert input/output values of each layer to int8.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>There are few combination of quantization for weights and activation.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>one popular is W4INT16, which quantization weight float into 4 bit integer, and activation into 16 bit integer.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1049,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2024/12/image-2-1000x1024.png" alt="" class="wp-image-1049"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Types of Quantization with training.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Post-Training Quantization (PTQ):</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Applied after the model is trained.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Converts weights and/or activations to lower precision.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Simple but may lead to a slight loss in accuracy.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Add calibration step to improve accuracy.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":2} --></p>
+<ol start="2" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Quantization-Aware Training (QAT):</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Simulates quantization effects during training to help the model adapt.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• More accurate than PTQ but requires retraining.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1050,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2024/12/image-3-996x1024.png" alt="" class="wp-image-1050"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Note: all pictures are from the online course from Qualcomm and Deeplearning.ai, check this link for full content: <a href="https://learn.deeplearning.ai/courses/introduction-to-on-device-ai/lesson/5/quantizing-models">https://learn.deeplearning.ai/courses/introduction-to-on-device-ai/lesson/5/quantizing-models</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/12/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

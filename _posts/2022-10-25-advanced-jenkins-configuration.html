@@ -1,0 +1,136 @@
+---
+layout: post
+title: Advanced Jenkins Configuration
+date: 2022-10-25 03:40:54.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph {"fontSize":"large"} --><html><body></p>
+<p class="has-large-font-size">Home Directory</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>After Jenkins installation, one of the next big thing is: Home directory </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We may have to rely on home directoy, when:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Our script uses '~' as shorthand of home directory</li>
+<li>Configure keys for remote ssh </li>
+<li>Configure setting.xml for maven in ~/.m2</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>There is a trap here, the Jenkins's default home directory is not our login users to Ubuntu.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It is specified in /etc/default/jenkins</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>By default JENKINS_HOME is located at /var/lib/jenkins</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>and default user and user group is jenkins.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":584,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-13-1024x806.png" alt="" class="wp-image-584"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>There are posts in the internet, who wants to reuse login home directory and user for Jenkins.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thus change the configuration of JENKINS_USER, JENKINS_GROUP and JENKINS_HOME, and chown /var/run/jenkins/log /var/lib/jenkins with lgoin user. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Upper is not working in new version Jenkins, eg 2.370. Jenkins cannot startup, and it will mess up your new user’s home directory.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Recommended way about Jenkins home directory issue:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, Still use Jenkins as running user, do not modify /etc/default/jenkins in Debian</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, Always remember that, in Jenkins, the $HOME or $JENKINS_HOME is pointed to /var/lib/jenkins, not your pc user’s /home/username, and user is jenkins</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, if you have ssh keys want reuse for git in Jenkins</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Copy the keys from /home/username/.ssh to /var/lib/jenkins/.ssh</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And change ownership to jenkins</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$sudo chown -R jenkins:jenkins /var/lib/jenkins/.ssh</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"large"} --></p>
+<p class="has-large-font-size">Maven Configuration</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>use your own maven setting xml </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>copy the file to Jenkins home directory</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ cp ~/.m2/setting.xml /var/lib/jenkins/.m2/</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p> and change ownership:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$sudo chown -R jenkins:jenkins /var/lib/jenkins/.m2/setting.xml</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Use aliyun maven repository, add following section in setting.xml:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>     &lt;mirror&gt;
+       &lt;id&gt;aliyunmaven&lt;/id&gt;
+       &lt;mirrorOf&gt;*&lt;/mirrorOf&gt;
+       &lt;name&gt;ali&lt;/name&gt;
+       &lt;url&gt;https://maven.aliyun.com/repository/central&lt;/url&gt;
+     &lt;/mirror&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Issue when using maven central repository:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>“<strong>Failed to read artifact descriptor for org.apache.maven.plugins:maven-clean-plugin:jar:2.5: Could not transfer artifact org.apache.maven.plugins:maven-clean-plugin:pom:2.5 from/to central</strong>”</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Override ssl check, by add below line in maven command:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>works for me.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your reading, please leave a reply if you have any question or comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/10/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

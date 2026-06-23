@@ -1,0 +1,69 @@
+---
+layout: post
+title: Python ast.literal_eval to evaluate string into list
+date: 2024-04-01 07:37:09.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>ast.literal_eval is a function in Python's ast (Abstract Syntax Trees) module. It's designed to safely evaluate strings containing Python literals or basic data structures (lists, dictionaries, tuples, strings, numbers, booleans, and None) without executing arbitrary code.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here's a brief explanation:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<!-- wp:list-item --></p>
+<li>Purpose: The primary purpose of ast.literal_eval is to safely evaluate strings that contain Python literals. This is useful when you want to evaluate potentially unsafe strings (like those obtained from user input or external sources) without the risk of executing arbitrary code.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Safety: Unlike the eval() function, which can execute arbitrary code and is thus unsafe for evaluating untrusted input, ast.literal_eval strictly evaluates only literals and basic data structures, ensuring safety.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Usage: You can use ast.literal_eval to safely parse and evaluate strings that represent Python literals or basic data structures. For example:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>import ast</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import ast
+s = "[1, 2, 3, {'a': 'b'}]"
+result = ast.literal_eval(s)
+print(result)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Output:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[1, 2, 3, {'a': 'b'}]</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this example, ast.literal_eval safely evaluates the string s, which contains a list of integers and a dictionary, without executing any code.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":4} --></p>
+<ol start="4">
+<!-- wp:list-item --></p>
+<li>Limitations: Keep in mind that ast.literal_eval can only evaluate literals and basic data structures. It cannot handle more complex expressions or function calls. If you need to evaluate more complex expressions, you may need to consider other options, such as eval() (with caution) or parsing the input manually.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Overall, ast.literal_eval provides a safe and convenient way to evaluate strings containing Python literals and basic data structures without executing arbitrary code. It's particularly useful in scenarios where security is a concern.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/04/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

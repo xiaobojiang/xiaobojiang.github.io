@@ -1,0 +1,89 @@
+---
+layout: post
+title: Foward private port in K8S with Kubectl
+date: 2022-03-15 03:13:05.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Kubernetes
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>In common case, external traffic needs to go through ingress into the K8S cluster. Interal resources are not accessible to the outside. For debug or diagnostic purpose, we want to access internal port, eg, redis inside the cluster. Similar to ssh forward, K8S also provide a powerful command "kubectl port-forward" for this purpose.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>the command looks like in this format:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kubectl port-forward &lt;resource-type/resource-name&gt; -n &lt;namespace&gt; [--address 0.0.0.0] [local_port]:&lt;remote_port&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>&lt;resource-type/resource-name&gt; is the resource and its unique name that listens the port in our k8s cluster, resource can be pod, service</li>
+<li>[--address 0.0.0.0] is optional parameter, with this, means this local port listens traffic from all ip. default is empty, means only traffic from localhost is accepted. </li>
+<li>&lt;namespace&gt; is the namespace where the resources are located</li>
+<li>[local_port] is the local port that this forwarded service listened, it is optional, empty means it will be forwared to a random local port</li>
+<li>&lt;remote_pod&gt; is the remote resource's port we want to forward to local</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can run port-forward on different resource in your cluster, eg, pod, deployment, services.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sample command to perform port forwarding on <strong>pod</strong>: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kubectl port-forward pods/my-pod 8080:80</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sample command to perform port forwarding on <strong>deployment</strong>: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kubectl port-forward deployment/my-deployment 8080:80</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sample command to perform port forwarding on <strong>replicaset</strong>: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kubectl port-forward replicaset/my-replicaset 8080:80</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sample command to perform port forwarding on <strong>service</strong>: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kubectl port-forward service/my-service 8080:80</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>The command is actively running to keep this particular tunnel alive. we can press Ctrl + C to immediately end port forwarding.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Try it out.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if have any comments or questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/03/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

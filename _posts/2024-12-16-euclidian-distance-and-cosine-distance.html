@@ -1,0 +1,80 @@
+---
+layout: post
+title: Euclidian Distance and Cosine distance
+date: 2024-12-16 07:53:40.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>The <strong>Euclidean Distance</strong> is a measure of the straight-line distance between two points in a multidimensional space. For two vectors $A = [a_1, a_2, \ldots, a_{1000}]$ and $B = [b_1, b_2, \ldots, b_{1000}]$ in a 1000-dimensional space, the Euclidean distance d is calculated as:<br>$$d = \sqrt{\sum_{i=1}^{1000} (a_i - b_i)^2}$$</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If the vectors are normalized, meaning they are scaled to have a magnitude of 1 ( |A| = |B| = 1 ), this can simplify calculations and lead to interesting properties:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Key Insights for Normalized Vectors</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Magnitude Constraint:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Normalization ensures:<br>$$||A||^2 = \sum_{i=1}^{1000} a_i^2 = 1 \quad \text{and} \quad ||B||^2 = \sum_{i=1}^{1000} b_i^2 = 1$$</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":2} --></p>
+<ol start="2" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Distance Formula for Normalized Vectors:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>The Euclidean distance between normalized vectors can also be expressed in terms of the cosine similarity:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>$$d = \sqrt{2(1 - \text{cos}(\theta))}$$</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>where $$\text{cos}(\theta)$$ is the cosine similarity between A and B , defined as:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>$$\text{cos}(\theta) = \frac{A \cdot B}{|A| |B|} = \sum_{i=1}^{1000} a_i b_i$$</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• When the vectors are identical ( A = B ), $\text{cos}(\theta) = 1$ and d = 0 .</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• When the vectors are orthogonal, $\text{cos}(\theta) = 0$ and $d = \sqrt{2}$ .</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• When the vectors are diametrically opposite, $\text{cos}(\theta) = -1$ and d = 2 .</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Practical Implications</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• For normalized vectors, the Euclidean distance is bounded between 0 and 2.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• The distance provides a sense of how “far apart” two points are in the normalized 1000-dimensional space.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><center><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/12/88x31.png"></center></a><center><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.</center><br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

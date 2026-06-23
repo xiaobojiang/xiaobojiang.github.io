@@ -1,0 +1,235 @@
+---
+layout: post
+title: Coding Agent and its acceleration on different software stacks
+date: 2026-04-27 03:03:51.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta:
+  _oembed_38d37e74c6b458b79ec7023bb8f2da68: "{{unknown}}"
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>In recent Andrew Ng's <a href="https://info.deeplearning.ai/glm-5.1-thinks-strategically-data-center-revolt-intensifies-when-helpful-llms-turn-unhelpful-humanoid-robots-get-to-work-1?ecid=ACsprvt_Oo-uuys2PfY8EXeSy3Q1Hxn49ywz33wHBVEjOQ4aYhafZ-uNb9wtILiWvpWri6He4TlZ&amp;utm_campaign=The%20Batch&amp;utm_medium=email&amp;_hsenc=p2ANqtz-9jUrQElySdz5FbMloHUITXDUlkwk4UHqXZtje-UH5eZP9QslmxUC7AX74c_EmvzM9wQj-sTHpXBzldtVqVxxEogvsdIg" data-type="link" data-id="https://info.deeplearning.ai/glm-5.1-thinks-strategically-data-center-revolt-intensifies-when-helpful-llms-turn-unhelpful-humanoid-robots-get-to-work-1?ecid=ACsprvt_Oo-uuys2PfY8EXeSy3Q1Hxn49ywz33wHBVEjOQ4aYhafZ-uNb9wtILiWvpWri6He4TlZ&amp;utm_campaign=The%20Batch&amp;utm_medium=email&amp;_hsenc=p2ANqtz-9jUrQElySdz5FbMloHUITXDUlkwk4UHqXZtje-UH5eZP9QslmxUC7AX74c_EmvzM9wQj-sTHpXBzldtVqVxxEogvsdIg">newsletter</a>, Andrew talks about AI's acceleration and impact on different software stacks.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here are the main points and my thinking:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>Coding agents are accelerating different types of software work to different degrees. When we architect teams, understanding these distinctions helps us to have realistic expectations.</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>From most accelerated to least: frontend → backend → infrastructure → research.</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>Frontend development is dramatically sped up due to strong model fluency in modern frameworks and tight feedback loops.</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>Backend is harder due to edge cases, security, and subtle bugs.</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>Infrastructure even less so, given complexity, reliability requirements, and debugging difficulty.</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>Research is least accelerated—coding is only a small part of the work, and insight remains the bottleneck.</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>— Andrew Ng</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I largely agree with this take—especially on frontend and backend.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Acceleration by Coding Agents (Highest → Lowest)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:table {"hasFixedLayout":false,"className":"is-style-stripes"} --></p>
+<figure class="wp-block-table is-style-stripes">
+<table>
+<tbody>
+<tr>
+<td>Frontend</td>
+<td>████████████████████</td>
+</tr>
+<tr>
+<td>Backend</td>
+<td>███████████████</td>
+</tr>
+<tr>
+<td>Infrastructure</td>
+<td>█████████</td>
+</tr>
+<tr>
+<td>Research</td>
+<td>████</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Where this really holds:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Frontend</strong> is being transformed the fastest. Tight feedback loops + well-learned frameworks = agents thrive.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Backend</strong> is still accelerated, but correctness, edge cases, and data integrity make it harder to fully trust AI output.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Infrastructure also feels right as “less accelerated”—not because agents can’t generate configs, but because:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>the blast radius is huge</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>debugging is opaque</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>trust is still limited</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:paragraph --></p>
+<p>Where I’d extend the discussion: Research</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>At first glance, research seems the least impacted—and in many ways, it still is.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>But there’s an important nuance:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>👉 AI doesn’t replace insight, but it can reshape the speed and scale of discovery</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Take AlphaFold as example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Predicted structures for <strong>200M+ proteins</strong>, compressing decades of lab work</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Tackled a <strong>50-year grand challenge</strong> in biology</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Now actively accelerating drug discovery pipelines</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>That’s not just “coding faster”—that’s changing the research loop itself.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So maybe the better framing is:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Coding agents don’t accelerate thinking in research…</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>but AI systems can compress entire scientific workflows</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:paragraph --></p>
+<p>A more useful mental model</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It’s not just about stack layers. It’s about:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>How quickly can you verify correctness?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Frontend → immediate → high acceleration</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Backend → delayed → moderate</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Infra → systemic → low</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Research → ambiguous → lowest</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>…but occasionally:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>When AI reshapes the problem (e.g., AlphaFold)</strong> → step-function acceleration</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:paragraph --></p>
+<p>What this means for teams</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Expect outsized gains in UI-heavy work</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Maintain strong senior ownership in backend and infra</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>In research: expect uneven—but sometimes breakthrough-level—acceleration</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:paragraph --></p>
+<p>The open question:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If AlphaFold is a glimpse of what’s possible…</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>which layer flips next?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This is Xiaobo, a thinker and practicer of AI. Please share your views and comments</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2026/04/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

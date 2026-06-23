@@ -1,0 +1,139 @@
+---
+layout: post
+title: How to Find Public IP Address of AWS EC2 or Lightsail VM
+date: 2024-08-26 06:12:59.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Cloud
+- Devops
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>When working with AWS EC2 or Lightsail virtual machines (VMs), knowing your public IP address is essential for managing network access or setting up services. There are various ways to get the public IP address of your instance directly from the terminal without relying on third-party websites.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Below, I'll walk through some quick and efficient methods to retrieve your public IP address on AWS EC2 or Lightsail.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Step 1: Connect to Your AWS Instance via SSH</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Before fetching the public IP address, you need to SSH into your AWS EC2 or Lightsail instance. Use the following command:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>$ ssh ec2-user@&lt;instance_name&gt;</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Replace <code>&lt;instance_name&gt;</code> with the name or IP address of your instance.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Step 2: Use <code>dig</code> to Find Your Public IP</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>One of the fastest methods to find the public IP address of your instance is to use the <code>dig</code> command with DNS resolvers that return your public-facing IP.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading">Method 1: Using OpenDNS Resolver</h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Run the following <code>dig</code> command to get your public IP via OpenDNS:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>$ dig +short myip.opendns.com @resolver1.opendns.com</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This command queries OpenDNS's resolver, which responds with the public IP of your instance. It's a simple and reliable method.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading">Method 2: Using Google DNS Resolver</h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Alternatively, you can use Google’s DNS resolver with this command:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>$ dig TXT +short o-o.myaddr.l.google.com @ns1.google.com</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>The response will include your public IP address, typically in a text format</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Step 3: Use <code>curl</code> to Retrieve IP</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Another convenient option to check your public IP is by using a simple HTTP request with <code>curl</code>. AWS provides an endpoint that returns your public IP address:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>$ curl http://checkip.amazonaws.com</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This command will output your public IP address as plain text.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Why These Methods are Preferred</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Speed:</strong> These commands directly query DNS servers or an AWS endpoint, making them faster and more reliable than using external websites.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Security:</strong> Since you’re not relying on third-party services, the commands are more secure.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Simplicity:</strong> No additional software or tools are needed beyond basic utilities like <code>dig</code> or <code>curl</code>, which are often pre-installed on most Linux distributions.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Summary of Commands</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dig +short myip.opendns.com @resolver1.opendns.com</code></td>
+<td>Get public IP using OpenDNS resolver</td>
+</tr>
+<tr>
+<td><code>dig TXT +short o-o.myaddr.l.google.com @ns1.google.com</code></td>
+<td>Get public IP using Google’s DNS resolver</td>
+</tr>
+<tr>
+<td><code>curl http://checkip.amazonaws.com</code></td>
+<td>Get public IP using AWS’s <code>checkip</code> endpoint</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Conclusion</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Knowing how to quickly find the public IP address of your AWS EC2 or Lightsail instance can save you time and make managing your instance more efficient. Whether you use <code>dig</code> or <code>curl</code>, these methods are reliable and don’t require third-party services, ensuring both speed and security.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/08/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

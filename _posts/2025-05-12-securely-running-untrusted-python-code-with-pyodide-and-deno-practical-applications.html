@@ -1,0 +1,262 @@
+---
+layout: post
+title: 'Securely Running Untrusted Python Code with Pyodide and Deno: Practical Applications'
+date: 2025-05-12 06:41:05.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>In today’s digital landscape, executing untrusted Python code safely is crucial for applications like AI agents, educational platforms, and online code execution services. Combining Pyodide and Deno offers a robust solution:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Pyodide</strong> compiles Python to WebAssembly (WASM), enabling Python execution in a browser or JavaScript environment.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Deno</strong> is a secure JavaScript/TypeScript runtime that provides fine-grained permission controls and a modern development experience.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Together, they allow for executing untrusted Python code in a sandboxed environment, ensuring safety and isolation.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🎯 Real-World Applications</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>1. AI Agents and Chatbots</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>AI agents often need to execute dynamically generated Python code. Using Pyodide within Deno ensures that this code runs in a secure, isolated environment, preventing potential security risks. For instance, Pydantic’s mcp-run-python server facilitates this by providing a sandboxed execution environment.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>2. Educational Platforms</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Online coding platforms can allow students to write and execute Python code without risking the host system’s integrity. By leveraging Pyodide and Deno, these platforms can offer real-time code execution in a browser, enhancing the learning experience.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>3. Online Code Execution Services</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Services that allow users to run Python snippets online can benefit from this setup. It ensures that each code execution is sandboxed, preventing malicious code from affecting other users or the server.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Check few options below:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🔧 Implementing a Pyodide Sandbox with Deno</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>For a lightweight and customizable approach, integrating Pyodide directly within a Deno script is effective. Simon Willison provides an insightful example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import pyodideModule from "npm:pyodide/pyodide.js";
+import { readLines } from "https://deno.land/std@0.186.0/io/mod.ts";
+
+const pyodide = await pyodideModule.loadPyodide();
+
+for await (const line of readLines(Deno.stdin)) {
+    let input;
+    try {
+        input = JSON.parse(line);
+    } catch (error) {
+        console.log(JSON.stringify({ error: "Invalid JSON input: " + error.message }));
+        continue;
+    }
+
+    if (input.shutdown) {
+        break;
+    }
+
+    try {
+        const result = await pyodide.runPythonAsync(input.code || "");
+        console.log(JSON.stringify({ output: result }));
+    } catch (error) {
+        console.log(JSON.stringify({ error: error.message.trim().split('\n').pop() || '' }));
+    }
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This script reads Python code from standard input, executes it using Pyodide, and outputs the result. It’s a straightforward method to sandbox Python execution without external dependencies.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧰 Leveraging LangChain’s PyodideSandbox</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>For applications requiring stateful execution and integration with AI workflows, LangChain’s PyodideSandbox offers a higher-level abstraction:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from langchain_sandbox import PyodideSandbox
+
+
+async def main():
+    # Create a PyodideSandbox instance
+    sandbox = PyodideSandbox("./sessions", allow_net=True)
+
+    # Code to execute
+    code = """
+    import numpy as np
+    x = np.array([1, 2, 3])
+    print(x)
+    """
+
+    # Execute the code in the sandbox
+    result = await sandbox.execute(code, session_id="123")
+    print(result.stdout)
+
+import asyncio 
+asyncio.run(main())</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This setup allows for persistent sessions, enabling variables and imports to be maintained across executions. It’s particularly useful for interactive environments and AI agents.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🤖 Deploying Pydantic’s MCP Run Python Server</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Pydantic’s mcp-run-python server provides a ready-to-use solution for executing Python code securely:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":1} --></p>
+<ol start="1" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Run the Server</strong>:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>deno run -N -R=node_modules -W=node_modules --node-modules-dir=auto jsr:@pydantic/mcp-run-python stdio</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":2} --></p>
+<ol start="2" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Integrate with PydanticAI</strong>:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+code = """
+import numpy
+a = numpy.array([1, 2, 3])
+print(a)
+a
+"""
+server_params = StdioServerParameters(
+    command='deno',
+    args=[
+        'run',
+        '-N',
+        '-R=node_modules',
+        '-W=node_modules',
+        '--node-modules-dir=auto',
+        'jsr:@pydantic/mcp-run-python',
+        'stdio',
+    ],
+)
+
+
+async def main():
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            tools = await session.list_tools()
+            print(len(tools.tools))
+            #&gt; 1
+            print(repr(tools.tools[0].name))
+            #&gt; 'run_python_code'
+            print(repr(tools.tools[0].inputSchema))
+            <em>"""
+            {'type': 'object', 'properties': {'python_code': {'type': 'string', 'description': 'Python code to run'}}, 'required': ['python_code'], 'additionalProperties': False, '$schema': 'http://json-schema.org/draft-07/schema#'}
+            """</em>
+            result = await session.call_tool('run_python_code', {'python_code': code})
+            print(result.content[0].text)
+            <em>"""
+            &lt;status&gt;success&lt;/status&gt;
+            &lt;dependencies&gt;["numpy"]&lt;/dependencies&gt;
+            &lt;output&gt;
+            [1 2 3]
+            &lt;/output&gt;
+            &lt;return_value&gt;
+            [
+              1,
+              2,
+              3
+            ]
+            &lt;/return_value&gt;
+            """</em>
+
+import asyncio
+asyncio.run(main())</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This approach is ideal for integrating Python execution into AI agents, offering features like automatic dependency management and detailed error reporting.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>⚠️ Considerations</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Security</strong>: While these methods provide isolation, it’s essential to understand that the security relies on the robustness of Deno’s runtime and Pyodide’s implementation. Always assess the risk based on your application’s requirements.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Performance</strong>: Using WebAssembly introduces some overhead. For performance-critical applications, evaluate the trade-offs between security and execution speed.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Limitations</strong>: Certain Python modules, especially those requiring native extensions, may not be supported in Pyodide. Ensure that the necessary libraries are compatible with Pyodide’s environment.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:paragraph --></p>
+<p>By leveraging Pyodide and Deno, you can create a secure and efficient sandbox for executing Python code, tailored to your specific needs and constraints.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Hope you find this helpful.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

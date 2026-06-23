@@ -1,0 +1,102 @@
+---
+layout: post
+title: Delete docker images with same name
+date: 2023-05-16 05:25:24.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+tags: []
+meta: {}
+render_with_liquid: false
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>To delete all docker images with the same name but different tags and keep only the newest image, you can use the following command: docker images --format='{{.Repository}}: {{.ID}} {{.Tag}} {{.CreatedAt}}' | grep "nginx:" | sort -k 2 -r | awk 'NR&gt;1 {print $2}'<strong>| xargs docker rmi -f</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here is what each part of the command does:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>
+<strong>docker images --format ' {{.Repository}}: {{.ID}} {{.Tag}} {{.CreatedAt}}'</strong>: This command lists all the docker images in your system along with their repository, tag and creation date.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>grep "TestImage:"</strong>: This command filters out all the images that have the name “TestImage”.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>sort -k 2 -r</strong>: This command sorts the filtered images by their tag in reverse order.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>awk 'NR&gt;1 {print $2}'</strong>: This command prints out all the image IDs except for the newest one.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>xargs docker rmi -f</strong>: This command removes all the image IDs that were printed out by the previous command.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can also remove docker images based on name using the following command: <strong>docker rmi $(docker images 'imagename' -q)</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here is what each part of the command does:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>
+<strong>docker images 'imagename' -q</strong>: This command lists all the image IDs for a given image name.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>docker rmi $(...)</strong>: This command removes all the image IDs that were printed out by the previous command.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you want to delete all images with the same name, you can use the following command: <strong>docker image rm $(docker image ls -a | grep "imagename" | awk '{print $3}')</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here is what each part of the command does:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>
+<strong>docker image ls -a</strong>: This command lists all the docker images in your system.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>grep "imagename"</strong>: This command filters out all the images that have the name “imagename”.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>awk '{print $3}'</strong>: This command prints out all the image IDs.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>docker image rm $(...)</strong>: This command removes all the image IDs that were printed out by the previous command.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>I hope this helps! Let me know if you have any other questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

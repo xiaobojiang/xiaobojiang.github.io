@@ -1,0 +1,288 @@
+---
+layout: post
+title: Getting started with OpenAI structured outputs
+date: 2025-08-11 05:24:50.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:heading {"level":1,"fontSize":"small"} --><html><body></p>
+<h1 class="wp-block-heading has-small-font-size">How to enforce predictable, schema-based LLM responses with Pydantic and.parse()</h1>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>📌 Introduction</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>In August 2024, OpenAI launched Structured Outputs, a feature that lets you lock LLM responses to a strict format you define.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Why is this a big deal?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Because LLMs love being “creative” — sometimes too much. Even when you ask for a list or a single word, they might give you a sentence, bullet points, or something else entirely.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>With Structured Outputs, you define the schema once, and every response must match it. No more broken JSON. No more regex hacks.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🛠 1. Setting Up</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>You’ll need:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Python 3.10+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>An <a href="https://platform.openai.com">OpenAI API key</a>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>openai and pydantic installed</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>pip install -U openai pydantic</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Test your setup:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from openai import OpenAI
+
+client = OpenAI()
+
+response = client.chat.completions.create(
+
+    model="gpt-4o-mini",
+
+    messages=[
+
+        {"role": "system", "content": "You are a helpful assistant."},
+
+        {"role": "user", "content": "Say hello!"}
+
+    ],
+
+    max_tokens=5
+
+)
+
+print(response.choices[0].message.content.strip())
+
+→ "Hello!"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>📐 2. Define Your Schema with Pydantic</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Structured Outputs require a Pydantic model to describe the exact response structure.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example: a simple sentiment schema ⬇️</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from pydantic import BaseModel
+
+from typing import Literal
+
+class SentimentResponse(BaseModel):
+
+    sentiment: Literal["positive", "negative", "neutral"]</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This enforces:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Only the sentiment field</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Only these 3 allowed values</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>📦 3. Using .parse() to Enforce the Schema</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Instead of create(), use .parse() and pass response_format=YourModel.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>response = client.beta.chat.completions.parse(
+
+    model="gpt-4o-mini",
+
+    messages=[
+
+        {"role": "system", "content": "Classify sentiment."},
+
+        {"role": "user", "content": "The room was clean and the staff was friendly."}
+
+    ],
+
+    response_format=SentimentResponse
+
+)
+
+print(response.choices[0].message.parsed.sentiment)
+
+→ "positive"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now every result matches your schema. No extra text, no surprises.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧩 4. Nested Schemas for Complex Data</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Pydantic lets you define nested models for hierarchical data.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example: Extract user info with addresses:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>class Address(BaseModel):
+
+    street: str
+
+    city: str
+
+    state: str
+
+    zip_code: str
+
+class UserInfo(BaseModel):
+
+    name: str
+
+    email: str
+
+    phone: str
+
+    addresses: list[Address]</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>LLM output will always match this structure — even for multiple addresses.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🔌 5. Function Calling + Structured Outputs</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Before Structured Outputs, defining function call schemas meant hand-writing long JSON schemas.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>class WeatherData(BaseModel):
+
+    location: str
+
+    unit: Literal["celsius", "fahrenheit"]
+
+    condition: Literal["sunny", "cloudy", "rainy", "snowy"]
+
+tools = [openai.pydantic_function_tool(WeatherData)]</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This auto-generates a function-call-compatible schema for the API.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You just feed it to tools= and let the model produce structured arguments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>💡 6. Best Practices</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>✅ Keep schemas simple &amp; specific</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>✅ Use Literal for enums</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>✅ Add field descriptions with Field()</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>✅ Handle refusals via .refusal attribute</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>✅ Use .parsed instead of manual JSON parsing</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example with descriptions:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from pydantic import Field
+
+class Person(BaseModel):
+
+    name: str = Field(..., description="Full name")
+
+    age: int = Field(..., description="Age in years")
+
+    occupation: str = Field(..., description="Current job title")</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🎯 Conclusion</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Structured Outputs make LLMs predictable, safe, and production-ready.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>By pairing Pydantic models with .parse(), you can:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Guarantee output formats</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Reduce prompt-engineering time</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Simplify function calling</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading, hope this helps.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/08/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

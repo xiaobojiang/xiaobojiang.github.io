@@ -1,0 +1,77 @@
+---
+layout: post
+title: Special character in Regex
+date: 2024-08-09 09:03:07.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>In regular expressions (regex), for example, the | character (also known as a pipe or vertical bar) is used to denote an OR condition. Here are explanations for more special characters:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Character Classes with Alternatives:<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>[xyz] or [a-c]: Matches any one of the enclosed characters. For instance, [abcd] is equivalent to [a-d] and matches the “b” in “brisket” and the “c” in “chop.”</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>[^xyz] or [^a-c]: Negated character class. Matches anything that is not enclosed in the square brackets. For example, [^abc] is equivalent to [^a-c] and initially matches “o” in “bacon” and “h” in “chop.”</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Wildcard:<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>. (dot): Matches any single character except line terminators (\n, \r, \u2028, or \u2029). For instance, /a.y/ matches “amy,” “any,” and “aay,” but not “aye.”</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Word Boundaries:<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>\\b: Represents a word boundary. It matches the position between a word character (alphanumeric or underscore) and a non-word character. For example, /\\bcat\\b/ matches the whole word “cat” but not “category” or “scat.”</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Alternation:<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>humor|humour: Matches either “humor” or “humour.” The | acts as an OR operator, allowing flexibility in matching variations of a word.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Remember that regex patterns can be more complex, combining various elements to match specific patterns within strings. If you have any more questions or need further examples, feel free to ask! 😊</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/08/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

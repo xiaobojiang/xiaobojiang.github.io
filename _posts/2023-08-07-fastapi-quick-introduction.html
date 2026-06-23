@@ -1,0 +1,140 @@
+---
+layout: post
+title: FastAPI - quick introduction
+date: 2023-08-07 07:21:15.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.7+ based on standard Python type hints. It is one of the fastest Python frameworks available1. The key features of FastAPI are:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>Fast: Very high performance, on par with NodeJS and Go (thanks to Starlette and Pydantic).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Fast to code: Increase the speed to develop features by about 200% to 300%.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Fewer bugs: Reduce about 40% of human (developer) induced errors.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Intuitive: Great editor support. Completion everywhere. Less time debugging.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Easy: Designed to be easy to use and learn. Less time reading docs.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Short: Minimize code duplication. Multiple features from each parameter declaration. Fewer bugs.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Robust: Get production-ready code. With automatic interactive documentation.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Standards-based: Based on (and fully compatible with) the open standards for APIs: OpenAPI (previously known as Swagger) and JSON Schema.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>FastAPI/Django/Flask</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Django, Flask, and FastAPI are all Python web frameworks used when developing web applications. Django is a full-stack web development framework that is popular for its robust and straightforward nature. Flask is a microframework that is more flexible than Django. FastAPI is a modern, fast (high-performance), web framework for building APIs with Python 3.7+ based on standard Python type hints.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>FastAPI is faster than Flask and Django in terms of performance. Flask is more flexible than Django.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Hands on Example</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+@app.get("/items/{item_id}")
+async def read_item(item_id: int, q: str = None):
+    return {"item_id": item_id, "q": q}
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This code creates two routes: one for the root URL and one for URLs that include an item ID. When the user navigates to the root URL, the <strong>root()</strong> function is called and returns a JSON object with a message. When the user navigates to a URL that includes an item ID (e.g., <strong>/items/42</strong>), the <strong>read_item()</strong> function is called and returns a JSON object with the item ID and any query parameters.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>q</strong> is a query parameter that can be used to pass additional information to an API endpoint. Query parameters are optional parameters that can be included in a URL after a question mark (<strong>?</strong>). They are used to filter or modify the results returned by an API endpoint.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For example, in the following URL:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>/items/42?q=some-query</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Start the server</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>FastAPI uses Uvicorn as the default server. Uvicorn is an ASGI server that can be run with a variety of different web servers.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>By default, Uvicorn binds to <strong>localhost</strong> on port <strong>8000</strong>. You can change the host and port by passing command-line arguments to the Uvicorn server.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import uvicorn
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World”}
+
+@app.get("/items/{item_id}")
+async def read_item(item_id: int, q: str = None):
+    return {"item_id": item_id, "q": q}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>What is Uvicorn</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Uvicorn is a lightning-fast ASGI server that can be used to run Python web applications. It is designed to be fast and efficient, making it an ideal choice for high-performance applications.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>ASGI stands for Asynchronous Server Gateway Interface. It is a standard interface between web servers and Python web applications or frameworks. ASGI is designed to support asynchronous programming, which can improve the performance of web applications by allowing them to handle more requests at the same time.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>FastAPI uses ASGI as its underlying interface for handling HTTP requests and responses.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Fire up:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":769,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2023/08/image.png" alt="" class="wp-image-769"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>That's it. hope you enjoy it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/08/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

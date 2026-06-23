@@ -1,0 +1,99 @@
+---
+layout: post
+title: Call async function in scheduler - Python
+date: 2024-06-17 09:02:03.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:list {"ordered":true} --><html><body></p>
+<ol>
+<!-- wp:list-item --></p>
+<li>Define <code>download_and_parse_files</code> as an asynchronous function.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Use a separate function to handle the invocation of the async function within the job.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here’s a full example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import asyncio
+from apscheduler.schedulers.background import BackgroundScheduler
+
+# Define your asynchronous function
+async def download_and_parse_files():
+    # Your async code here
+    await asyncio.sleep(1)
+    print("Files downloaded and parsed")
+
+# Define a wrapper function to run the async function
+def run_async_job():
+    asyncio.run(download_and_parse_files())
+
+# Create a scheduler instance
+scheduler = BackgroundScheduler()
+
+# Schedule the job
+scheduler.add_job(run_async_job, 'interval', seconds=10)
+
+# Start the scheduler
+scheduler.start()
+
+# Keep the script running
+try:
+    while True:
+        pass
+except (KeyboardInterrupt, SystemExit):
+    scheduler.shutdown()
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Explanation:</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<!-- wp:list-item --></p>
+<li>
+<strong>Asynchronous Function</strong>: <code>download_and_parse_files</code> is defined as an async function using <code>async def</code>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Wrapper Function</strong>: <code>run_async_job</code> is a synchronous function that calls <code>asyncio.run(download_and_parse_files())</code>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Scheduler Setup</strong>: <code>scheduler.add_job(run_async_job, 'interval', seconds=10)</code> schedules the <code>run_async_job</code> function to run every 10 seconds.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>By separating the async function from its invocation, this approach ensures compatibility with APScheduler, which expects synchronous callable jobs.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If we want to call the async function directly in scheduler, then use this line</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>scheduler.add_job(lambda:asyncio.run(download_and_parse_files()), 'interval', seconds=10)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thank for your reading.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/06/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

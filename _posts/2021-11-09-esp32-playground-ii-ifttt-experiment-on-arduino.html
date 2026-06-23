@@ -1,0 +1,350 @@
+---
+layout: post
+title: ESP32 Playground - II - IFTTT experiment on Arduino
+date: 2021-11-09 07:13:50.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Internet of Things
+- Technology
+tags: []
+meta:
+  _oembed_017ed8a2e1c924db228fd372283c4df1: "{{unknown}}"
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>This is the second post of ESP32 playground.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In previous post (https://www.iotcolon.com/?p=212), brief introduction of ESP32 and IDE setup are addressed.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Till now, we already have a working IDE of Arduino or VS code.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Target</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this post,  we will try an example application of IFTTT + ESP32, the final goal is when user press the button on the ESP32 board, one say-hi email will be sent to your mail box. All the code will be written and composed on Arduino IDE.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":233,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/IFTTT.drawio.png" alt="" class="wp-image-233"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 1. main flow for ESP32 + IFTTT experiment </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>What is IFTTT?</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If This Then That (commonly known as IFTTT, /ɪft/), is a web-based service that allows users to create chains of conditional statements triggered by changes that occur within other web services. It is both a website and a mobile app of free service with the following slogan: "Put the Internet to work for you".</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>IFTTT aims to help people use the open API of various websites to monitor the triggers set by users. If triggers are triggered, actions set by users will be executed. Actions can be email, sms, or even write a blog. Usually, we can create n applets to meet our various automation needs.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":234,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-15.png" alt="" class="wp-image-234"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 2. IFTTT, what it is?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Prerequisite of experiment</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Before this experiment, something needs to be prepared:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>One Dfrobot ESP32-E board</li>
+<li>Arduino IDE</li>
+<li>IFTTT account</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Configure Arduino IDE</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Some extra configuration are required for Arduino IDE.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>First please follow previous post to install ESP32 boards in Arduino IDE.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Second you need to install “ArduinoJson” library, this library helps you to compose json object. You can install it in menu: Sketch -&gt; Include Library -&gt; Manage Library. In the library manager, search “ArduinoJson”, and select the one whose author is Benoit and install.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":235,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-16.png" alt="" class="wp-image-235"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 3. Install ArduinoJson </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Configure IFTTT</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, enter IFTTT website (ifttt.com), login with your account. If you do not have one, you can register one in short time.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":236,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-17.png" alt="" class="wp-image-236"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 4. Create new applet</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, Click “create” to make a new applet.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":237,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-18.png" alt="" class="wp-image-237"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 5. main elements in a new applet</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, Follow the guide, we need to define the “If this”, which is the event. Let us click add, search and find the “webhooks”. Check more details of webhook in : https://ifttt.com/maker_webhooks</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":238,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-19.png" alt="" class="wp-image-238"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 6. choose webhooks as event </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then select “Receive a web request”.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":239,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-20.png" alt="" class="wp-image-239"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 7. select "Receive a web request" in webhooks</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Provide this event with a name, like “button_pressed”, then click “Create trigger”</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":240,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-21.png" alt="" class="wp-image-240"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 8. input a name for event</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>With all these settings, you can make a POST or GET web request to trigger the event:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://maker.ifttt.com/trigger/{event_name}/with/key/{your_key}">https://maker.ifttt.com/trigger/{event_name}/with/key/{your_key}</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>With an optional JSON body of:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>{ "value1" : "", "value2" : "", "value3" : "" }</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The data is completely optional, and you can also pass value1, value2, and value3 as query parameters or form variables. This content will be passed on to the action in your Applet.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>4, We also need to define “Then That”, which is the action to trigger.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Choose “Email” as the action service.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":241,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-22.png" alt="" class="wp-image-241"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 9. select email as action service</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Click next step.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, if we have not registered any email address before. A pop window will ask input for email address, pin code to valid your mail box. Just follow the guide, those pics will be skipped here.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":242,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-23.png" alt="" class="wp-image-242"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 10. select "Send me an email"</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We can customize the email subject and body text, in which “EventName, Value1, Value2, Value3” come from the webhook event request.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":243,"sizeSlug":"large","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img src="{{site.baseurl}}/assets/2021/11/image-24-616x1024.png" alt="" class="wp-image-243"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 11. customize email template </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>5, click the finish to complete the whole applet, its status is connected. We can drag the radio button to connect or disconnect this applet. If this applet is not desired, click Archive button to disable it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":245,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-26.png" alt="" class="wp-image-245"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 12. a complete applet with event and action defined</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Cofiguration of IFTTT is done, now if we make a web request to IFTTT event url, a mail with defined subject and payload will be sent to our mail box.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Coding and flash with Arduino</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Coding part would be simple, the program first provides WiFi SSID and password to ESP32 to make it connected to AP, then listening for the button pressed (pin27), finally, if button pressed, it will make a post request to IFTTT webhook url.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Following is the whole code</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#include &lt;WiFi.h&gt;
+#include &lt;HTTPClient.h&gt;
+#include &lt;ArduinoJson.h&gt;
+
+#define BUTTON_PIN  D4
+
+const char* WIFI_SSID     = "ssid";
+const char* WIFI_PASSWORD = "password";
+const char* ntpServer = "pool.ntp.org";
+const long gmtOffset_sec = 28800;
+const int daylightOffset_sec = 0;
+
+String IFTTT_EVENT   = "button_pressed";
+String IFTTT_KEY     = "my_key";
+
+String IFTTT_VALUE_1 = "hi";
+String IFTTT_VALUE_2 = "greeting";
+String IFTTT_VALUE_3 = "0";
+
+HTTPClient http;
+unsigned long lastTime = 0;
+unsigned long timerDelay = 10000;
+DynamicJsonDocument doc(1024);
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.println("Connecting");
+  while(WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.print("wifi connect success");
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+}
+
+unsigned int lastState = HIGH;
+unsigned int currentState;
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  currentState = digitalRead(BUTTON_PIN);
+
+  if(lastState == HIGH &amp;&amp; currentState == LOW)
+  {
+    //pressed
+    String url = "https://maker.ifttt.com/trigger/"+IFTTT_EVENT+"/with/key/"+IFTTT_KEY;
+    doc["value1"] = IFTTT_VALUE_1;
+    doc["value2"] = IFTTT_VALUE_2;
+    doc["value3"] = IFTTT_VALUE_3;
+    String json;
+    serializeJson(doc, json);
+    Serial.println(url);
+    Serial.println(json);
+    http.begin(url);
+    http.addHeader("Content-Type","application/json");
+    int httpCode = http.POST(json);
+    if (httpCode == HTTP_CODE_OK)
+    {
+      Serial.println("IFTTT triggered!");
+    }
+    else
+    {
+      Serial.println("IFTTT trigger failed!");
+    }
+    http.end();
+    
+    
+  }
+  else if(lastState == LOW &amp;&amp; currentState == HIGH)
+  {
+    //released
+  }
+  lastState = currentState;
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Compile and download the code to ESP32 board. Some points may need attention: 1, make sure the board is “FireBeetle-ESP32” 2, always select the right serial port, 3, please change the upload speed Frequency to lower value if multiple flashing failures are observed. Eg make the upload speed to “460800”.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":244,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-25.png" alt="" class="wp-image-244"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 13. adjust arduino flashing settings</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Try the program, press the button, and wait in the mail box.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Bingo, after few seconds, we can find a new mail from IFTTT, it works!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":246,"width":840,"height":583,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><img src="{{site.baseurl}}/assets/2021/11/image-27.png" alt="" class="wp-image-246" width="840" height="583"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 14. mail received</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>That's all for the post, in the next post, we will experiment on making the same feature with ESP-IDF on VS code.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have questions or comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/11/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

@@ -1,0 +1,312 @@
+---
+layout: post
+title: 'Power tool to build UI with python: Kivy'
+date: 2021-09-30 05:24:02.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>How to build UI with python, there might be many options. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here I would like to recommand Kivy.It comes with native support for many multi-touch input devices, a growing library of multi-touch aware widgets and hardware accelerated OpenGL drawing. Kivy is designed to let you focus on building custom and highly interactive applications as quickly and easily as possible.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Key concept: properties, UI layout with code, event, kv language</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"large"} --></p>
+<p class="has-large-font-size">Introduction </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>With Kivy, you can take full advantage of the dynamic nature of Python. There are thousands of high-quality, free libraries that can be integrated in your application. At the same time, performance-critical parts are implemented using <a href="http://cython.org/">Cython</a>.Using Kivy on your computer, you can create apps that run on:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"style":{"typography":{"fontSize":"12px"}}} --></p>
+<ul style="font-size:12px">
+<li>Desktop computers: OS X, Linux, Windows.</li>
+<li>iOS devices: iPad, iPhone.</li>
+<li>Android devices: tablets, phones.</li>
+<li>Any other touch-enabled professional/homebrew devices supporting TUIO (Tangible User Interface Objects).</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:image {"id":147,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-10.png" alt="" class="wp-image-147"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Some key concepts in Kivy:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Properties</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>using Kivy’s properties:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>class MyClass(EventDispatcher):
+    numeric_var = NumericProperty(1)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>These properties implement the <a href="http://en.wikipedia.org/wiki/Observer_pattern">Observer pattern</a>. They help you to:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"style":{"typography":{"fontSize":"12px"}}} --></p>
+<ul style="font-size:12px">
+<li>Easily manipulate widgets defined in the <a href="https://kivy.org/doc/stable/guide/lang.html">Kv language</a>
+</li>
+<li>Automatically observe any changes and dispatch functions/code accordingly</li>
+<li>Check and validate values</li>
+<li>Optimize memory management</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>To use them, <strong>you have to declare them at class level</strong>. That is, directly in the class, not in any method of the class. A property is a class attribute that will automatically create instance attributes. Each property by default provides an on_&lt;propertyname&gt; event that is called whenever the property’s state/value changes.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Kivy provides the following properties:<a href="https://kivy.org/doc/stable/api-kivy.properties.html#kivy.properties.NumericProperty">NumericProperty</a>, <a href="https://kivy.org/doc/stable/api-kivy.properties.html#kivy.properties.StringProperty">StringProperty</a>, <a href="https://kivy.org/doc/stable/api-kivy.properties.html#kivy.properties.ListProperty">ListProperty</a>, <a href="https://kivy.org/doc/stable/api-kivy.properties.html#kivy.properties.ObjectProperty">ObjectProperty</a>, <a href="https://kivy.org/doc/stable/api-kivy.properties.html#kivy.properties.BooleanProperty">BooleanProperty</a>, <a href="https://kivy.org/doc/stable/api-kivy.properties.html#kivy.properties.BoundedNumericProperty">BoundedNumericProperty</a>, <a href="https://kivy.org/doc/stable/api-kivy.properties.html#kivy.properties.OptionProperty">OptionProperty</a>, <a href="https://kivy.org/doc/stable/api-kivy.properties.html#kivy.properties.ReferenceListProperty">ReferenceListProperty</a>, <a href="https://kivy.org/doc/stable/api-kivy.properties.html#kivy.properties.AliasProperty">AliasProperty</a>, <a href="https://kivy.org/doc/stable/api-kivy.properties.html#kivy.properties.DictProperty">DictProperty</a><br></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Event</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Kivy is mostly <a href="http://en.wikipedia.org/wiki/Event-driven_programming">event-based</a>, meaning the flow of the program is determined by events.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Clock events</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":143,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-6.png" alt="" class="wp-image-143"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>The <a href="https://kivy.org/doc/stable/api-kivy.clock.html">Clock object</a> allows you to schedule a function call in the future as a one-time event with schedule_once(), or as a repetitive event with schedule_interval().You can also create Triggered events with create_trigger(). Triggers have the advantage of being called only once per frame, even if you have scheduled multiple triggers for the same callback.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Input events</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":146,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-8.png" alt="" class="wp-image-146"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>All the mouse click, touch and scroll wheel events are part of the <a href="https://kivy.org/doc/stable/api-kivy.input.motionevent.html#kivy.input.motionevent.MotionEvent">MotionEvent</a>, extended by <a href="https://kivy.org/doc/stable/api-kivy.input.postproc.html">Input Postprocessing</a> and dispatched through the <a href="https://kivy.org/doc/stable/api-kivy.core.window.html#kivy.core.window.WindowBase.on_motion">on_motion</a> event in the <a href="https://kivy.org/doc/stable/api-kivy.core.window.html#kivy.core.window.WindowBase">Window</a> class. This event then generates the <a href="https://kivy.org/doc/stable/api-kivy.uix.widget.html#kivy.uix.widget.Widget.on_touch_down">on_touch_down()</a>, <a href="https://kivy.org/doc/stable/api-kivy.uix.widget.html#kivy.uix.widget.Widget.on_touch_move">on_touch_move()</a> and <a href="https://kivy.org/doc/stable/api-kivy.uix.widget.html#kivy.uix.widget.Widget.on_touch_up">on_touch_up()</a> events in the <a href="https://kivy.org/doc/stable/api-kivy.uix.widget.html#kivy.uix.widget.Widget">Widget</a>.For an in-depth explanation, have a look at <a href="https://kivy.org/doc/stable/api-kivy.input.html">Input management</a>.<strong>Class events</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":148,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-11.png" alt="" class="wp-image-148"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Our base class <a href="https://kivy.org/doc/stable/api-kivy.event.html#kivy.event.EventDispatcher">EventDispatcher</a>, used by <a href="https://kivy.org/doc/stable/api-kivy.uix.widget.html#kivy.uix.widget.Widget">Widget</a>, uses the power of our <a href="https://kivy.org/doc/stable/api-kivy.properties.html">Properties</a> for dispatching changes. This means when a widget changes its position or size, the corresponding event is automatically fired.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In addition, you have the ability to create your own events using <a href="https://kivy.org/doc/stable/api-kivy.event.html#kivy.event.EventDispatcher.register_event_type">register_event_type()</a>, as the on_press and on_release events in the <a href="https://kivy.org/doc/stable/api-kivy.uix.button.html#kivy.uix.button.Button">Button</a> widget demonstrate.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Another thing to note is that if you override an event, you become responsible for implementing all its behaviour previously handled by the base class. The easiest way to do this is to call super():</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>def on_touch_down(self, touch):
+    if super(OurClassName, self).on_touch_down(touch):
+        return True
+    if not self.collide_point(touch.x, touch.y):
+        return False
+    print('you touched me!')
+    return True</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":144,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-7.png" alt="" class="wp-image-144"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Kivy properties, by default, provide an on_&lt;property_name&gt; event. This event is called when the value of the property is changed.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>Note</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>If the new value for the property is equal to the current value, then the on_&lt;property_name&gt; event will not be called.For example, consider the following code:</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>  class CustomBtn(Widget):
+
+     pressed = ListProperty([0, 0])
+
+     def on_touch_down(self, touch):
+         if self.collide_point(*touch.pos):
+             self.pressed = touch.pos
+             return True
+         return super(CustomBtn, self).on_touch_down(touch)
+
+     def on_pressed(self, instance, pos):
+         print ('pressed at {pos}'.format(pos=pos))</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the code above at line 3:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>pressed = ListProperty([0, 0])</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>We define the pressed Property of type <a href="https://kivy.org/doc/stable/api-kivy.properties.html#kivy.properties.ListProperty">ListProperty</a>, giving it a default value of [0, 0]. From this point forward, the on_pressed event will be called whenever the value of this property is changed.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>At Line 5:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>  def on_touch_down(self, touch):
+    if self.collide_point(*touch.pos):
+        self.pressed = touch.pos
+        return True
+    return super(CustomBtn, self).on_touch_down(touch)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>We override the on_touch_down() method of the Widget class. Here, we check for collision of the touch with our widget.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If the touch falls inside of our widget, we change the value of pressed to touch.pos and return True, indicating that we have consumed the touch and don’t want it to propagate any further.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally, if the touch falls outside our widget, we call the original event using super(…) and return the result. This allows the touch event propagation to continue as it would normally have occurred.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally on line 11:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>  def on_pressed(self, instance, pos):
+    print ('pressed at {pos}'.format(pos=pos))</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>We define an on_pressed function that will be called by the property whenever the property value is changed.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Kv Design Language</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Kivy provides a design language specifically geared towards easy and scalable GUI Design. The language makes it simple to separate the interface design from the application logic, adhering to the <a href="http://en.wikipedia.org/wiki/Separation_of_concerns">separation of concerns principle</a>. For example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":145,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-9.png" alt="" class="wp-image-145"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://kivy.org/doc/stable/_images/gs-lang.png"><br></a>In the above code :</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>  &lt;LoginScreen&gt;:  # every class in your app can be represented by a rule like
+                # this in the kv file
+    GridLayout: # this is how you add your widget/layout to the parent
+                # (note the indentation).
+        rows: 2 # this how you set each property of your widget/layout</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>That’s it, that’s how simple it is to design your GUI in the Kv language.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Layouts</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Layouts are containers used to arrange widgets in a particular manner.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://kivy.org/doc/stable/api-kivy.uix.anchorlayout.html#module-kivy.uix.anchorlayout">AnchorLayout</a>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Widgets can be anchored to the ‘top’, ‘bottom’, ‘left’, ‘right’ or ‘center’.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":151,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image.gif" alt="" class="wp-image-151"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://kivy.org/doc/stable/api-kivy.uix.boxlayout.html#module-kivy.uix.boxlayout">BoxLayout</a>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Widgets are arranged sequentially, in either a ‘vertical’ or a ‘horizontal’ orientation.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":149,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-1.gif" alt="" class="wp-image-149"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://kivy.org/doc/stable/api-kivy.uix.floatlayout.html#module-kivy.uix.floatlayout">FloatLayout</a>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Widgets are essentially unrestricted.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":150,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-2.gif" alt="" class="wp-image-150"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://kivy.org/doc/stable/api-kivy.uix.relativelayout.html#module-kivy.uix.relativelayout">RelativeLayout</a>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Child widgets are positioned relative to the layout.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://kivy.org/doc/stable/api-kivy.uix.gridlayout.html#module-kivy.uix.gridlayout">GridLayout</a>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Widgets are arranged in a grid defined by the rows and cols properties.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":152,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-3.gif" alt="" class="wp-image-152"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://kivy.org/doc/stable/api-kivy.uix.pagelayout.html#module-kivy.uix.pagelayout">PageLayout</a>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Used to create simple multi-page layouts, in a way that allows easy flipping from one page to another using borders.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":153,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-4.gif" alt="" class="wp-image-153"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://kivy.org/doc/stable/api-kivy.uix.scatterlayout.html#module-kivy.uix.scatterlayout">ScatterLayout</a>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Widgets are positioned similarly to a RelativeLayout, but they can be translated, rotated and scaled.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://kivy.org/doc/stable/api-kivy.uix.stacklayout.html#module-kivy.uix.stacklayout">StackLayout</a>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Widgets are stacked in a lr-tb (left to right then top to bottom) or tb-lr order.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":154,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/09/image-5.gif" alt="" class="wp-image-154"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>When you add a widget to a layout, the following properties are used to determine the widget’s size and position, depending on the type of layout:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>size_hint</strong>: defines the size of a widget as a fraction of the parents size. Values are restricted to the range 0.0 - 1.0 i.e. 0.01 = 1/100th of the parent size (1%) and 1. = same size (100%).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>pos_hint</strong>: is used to place the widget relative to the parent.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The <strong>size_hint</strong> and <strong>pos_hint</strong> are used to calculate a widget’s size and position only if the value(s) are not set to None. If you set these values to None, the layout will not position/size the widget and you can specify the values (x, y, width, height) directly in screen coordinates.<br></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Further Explore</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>With those knowledges, you could already start build an app for yourself. Kivy website also provide a list of examples for you to explore: <a href="https://kivy.org/doc/stable/gettingstarted/examples.html">https://kivy.org/doc/stable/gettingstarted/examples.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In my github, I also transferred those examples into working code, please find the code in: <a href="https://github.com/xiaobojiang/kivy_playground">https://github.com/xiaobojiang/kivy_playground</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image --></p>
+<figure class="wp-block-image"><img src="{{site.baseurl}}/assets/2021/09/86cee532-155e-4342-ac37-032cb2c54e7a" alt=""></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have any questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/09/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

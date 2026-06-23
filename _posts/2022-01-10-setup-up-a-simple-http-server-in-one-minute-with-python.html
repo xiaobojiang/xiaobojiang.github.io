@@ -1,0 +1,134 @@
+---
+layout: post
+title: Setup up a simple http server in one minute with Python
+date: 2022-01-10 08:37:43.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Sometimes, when I setup a new network, eg a VPN tunnel, or a server is deployed in some VPC, I want to know that is the network or firewall properly configured.  </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The easiest way before deploying the service, is to setup a simple http service. Then with tools like telnet or curl, the service reachability can be easily verified.<br>I would like to provide some methods based on Python, which can help you quickly setup a server with few single lines.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br><strong>Method 1: SimpleHTTPServer </strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>What is it: This is the built-in web server lib in Python: SimpleHTTPServer, which comes with Python is a simple HTTP server that provides standard GET and HEAD request handlers.<br>How to use it:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ python -m SimpleHTTPServer</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This starts a HTTP server on port 8000 (which is the default port)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Be cautious: This will now show the files and directories which are in the current working directory.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can also change the port to other (eg.8080), with following command:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ python -m SimpleHTTPServer 8080</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you face the error: “No module named SimpleHTTPServer”<br>This is because SimpleHTTPServer is merged with http.server in python3. Please use the below command, replace SimpleHTTPServer with http.server:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ python3 -m http.server 8080</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Test it:Just use your favorite browser, type: https://&lt;server ip&gt;:&lt;port&gt;You shall see the directories.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":336,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2022/01/image-8.png" alt="" class="wp-image-336"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Or with curl:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":334,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2022/01/image-7.png" alt="" class="wp-image-334"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Comment:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It is easy, but only for testing purpose, and it will expose your files for others, be cautious.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Method 2: flask</strong><br>What is it?Flask is a web framework, it’s a Python module that lets you develop web applications easily.Flask is also easy to get started with as a beginner because there is little boilerplate code for getting a simple app up and running.<br>How to use it?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Installation:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ pip install flask</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>We will build a simple “Hello World” web application.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Prepare a file with name “app.py”<br>In the file, place few lines of code:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello_world():
+    return "&lt;p&gt;Hello, World!&lt;/p&gt;"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Run the server:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>With command </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ flask run —-port 8080
+* Environment: production
+WARNING: This is a development server. Do not use it in a production deployment.
+Use a production WSGI server instead.
+* Debug mode: off
+* Running on http://127.0.0.1:8080/ (Press CTRL+C to quit)
+127.0.0.1 - - [05/Jan/2022 11:03:33] "GET / HTTP/1.1" 200 -</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Test it:Try the <a href="http://localhost:8080/">http://localhost:8080</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p> in the browser, you shall get the “Hello World!"</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":333,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2022/01/image-5.png" alt="" class="wp-image-333"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>And this also works for curl:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":335,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2022/01/image-6.png" alt="" class="wp-image-335"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Comments:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Using flask requires few more lines of code, but it can be easily extended to more rich features, and support complicated http request.<br>These are the two methods to setup a simple http server in one minute.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/01/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

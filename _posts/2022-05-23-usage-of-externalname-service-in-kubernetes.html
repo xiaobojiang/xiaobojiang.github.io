@@ -1,0 +1,58 @@
+---
+layout: post
+title: Usage of externalName service in Kubernetes
+date: 2022-05-23 03:15:55.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Kubernetes
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p><em><em>An</em> </em><strong><em>ExternalName</em></strong><em> <em>Service</em> <em>is</em> <em>a</em> <em>special</em> <em>case</em> <em>of</em> <em>Service</em> <em>that</em> <em>does</em> <em>not</em> <em>have</em> <em>selectors</em> <em>and</em> <em>uses</em> <em>DNS</em> <em>names</em> <em>instead</em></em>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Services with type ExternalName work as other regular services, but when you want to access to that service name, instead of returning cluster-ip of this service, it returns CNAME record with value that mentioned in externalName.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>As example mentioned in <a href="https://kubernetes.io/docs/concepts/services-networking/service/#externalname">Kubernetes Documentation</a>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kind: Service
+apiVersion: v1
+metadata:
+  name: my-service
+spec:
+  type: ExternalName
+  externalName: my.database.example.com</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>When you want to do curl -v <a href="http://my-service/">http://my-service</a> or curl -v <a href="http://my-service.default.svc.cluster.local/">http://my-service.default.svc.cluster.local</a> according your namespace(in this example it is default), it will redirect you at the DNS level to <a href="http://my.database.example.com/">http://my.database.example.com</a> </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>ExternalName can be useful when in-cluster pods need to access resource outside of cluster (eg, database), and still keep accessing as like to one internal service. This can avoid hardcoding those configuration in application, and instead manage those address as a single service.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I hope it was useful.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Please leave a reply if you have any question.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

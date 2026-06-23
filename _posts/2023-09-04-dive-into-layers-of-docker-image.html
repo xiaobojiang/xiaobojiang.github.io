@@ -1,0 +1,84 @@
+---
+layout: post
+title: Dive into layers of docker image
+date: 2023-09-04 02:45:24.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph {"fontSize":"small"} --><html><body></p>
+<p class="has-small-font-size">Dive is a very handy tool to inspect docker image. it is "<strong>A tool for exploring a docker image, layer contents, and discovering ways to shrink the size of your Docker/OCI image.</strong>"</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I use this tool to review the changes I wrote in the dockerfile, and make sure everything is executed correctly.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Furthermore, we can use this tool to analyze the files and packages in the image.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It is hosted in github, <a href="https://github.com/wagoodman/dive">https://github.com/wagoodman/dive</a>. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Prepare a shell script, name is dive.sh</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>echo $1
+docker run --rm -it \
+-v /var/run/docker.sock:/var/run/docker.sock \
+quay.io/wagoodman/dive:latest $1</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Use dive again a image by following command:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sh dive.sh &lt;image url or id&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now we shall see UI similar to below image.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Upper left pannel is the layers of this image, including all steps we requested in the dockerfile.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Lower left pannel is the details of the image.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Right pannel is details of layer content, we can know which files are added or updated by exploring in the panel view.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":781,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2023/09/image-1-1024x636.png" alt="" class="wp-image-781"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the right panel: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>How to view changes: up and down in layer</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>How to see files changed: tab to “Current Layer details”</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In current Layer details: shift + space to unfold and explore changes.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":782,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2023/09/image-1024x270.png" alt="" class="wp-image-782"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thank for your time reading, hope it is useful.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/09/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

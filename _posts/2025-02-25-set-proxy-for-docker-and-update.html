@@ -1,0 +1,125 @@
+---
+layout: post
+title: Set proxy for Docker and update
+date: 2025-02-25 10:15:29.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>To set a proxy for container traffic, you can configure the Docker daemon or set environment variables directly on the container. Here’s a short overview of both methods:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li><strong>Set Proxy for Docker Daemon (Global Setting)</strong></li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>To set a global proxy for all containers, update the Docker daemon’s configuration.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Step 1: Create or edit a file at /etc/systemd/system/docker.service.d/http-proxy.conf (or /etc/default/docker on older systems):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>[Service]
+Environment="HTTP_PROXY=http://your-proxy:port"
+Environment="HTTPS_PROXY=http://your-proxy:port"
+Environment="NO_PROXY=localhost,127.0.0.1,.yourdomain.com"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>•Step 2: Restart the Docker service:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>sudo systemctl daemon-reload
+sudo systemctl restart docker</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Step 3: Restart or recreate containers for the new settings to take effect.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":2} --></p>
+<ol start="2" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li><strong>Set Proxy for a Specific Container</strong></li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can set proxy environment variables directly when running a container.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Step 1: Run the container with proxy settings:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>docker run -e http_proxy="http://your-proxy:port" -e https_proxy="http://your-proxy:port" -e no_proxy="localhost,127.0.0.1,.yourdomain.com" &lt;image_name&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":3} --></p>
+<ol start="3" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li><strong>Set Proxy in Docker Compose</strong></li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you’re using Docker Compose, set the environment variables in your docker-compose.yml file.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>services:
+  my_service:
+    image: &lt;image_name&gt;
+    environment:
+      - http_proxy=http://your-proxy:port
+      - https_proxy=http://your-proxy:port
+      - no_proxy=localhost,127.0.0.1,.yourdomain.com</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>•Step 2: Recreate the containers:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>docker-compose down
+docker-compose up -d</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Update the proxy but Container Doesn’t Reflect Daemon Changes Immediately</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you updated the proxy settings for the Docker daemon (e.g., by modifying /etc/systemd/system/docker.service.d/http-proxy.conf), the changes will not take effect for running containers unless you restart Docker and recreate the containers.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• First check general docker daemon information</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>docker info</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Restart Docker to apply new proxy settings:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>sudo systemctl restart docker</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Recreate Containers: If the proxy settings are passed during container creation, you’ll need to recreate the containers to apply the updated proxy settings. This can be done by stopping and removing the container and then starting a new one.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>docker stop &lt;container_name&gt;
+docker rm &lt;container_name&gt;
+docker run -e &lt;other-options&gt; container</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/02/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

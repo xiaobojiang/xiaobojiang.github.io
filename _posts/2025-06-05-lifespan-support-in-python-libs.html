@@ -1,0 +1,238 @@
+---
+layout: post
+title: Lifespan support in Python libs
+date: 2025-06-05 07:14:17.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Continued with <a href="https://www.iotcolon.com/?p=1126">https://www.iotcolon.com/?p=1126</a>, actually several <strong>common Python frameworks and libraries</strong>, especially in the <strong>web, async, and dependency injection ecosystems</strong>, support a concept of <strong>lifespan</strong>, which typically refers to startup and shutdown hooks for managing resources.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here’s a breakdown of key libraries that support lifespan-style parameters or concepts:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>✅ 1. </strong><strong>FastAPI</strong><br />
+</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">
+<strong>✔️ Supports </strong><strong>lifespan</strong><strong> parameter (since FastAPI 0.95)</strong><br />
+</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from fastapi import FastAPI
+
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+
+async def lifespan(app: FastAPI):
+
+    # Startup logic
+
+    print("Startup: connect to DB")
+
+    yield
+
+    # Shutdown logic
+
+    print("Shutdown: disconnect DB")
+
+app = FastAPI(lifespan=lifespan)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Used to manage DB connections, background tasks, cache, etc.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>✅ 2. </strong><strong>Starlette</strong><br />
+</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>FastAPI is built on Starlette, which also supports lifespan hooks:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from starlette.applications import Starlette
+
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+
+async def lifespan(app):
+
+    print("Start services")
+
+    yield
+
+    print("Stop services")
+
+app = Starlette(lifespan=lifespan)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>✅ 3. </strong><strong>AnyIO</strong><strong>/ </strong><strong>Trio</strong><br />
+</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Both offer structured concurrency and resource scoping. While they don’t use the word “lifespan”, the pattern is the same.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import anyio
+
+async def main():
+
+    async with anyio.create_task_group() as tg:
+
+        tg.start_soon(worker)
+
+async def worker():
+
+    print("Running background task")</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This is lifespan-like because the TaskGroup or nursery defines the lifetime of tasks.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>✅ 4. </strong><strong>Typer </strong><strong>(CLI framework by FastAPI author)</strong><br />
+</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>It uses FastAPI-style hooks if you embed a FastAPI app or use async commands. It doesn’t have a built-in lifespan, but you can simulate startup/shutdown logic in a CLI context.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>✅ 5. </strong><strong>Dependency Injection Libraries</strong><br />
+</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Like punq, wired, or lagom, often use<strong>context-managed containers</strong>or lifecycle scopes (singleton, transient, etc.). For example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>with container.scoped() as scope:
+
+    service = scope.get(MyService)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This is a form of lifespan control — for DI containers.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>✅ 6. AsyncExitStack</strong> <strong> / @asynccontextmanager</strong><br />
+</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Used directly or indirectly in many libraries to manage resource lifetimes (e.g., HTTP clients, DB connections, locks).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>✅ 7. </strong><strong>Uvicorn / ASGI Servers</strong><br />
+</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>They honor lifespan protocol for startup/shutdown of ASGI apps (like FastAPI/Starlette). You can disable it with --lifespan off, or rely on it for graceful resource handling.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🚫 What Doesn’t Use </strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>lifespan</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Traditional WSGI apps (e.g., Flask, Django) — unless manually adapted</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Sync scripts or tools (unless you manually use try/finally or contextlib)</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>✅ TL;DR Table</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<tbody>
+<tr>
+<td><strong>Library / Framework</strong></td>
+<td>
+<strong>Supports</strong>lifespan<strong>?</strong>
+</td>
+<td><strong>Notes</strong></td>
+</tr>
+<tr>
+<td>FastAPI</td>
+<td>✅ Yes</td>
+<td>Via lifespan=... param</td>
+</tr>
+<tr>
+<td>Starlette</td>
+<td>✅ Yes</td>
+<td>Base for FastAPI</td>
+</tr>
+<tr>
+<td>AnyIO / Trio</td>
+<td>✅ Yes</td>
+<td>Structured concurrency</td>
+</tr>
+<tr>
+<td>Typer</td>
+<td>⚠️ Partial</td>
+<td>Manual setup needed</td>
+</tr>
+<tr>
+<td>Flask / Django</td>
+<td>❌ No (manual only)</td>
+<td>Use before_first_request or signals</td>
+</tr>
+<tr>
+<td>Uvicorn</td>
+<td>✅ Yes</td>
+<td>ASGI lifespan protocol</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/06/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

@@ -1,0 +1,696 @@
+---
+layout: post
+title: 'AWS CDK turtorial - 2: setup a EKS faraget cluster'
+date: 2021-08-18 07:09:21.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Cloud
+- Kubernetes
+- Technology
+tags: []
+meta:
+  _edit_last: '1'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>This is the second post on CDK, <a href="https://www.iotcolon.com/?p=65" data-type="post" data-id="65">previous post</a> talks about CDK basics and installation. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this post, we will use CDK to create and provision a EKS fargate cluster.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, I will assume you already have your CDK environment ready and running. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To make it simple, I will put all the code in one stack, in practice, you can split different functions into different stacks or python files.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let's take a look at the architecture we want to achieve. All resources are inside a VPC, and for the sake of security, all EKS cluster's resources are in the private subnets of VPC.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":75290} --></p>
+<figure class="wp-block-image"><img src="{{site.baseurl}}/assets/2021/08/aws-eks-architecture.png" alt="Amazon EKS Architecture" class="wp-image-75290"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Image Source: https://aws.amazon.com/quickstart/architecture/amazon-eks/</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>VPC</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Create a VPC in CDK is rather simple, specify the name, cidr range, number of zones.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>sample code:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>         vpc = ec2.Vpc(self,
+            'my-vpc', # VPC id
+            cidr=cidr_range, # CIDR
+            max_azs=3,  # 3 aza
+            nat_gateways=1 # create NAT Gateway
+        )</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>EKS fargate cluster</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then, create a master role for eks cluster.  In order to issue kubectl commands against an EKS cluster, the mastersRole must be explicitly defined.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>        eks_master_role = iam.Role(self, 'eksMasterRole',
+            role_name='eksAdminRole',
+            assumed_by=iam.AccountRootPrincipal()
+        )</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now, you can create a eks cluster, specify that we create a fargate cluster, and subnets type is private, also make the endpoint public accessible:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>         ekscluster = eks.FargateCluster(self, 
+            'myCluster',  # cluster id
+            vpc=vpc,  # ref VPC
+            cluster_name='myCluster',
+            version=eks.KubernetesVersion.V1_19,  # K8S version
+            masters_role=eks_master_role, # master's IAM Role
+            endpoint_access=eks.EndpointAccess.PUBLIC, # no need nodes
+            vpc_subnets=[{'subnet_type':ec2.SubnetType.PRIVATE}]
+        )</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, AWS provides two kinds of eks cluster, one is common ec2 based, second is fargate one.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>AWS Fargate is a technology that you can use with Amazon ECS to run containers without having to manage servers or clusters of Amazon EC2 instances. With Fargate, you no longer have to provision, configure, or scale clusters of virtual machines to run containers. This removes the need to choose server types, decide when to scale your clusters, or optimize cluster packing.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>few differences:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1. Performance - The difference here is due to the fact that with an EC2, the compute is already accounted for so all the service needs to do is directly assign the pods to one of the nodes registered and actively reporting in your cluster. Fargate allocates the right amount of compute, eliminating the need to choose instances and scale cluster capacity and each task or pod in its own kernel providing the tasks and pods their own isolated compute environment, however, a larger provisioning time would be added to your workloads as the provisioning happen 'on-the-fly'. This means that you will need to architect your application to be able to handle these delays.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2. Pricing model/Cost - In relation to this topic, please note that according to our documentation, the amount of $0.10 is charged per hour for each Amazon EKS cluster that you create. Besides that, When using EC2 to run your Kubernetes workers nodes allows you to optimize price by taking advantage of billing models such as spot instances, or reserved instances. In this case, amounts are charged for the instances and for the resources associated with them, such as EC2 instances or EBS volumes. On the other hand, using Fargate, pricing is calculated based on the vCPU and memory resources used from the time you start to download your container image until the Amazon EKS pod terminates, rounded up to the nearest second. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3. fargate also has its limitations: cluster cannot use GPU, daemonset is not supported. fargate uses sidecar similar technology to enable logging</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, I want to try out the new tech, I choose to use fargate cluster. however, the configuration is similar, using fargate, you do not need to add a NodeGroup as EC2 cluster.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Fargate Profile </strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For fargate cluster, you need to create a fargate profile, and add namespaces into it, so the pods defined in these namespaces can be assigned to fargate nodes.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>when the cluster was created, it contains a default fargate profile, and namespaces is "default" and "kube-system".</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Once the fargate profile is created, you cannot add namespaces to it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you face this case, create a new profile.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>        namespaces = ['dev','qa']
+        #add profile for user namespaces
+        selectors = []
+        for namespace in namespaces:
+            selectors.append(eks.Selector(namespace=namespace))
+            #create namespace in kubectl
+            nsManifest = {
+                "apiVersion":"v1",
+                "kind": "Namespace",
+                "metadata": {"name": namespace}
+            }
+            ekscluster.add_manifest("namespace-"+namespace, nsManifest)
+
+        myfargateprofile=ekscluster.add_fargate_profile(
+            'appfargateprofile',
+            fargate_profile_name='appFargateProfile',
+            selectors=selectors
+        )</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Metrics Service</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>By default, aws cluster does not contain metrics server. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>you can add with following lines:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>        #deploy metrics service
+        metrics_manifest_url = 'https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml'
+        metric_manifest = list(yaml.safe_load_all(requests.get(metrics_manifest_url).text))
+        ekscluster.add_manifest('metrics-server', *metric_manifest)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>AWS Load Balancer Controller</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you want to expose your service, an ingress is required, here AWS provides three ways: application load  balancer, network load balancer and classic load balancer. difference can be found: https://aws.amazon.com/elasticloadbalancing/features/</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Application Load Balancer</th>
+<th>Network Load Balancer</th>
+<th>Classic Load Balancer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Version</td>
+<td>New v2</td>
+<td>New v2</td>
+<td>Old v1</td>
+</tr>
+<tr>
+<td>Use cases</td>
+<td>Web apps, microservices &amp; containers</td>
+<td>Extreme performance - millions of requests with less latency (100ms)</td>
+<td>Avoid if possible. Not recommended by AWS.</td>
+</tr>
+<tr>
+<td>Protocols Supported</td>
+<td>HTTP, HTTPS (Layer 7)</td>
+<td>TCP, UDP, TLS (Layer 4)</td>
+<td>TCP, SSL/TLS, HTTP, HTTPS(Layer 4 &amp; 7)</td>
+</tr>
+<tr>
+<td>Connection draining</td>
+<td>   ✓</td>
+<td> </td>
+<td>    ✓</td>
+</tr>
+<tr>
+<td>Dynamic Host Port Mapping</td>
+<td>   ✓</td>
+<td>    ✓</td>
+<td> </td>
+</tr>
+<tr>
+<td>Cross-zone load balancing</td>
+<td>✓(Always Enabled)</td>
+<td>✓(Default Disabled)</td>
+<td>✓(Default Disabled)</td>
+</tr>
+<tr>
+<td>Sticky sessions</td>
+<td>✓</td>
+<td> </td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Server Name Indication (SNI)</td>
+<td>✓</td>
+<td>✓</td>
+<td> </td>
+</tr>
+<tr>
+<td>Static IP</td>
+<td> </td>
+<td>✓</td>
+<td> </td>
+</tr>
+<tr>
+<td>Elastic IP address</td>
+<td> </td>
+<td>✓</td>
+<td> </td>
+</tr>
+<tr>
+<td>Preserve Source IP address</td>
+<td> </td>
+<td>✓</td>
+<td> </td>
+</tr>
+<tr>
+<td>WebSockets</td>
+<td>✓</td>
+<td>✓</td>
+<td> </td>
+</tr>
+<tr>
+<td>IP addresses as targets</td>
+<td>✓</td>
+<td>✓ (TCP, TLS)</td>
+<td> </td>
+</tr>
+<tr>
+<td>Source IP address range (CIDR) based routing</td>
+<td>✓</td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td>Path(Route) Based Routing</td>
+<td>✓</td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td>Host-Based Routing</td>
+<td>✓</td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td>Fixed response</td>
+<td>✓</td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td>Lambda functions as targets</td>
+<td>✓</td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td>HTTP header-based routing</td>
+<td>✓</td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td>HTTP method-based routing</td>
+<td>✓</td>
+<td> </td>
+<td> </td>
+</tr>
+<tr>
+<td>Query string parameter-based routing</td>
+<td>✓</td>
+<td> </td>
+<td> </td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>By installing Aws Load Balancer Controoller, you can config at ingress which type you would like to use.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, let's install Aws Load Balancer Controller, few steps in below code:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, Create an IAM role and annotate the Kubernetes service account that's named <code>aws-load-balancer-controller</code> in the <code>kube-system</code> namespace</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, create an IAM policy for the AWS Load Balancer Controller that allows it to make calls to AWS APIs on your behalf. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, attach the policy created in step 2 to the service account  <code>aws-load-balancer-controller</code> </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>4, using helm chart to create Aws Load Balancer Controller</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>thanks to https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html and typescript ref: https://github.com/aws-samples/cdk-eks-fargate/blob/main/lib/aws-loadbalancer-controller.ts</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>        
+
+        awsLbControllerServiceAccount = ekscluster.add_service_account(
+            'aws-load-balancer-controller',
+            name='aws-load-balancer-controller',
+            namespace='kube-system'
+        )
+        
+        # link: https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.2.0/docs/install/iam_policy.json 
+        alb_policy_document_json = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "iam:CreateServiceLinkedRole",
+                        "ec2:DescribeAccountAttributes",
+                        "ec2:DescribeAddresses",
+                        "ec2:DescribeAvailabilityZones",
+                        "ec2:DescribeInternetGateways",
+                        "ec2:DescribeVpcs",
+                        "ec2:DescribeSubnets",
+                        "ec2:DescribeSecurityGroups",
+                        "ec2:DescribeInstances",
+                        "ec2:DescribeNetworkInterfaces",
+                        "ec2:DescribeTags",
+                        "ec2:GetCoipPoolUsage",
+                        "ec2:DescribeCoipPools",
+                        "elasticloadbalancing:DescribeLoadBalancers",
+                        "elasticloadbalancing:DescribeLoadBalancerAttributes",
+                        "elasticloadbalancing:DescribeListeners",
+                        "elasticloadbalancing:DescribeListenerCertificates",
+                        "elasticloadbalancing:DescribeSSLPolicies",
+                        "elasticloadbalancing:DescribeRules",
+                        "elasticloadbalancing:DescribeTargetGroups",
+                        "elasticloadbalancing:DescribeTargetGroupAttributes",
+                        "elasticloadbalancing:DescribeTargetHealth",
+                        "elasticloadbalancing:DescribeTags"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "cognito-idp:DescribeUserPoolClient",
+                        "acm:ListCertificates",
+                        "acm:DescribeCertificate",
+                        "iam:ListServerCertificates",
+                        "iam:GetServerCertificate",
+                        "waf-regional:GetWebACL",
+                        "waf-regional:GetWebACLForResource",
+                        "waf-regional:AssociateWebACL",
+                        "waf-regional:DisassociateWebACL",
+                        "wafv2:GetWebACL",
+                        "wafv2:GetWebACLForResource",
+                        "wafv2:AssociateWebACL",
+                        "wafv2:DisassociateWebACL",
+                        "shield:GetSubscriptionState",
+                        "shield:DescribeProtection",
+                        "shield:CreateProtection",
+                        "shield:DeleteProtection"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:AuthorizeSecurityGroupIngress",
+                        "ec2:RevokeSecurityGroupIngress"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:CreateSecurityGroup"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:CreateTags"
+                    ],
+                    "Resource": "arn:aws:ec2:*:*:security-group/*",
+                    "Condition": {
+                        "StringEquals": {
+                            "ec2:CreateAction": "CreateSecurityGroup"
+                        },
+                        "Null": {
+                            "aws:RequestTag/elbv2.k8s.aws/cluster": "false"
+                        }
+                    }
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:CreateTags",
+                        "ec2:DeleteTags"
+                    ],
+                    "Resource": "arn:aws:ec2:*:*:security-group/*",
+                    "Condition": {
+                        "Null": {
+                            "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
+                            "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
+                        }
+                    }
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "ec2:AuthorizeSecurityGroupIngress",
+                        "ec2:RevokeSecurityGroupIngress",
+                        "ec2:DeleteSecurityGroup"
+                    ],
+                    "Resource": "*",
+                    "Condition": {
+                        "Null": {
+                            "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
+                        }
+                    }
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "elasticloadbalancing:CreateLoadBalancer",
+                        "elasticloadbalancing:CreateTargetGroup"
+                    ],
+                    "Resource": "*",
+                    "Condition": {
+                        "Null": {
+                            "aws:RequestTag/elbv2.k8s.aws/cluster": "false"
+                        }
+                    }
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "elasticloadbalancing:CreateListener",
+                        "elasticloadbalancing:DeleteListener",
+                        "elasticloadbalancing:CreateRule",
+                        "elasticloadbalancing:DeleteRule"
+                    ],
+                    "Resource": "*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "elasticloadbalancing:AddTags",
+                        "elasticloadbalancing:RemoveTags"
+                    ],
+                    "Resource": [
+                        "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*",
+                        "arn:aws:elasticloadbalancing:*:*:loadbalancer/net/*/*",
+                        "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/*/*"
+                    ],
+                    "Condition": {
+                        "Null": {
+                            "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
+                            "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
+                        }
+                    }
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "elasticloadbalancing:AddTags",
+                        "elasticloadbalancing:RemoveTags"
+                    ],
+                    "Resource": [
+                        "arn:aws:elasticloadbalancing:*:*:listener/net/*/*/*",
+                        "arn:aws:elasticloadbalancing:*:*:listener/app/*/*/*",
+                        "arn:aws:elasticloadbalancing:*:*:listener-rule/net/*/*/*",
+                        "arn:aws:elasticloadbalancing:*:*:listener-rule/app/*/*/*"
+                    ]
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "elasticloadbalancing:ModifyLoadBalancerAttributes",
+                        "elasticloadbalancing:SetIpAddressType",
+                        "elasticloadbalancing:SetSecurityGroups",
+                        "elasticloadbalancing:SetSubnets",
+                        "elasticloadbalancing:DeleteLoadBalancer",
+                        "elasticloadbalancing:ModifyTargetGroup",
+                        "elasticloadbalancing:ModifyTargetGroupAttributes",
+                        "elasticloadbalancing:DeleteTargetGroup"
+                    ],
+                    "Resource": "*",
+                    "Condition": {
+                        "Null": {
+                            "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
+                        }
+                    }
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "elasticloadbalancing:RegisterTargets",
+                        "elasticloadbalancing:DeregisterTargets"
+                    ],
+                    "Resource": "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*"
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "elasticloadbalancing:SetWebAcl",
+                        "elasticloadbalancing:ModifyListener",
+                        "elasticloadbalancing:AddListenerCertificates",
+                        "elasticloadbalancing:RemoveListenerCertificates",
+                        "elasticloadbalancing:ModifyRule"
+                    ],
+                    "Resource": "*"
+                }
+            ]
+        }
+        
+        alb_policy_document = iam.PolicyDocument.from_json( alb_policy_document_json )
+
+        alb_policy = iam.Policy(self,
+            'AwsEksAlbPolicy',
+            policy_name='AwsEksAlbPolicy',
+            document=alb_policy_document
+        )
+        #optionaly, you can create PolicyStatement, and awsLbControllerServiceAccount.add_to_principal_policy()
+        awsLbControllerServiceAccount.role.attach_inline_policy(alb_policy)
+     
+        ekscluster.add_helm_chart(
+            'aws-load-balancer-controller', 
+            chart='aws-load-balancer-controller',
+            release='aws-load-balancer-controller',
+            repository='https://aws.github.io/eks-charts',
+            namespace='kube-system',
+            values={
+                'clusterName':ekscluster.cluster_name,
+                'image': {
+                    'repository': self.getAwsLoadBalancerControllerRepo(),
+                },
+                'region': cdk.Aws.REGION,
+                'vpcId': vpc.vpc_id,
+                'serviceAccount':{
+                    'create': False,
+                    'name': 'aws-load-balancer-controller'
+                }
+            },
+        )</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>5, final step is still in shell script (pity), I will try to adapt kustomiztion of K8S to cdk</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#Install the TargetGroupBinding custom resource definitions. remaining is done in EKS stack
+kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Logging to CloudWatch</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Steps referred to https://docs.aws.amazon.com/eks/latest/userguide/fargate-logging.html</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>here, also shell scritps are heavily used, not all code in CDK:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1,  Create a dedicated Kubernetes namespace named <code>aws-observability</code>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#file of aws-observability-namespace.yaml
+
+
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: aws-observability
+  labels:
+    aws-observability: enabled</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, Create a <code>ConfigMap</code> with a <code>Fluent Conf</code> data value to ship container logs to a destination. Fluent Conf is Fluent Bit, which is a fast and lightweight log processor configuration language that is used to route container logs to a log destination of your choice.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># file: aws-logging-cloudwatch-configmap.yaml
+
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: aws-logging
+  namespace: aws-observability
+  labels:
+data:
+  output.conf: |
+    [OUTPUT]
+        Name cloudwatch_logs
+        Match   *
+        region ${REGION}
+        log_group_name fluent-bit-cloudwatch
+        log_stream_prefix from-fluent-bit-
+        auto_create_group true</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, use shell script to apply them in eks cluster</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>
+export REGION=eu-central-1
+
+info_line "enable logging for fargate pods, to cloudwatch"
+
+kubectl apply -f ${current_dir}/k8s/fargate-logging/aws-observability-namespace.yaml
+
+envsubst '${REGION}' &lt; ${current_dir}/k8s/fargate-logging/aws-logging-cloudwatch-configmap.yaml  | kubectl apply -f -
+
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>4, Create a CloudWatch IAM policy, and Attach the IAM policy to the pod execution role specified for your Fargate profile. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>        #enable cloudwatch logs
+        cloudwatch_policy_document_json ={
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup",
+                    "logs:DescribeLogStreams",
+                    "logs:PutLogEvents"
+                ],
+                "Resource": "*"
+            }]
+        }
+
+        cloudwatch_policy_document = iam.PolicyDocument.from_json( cloudwatch_policy_document_json )
+
+        cloudwatch_policy = iam.Policy(self,
+            'CloudWatchLogEKSPolicy',
+            policy_name='CloudWatchLogEKSPolicy',
+            document=cloudwatch_policy_document
+        )
+
+        myfargateprofile.pod_execution_role.attach_inline_policy(cloudwatch_policy)
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>alright, that's all of the turtorial I want to share, with this, basically you can have a runing eks cluster. you can deploy your deployments and services, use ingress to expose your services. I may have another topic to share something about ALB and NLB usage.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Also a todo for me and reader, can you help me remove three lines of shell scripts, and completely deploy upper code in full CDK style?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>thanks for your time, any questions, please leave a comment or drop me a mail (xiaobo.j.jiang@gmail.com)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/08/88x31.png"></a><br>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

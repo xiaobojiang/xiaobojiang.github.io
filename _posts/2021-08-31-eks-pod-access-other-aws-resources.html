@@ -1,0 +1,213 @@
+---
+layout: post
+title: EKS pod access other aws resources
+date: 2021-08-31 07:12:31.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Cloud
+- Kubernetes
+- Technology
+tags: []
+meta:
+  _edit_last: '1'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>When you have a EKS cluster, and running services, there is always requirement that EKS pods needs to access other aws resources, eg, S3.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>One common way, is you create a IAM user with programtic access, and add policy to specify the resource go/no-go, and later use the access id and key in the AWS SDK to call APIs.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p> I would not say this is bad, but this brings a lot of chanlendges: 1, management of those crendentials, 2, you may need to create many IAM users to ensure control granularity, 3, it is not easy to automate.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Actually, I found that there is a more elegant way in aws to do this: service account.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>People who are familiar with Kubernetes shall also know this idea[1], A service account provides an identity for processes that run in a Pod.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can associate an IAM role with a Kubernetes service account. This service account can then provide AWS permissions to the containers in any pod that uses that service account. With this feature, you no longer need to provide extended permissions to the Amazon EKS node IAM role so that pods on that node can call AWS APIs [2]. From my test, pod with service account, it is calling web-identity to sts service get API access credentials.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In comparison, you can also configure IAM role on nodes (EC2) [3], so that all pods on the node have the access. I would not recommend this, personally it is not so scalable and not good granularity.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The IAM roles for service accounts feature provides the following benefits:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Least privilege</strong> — By using the IAM roles for service accounts feature, you no longer need to provide extended permissions to the node IAM role so that pods on that node can call AWS APIs. You can scope IAM permissions to a service account, and only pods that use that service account have access to those permissions. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Credential isolation </strong>— A container can only retrieve credentials for the IAM role that is associated with the service account to which it belongs. A container never has access to credentials that are intended for another container that belongs to another pod.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Auditability </strong>— Access and event logging is available through CloudTrail to help ensure retrospective auditing.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Try it out with S3</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>After go through the concept, let's take one example to illustrate the how-to: S3 access.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, also share the process mainly with CDK python.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Step 1</strong>, create a S3 bucket.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>block all public access and make encrpytion as KMS_MANAGED.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>        appS3 = s3.Bucket(self,
+            "AppDataBucket",
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            encryption=s3.BucketEncryption.KMS_MANAGED
+        )</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Step 2</strong>, create corresponding access policy. Here I referred to example S3 policy of aws [4]</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>allow all access to this bucket.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note: later I found I cannot list buckets, is it due to only one bucket is listed in allowed resource.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>        
+
+        appS3_policy_document_json = {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Action": [
+                    "s3:*"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::"+appS3.bucket_name,
+                    "arn:aws:s3:::"+appS3.bucket_name+'/*'
+                ]
+            }]
+        }
+        appS3_policy_document = iam.PolicyDocument.from_json(appS3_policy_document_json)
+
+        appS3_policy = iam.Policy(self,
+            'appS3Policy',
+            policy_name='appS3Policy',
+            document=appS3_policy_document
+        )</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Step 3</strong>,  for the required namespaces, create service acccount, and associate policy to service account's role.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#use service account way, , you need to specify sa in pod yaml, eg: serviceAccountName: serviceaccount-appdev
+        for namespace in namespaces:
+            #create service account
+            eksS3ServiceAccount = ekscluster.add_service_account(
+                'serviceaccount-'+namespace,
+                name='serviceaccount-'+namespace,
+                namespace=namespace
+            )
+            eksS3ServiceAccount.role.attach_inline_policy(bseS3_policy)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Step 4</strong>: create a python pod in the namespace, and try to access with boto3.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>boto3 is the aws python sdk, refer to [5].</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>in below deployment, please note the line of serviceAccount, and fill the name of created service account.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#pod deployment yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eks-iam-test-s3
+  namespace: appdev
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: eks-iam-test-s3
+  template:
+    metadata:
+      labels:
+        app: eks-iam-test-s3
+    spec:
+      serviceAccountName: serviceaccount-appdev
+      containers:
+      - name: eks-iam-test
+        image: python:3.9
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do sleep 10;done"]
+      restartPolicy: Always
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># deploy exec into your python pod
+$ kubectl apply -f s3-pod.yaml
+$ kubectl exec -it <meta charset="utf-8">eks-iam-test-s3 -n appdev bash
+$ pip install boto3
+$ python</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Try following code in python pod, you can see the files in the S3 bucket, generate presigned url and download the files to your pod.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If your program works the same, congrats, your pod now have access to S3 bucket, and enjoy!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#example python commands in inteactive shell
+$ import boto3
+$ client = boto3.client('s3')
+$ response=client.list_objects(Bucket='your bucket name')
+$ print(response)
+$ client.generate_presigned_url('get_object',{'Bucket': 'your bucket name', 'Key': 'yourfilename'},HttpMethod="GET")
+$ client.download_file('your bucket name', 'your file name', 'saved file name')
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Reference:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[1]  https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[2]  https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[3] https://docs.aws.amazon.com/eks/latest/userguide/create-node-role.html</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[4] https://docs.aws.amazon.com/AmazonS3/latest/userguide/example-bucket-policies.html</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[5] https://aws.amazon.com/sdk-for-python/</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/08/88x31.png"></a><br>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

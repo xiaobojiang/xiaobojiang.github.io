@@ -1,0 +1,118 @@
+---
+layout: post
+title: Environment agnostic or specific for CDK deployment
+date: 2021-12-06 09:08:11.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Cloud
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>It starts from an observation in my CDK deployment, I always find my VPC has two zones, event I specify max_azs=3, and deployed region eu-central-1 also owns 3 zones.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It puzzled me for a while, and until I was asked to make a production deployment, and requirement is to have 3 zones, I came back to check the document.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally, I have the answer:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>“<em>maxAzs - the maximum number of availability zones to use in the region. By default 3 availability zones are used for stacks, where we explicitly set the environment (account and region) and 2 availability zones are used for environment-agnostic stacks.</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>There are regions, that currently have only 2 availability zones, so the safe bet for CDK is to cap us at 2 AZs for environment-agnostic stacks.</em>”</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In my CDK code, I tried to avoid hardcoding region name and account id, so I always use</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ export AWS_PROFILE=&lt;profilename&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then run “cdk deploy mystack” to deploy stacks. Which is so called environment agnostic deployment.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Upper also has an equivalent shell command:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ cdk deploy --profile myprofile my-stack</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>The default behavior when we don't specify account and region is that the stack we deploy is environment agnostic.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This means, that CDK CLI checks whether we passed in the --profile flag when deploying, if we did, it uses the account and region that correspond to that profile</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>When we deploy an environment agnostic stack we're unable to access the resolved values of the account and region properties, because they get <a href="https://bobbyhadz.com/blog/cdk-get-region-accountid" target="_blank" rel="noreferrer noopener">resolved at deployment time rather than synthesis time</a>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In order to explicitly set the account and region properties when deploying a CDK application we have to set the env property when initializing the stack.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>const app = new cdk.App();
+
+new MyCdkStack(app, `my-cdk-stack`, {
+    stackName: `my-cdk-stack`,
+    // Explicitly set env property
+    env: {
+        region: 'us-east-1',
+        account: 123456789,
+   },
+});
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>We can set the values of region and account using explicitly set by us environment variables, secrets, parameters, etc.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>An alternative approach would be to use environment variables that are already pre-set in the CDK environment:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>const app = new cdk.App();
+
+new MyCdkStack(app, `my-cdk-stack`, {
+    stackName: `my-cdk-stack`,
+    env: {
+        region: process.env.CDK_DEFAULT_REGION,
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+    },
+});
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>The CDK_DEFAULT_REGION and CDK_DEFAULT_ACCOUNT environment variables get resolved based on the --profile flag we pass when deploying.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If we don't explicitly pass a --profile flag then the values resolve to the account and region, that correspond to our default AWS profile on that machine.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It's best practice to explicitly set concrete values for CDK_DEFAULT_REGION and CDK_DEFAULT_ACCOUNT, because when collaborating with other developers on a project, we can't rely on every developer having the same settings for their default AWS profile. What ends up happening is the stack gets deployed to different regions/accounts by multiple people.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In conclusion, in prod env, set the region and account with specific values, this can avoid ambiguity and wrong env settings. And with this, I can deploy the VPC with desired 3 zones.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Bravo!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave me a reply if you have any comments or suggestions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/12/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

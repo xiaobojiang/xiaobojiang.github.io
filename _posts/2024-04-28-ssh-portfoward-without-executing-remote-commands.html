@@ -1,0 +1,29 @@
+---
+layout: post
+title: SSH portfoward without executing remote commands
+date: 2024-04-28 02:17:18.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Cloud
+- Devops
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph {"style":{"spacing":{"padding":{"top":"0","bottom":"0"}}},"fontSize":"small"} --><html><body></p>
+<p class="has-small-font-size" style="padding-top:0;padding-bottom:0">We can use port forward to run remote service locally for debugging purpose. Sometimes we do not want to make ssh terminal visible.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"style":{"spacing":{"padding":{"top":"0","bottom":"0"}}},"fontSize":"small"} --></p>
+<p class="has-small-font-size" style="padding-top:0;padding-bottom:0">Below command can help.<br>The ssh command with the flags -NfL localhost:9999:localhost:9999 your_user_name@remote_ip_address does the following:  <br><br>-N: Do not execute a remote command. This is used to forward ports only.<br>-f: Requests ssh to go to background just before command execution. Be careful on this option, it really goes to background. we can check the PID via command pgrep -f "ssh command. eg, ssh -NfL 8000:127.0.0.1:8000 hp", and kill it. <br>-L: localhost:9999:localhost:9999: Specifies that the local port 9999 on your machine <br>should be forwarded to port 9999 on the remote machine (localhost). <br><br>This means that any traffic sent to port 9999 on your machine will be forwarded to port 9999 on the remote machine.<br><br>your_user_name@remote_ip_address: Specifies the username (your_user_name) and the IP address or hostname (remote_ip_address) of the remote machine.<br><br>Overall, this command establishes an SSH connection to the remote machine (remote_ip_address) and sets up port forwarding from port 9999 on your local machine to port 9999 on the remote machine, without executing any remote command (-N) and running in the background (-f). <br><br>Finally, recommand to use ssh -NL flags, which runs in foreground, and easy to kill if applicable.<br><br></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/04/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

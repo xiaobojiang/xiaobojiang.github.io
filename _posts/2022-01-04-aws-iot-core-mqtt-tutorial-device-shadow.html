@@ -1,0 +1,234 @@
+---
+layout: post
+title: AWS IOT core MQTT tutorial - Device Shadow
+date: 2022-01-04 06:52:50.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Cloud
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Besides the common MQTT functions (refer to pubsub post: https://www.iotcolon.com/?p=299), AWS IOT core also provide function of device shadow. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>What is device shadow? My understanding is that it makes a digital twin of physical device in the cloud, and it contains data of device state, and in common practice, it has desired state and reported state.  </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Instead of previous command based device-cloud communication, device shadow can make application be easy by knowing device by reported state, and doing business by maintaining the desired state, and device always syncs the desired state from cloud and update local state to it. <br>AWS Shadows use JSON shadow documents to store and retrieve data. A shadow’s document contains a state property that describes these aspects of the device’s state: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li> desired Apps specify the desired states of device properties by updating the desired object. </li>
+<li> reported Devices report their current state in the reported object. </li>
+<li> delta AWS IoT reports differences between the desired and the reported state in the delta object.</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:image {"align":"center","id":330,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2022/01/image-4.png" alt="" class="wp-image-330"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 1. example device shadow Json document</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Shadows can be named or unnamed (classic). With named shadows, we can create different views of a thing object’s state. For example, we could divide a thing object with many properties into shadows with logical groups of properties, each identified by its shadow name. We need to create them specially with a name.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":329,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2022/01/image-3.png" alt="" class="wp-image-329"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 2. example of classic device shadow </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The classic, unnamed shadows are simpler, by default there, but somewhat more limited than the named shadows. Each AWS IoT thing object can have only one unnamed shadow. The topics used by each differ only in the topic prefix. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This table shows the topic prefix used by each shadow type.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table>
+<tbody>
+<tr>
+<td>ShadowTopicPrefix value</td>
+<td>Shadow type</td>
+</tr>
+<tr>
+<td>$aws/things/thingName/shadow</td>
+<td>Unnamed (classic) shadow</td>
+</tr>
+<tr>
+<td>$aws/things/thingName/shadow/name/shadowName</td>
+<td>Named shadow</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>If the device want to support AWS device shadow, there are few topics must be integrated:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<li>The client should have a current shadow document so that it can identify the properties to change. See the /get action for how to obtain the current shadow document.</li>
+<li>The client subscribes to these MQTT topics (for named shadow type, for unnamed, remove the content in &lt;&gt; bracket):
+<ul>
+<li>$aws/things/<em>thingName</em>/shadow/&lt;name/<em>shadowName&gt;</em>/update/accepted</li>
+<li>$aws/things/<em>thingName</em>/shadow/&lt;name/<em>shadowName&gt;</em>/update/rejected</li>
+<li>$aws/things/<em>thingName</em>/shadow/&lt;name/<em>shadowName&gt;</em>/update/delta</li>
+<li>$aws/things/<em>thingName</em>/shadow/&lt;name/<em>shadowName&gt;</em>/update/documents</li>
+</ul>
+</li>
+<li>The client publishes a $aws/things/<em>thingName</em>/shadow/&lt;name/<em>shadowName&gt;</em>/update request topic with a state document that contains the desired state of the shadow. Only the properties to change need to be included in the document. { "state": { "desired": { "color": { "r": 10 }, "engine": "ON" } } }</li>
+<li>If the update request is valid, AWS IoT updates the desired state in the shadow and publishes messages on these topics:
+<ul>
+<li>$aws/things/<em>thingName</em>/shadow/&lt;name/<em>shadowName&gt;</em>/update/accepted</li>
+<li>$aws/things/<em>thingName</em>/shadow/&lt;name/<em>shadowName&gt;</em>/update/delta</li>
+</ul>
+</li>
+<li>The /update/accepted message contains an <a href="https://docs.aws.amazon.com/iot/latest/developerguide/device-shadow-document.html#device-shadow-example-response-json-accepted">/accepted response state document</a> shadow document, and the /update/delta message contains a <a href="https://docs.aws.amazon.com/iot/latest/developerguide/device-shadow-document.html#device-shadow-example-response-json-delta">/delta response state document</a> shadow document.</li>
+<li>If the update request is not valid, AWS IoT publishes a message with the $aws/things/<em>thingName</em>/shadow/&lt;name/<em>shadowName</em>/update/rejected topic with an <a href="https://docs.aws.amazon.com/iot/latest/developerguide/device-shadow-document.html#device-shadow-example-error-json">Error response document</a> shadow document that describes the error.</li>
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>So accordingly, the policy is different with simple pub/sub example, upper mentioned topics shall be specifically mentioned in the policy. Furthermore, in the policy provided, the variable is also used. So that this policy can be applied across devices. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>When we're replacing thing names with thing policy variables, the value of clientId in the MQTT connect message or the TLS connection must exactly match the thing name.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Look at it closely, in the “iot:Connect”, we make the Resource as “MyIotThing*”, so if the things’ names are defined in this way, eg MyIotThing, all of them are allowed to connect, and each can pub/sub to correspondingly device shadow topics. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iot:Publish"
+      ],
+      "Resource": [
+        "arn:aws:iot:eu-central-1:530588299168:topic/$aws/things/${iot:Connection.Thing.ThingName}/shadow/get",
+        "arn:aws:iot:eu-central-1:530588299168:topic/$aws/things/${iot:Connection.Thing.ThingName}/shadow/update"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iot:Receive"
+      ],
+      "Resource": [
+        "arn:aws:iot:eu-central-1:530588299168:topic/$aws/things/${iot:Connection.Thing.ThingName}/shadow/get/accepted",
+        "arn:aws:iot:eu-central-1:530588299168:topic/$aws/things/${iot:Connection.Thing.ThingName}/shadow/get/rejected",
+        "arn:aws:iot:eu-central-1:530588299168:topic/$aws/things/${iot:Connection.Thing.ThingName}/shadow/update/accepted",
+        "arn:aws:iot:eu-central-1:530588299168:topic/$aws/things/${iot:Connection.Thing.ThingName}/shadow/update/rejected",
+        "arn:aws:iot:eu-central-1:530588299168:topic/$aws/things/${iot:Connection.Thing.ThingName}/shadow/update/delta"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iot:Subscribe"
+      ],
+      "Resource": [
+        "arn:aws:iot:eu-central-1:530588299168:topicfilter/$aws/things/${iot:Connection.Thing.ThingName}/shadow/get/accepted",
+        "arn:aws:iot:eu-central-1:530588299168:topicfilter/$aws/things/${iot:Connection.Thing.ThingName}/shadow/get/rejected",
+        "arn:aws:iot:eu-central-1:530588299168:topicfilter/$aws/things/${iot:Connection.Thing.ThingName}/shadow/update/accepted",
+        "arn:aws:iot:eu-central-1:530588299168:topicfilter/$aws/things/${iot:Connection.Thing.ThingName}/shadow/update/rejected",
+        "arn:aws:iot:eu-central-1:530588299168:topicfilter/$aws/things/${iot:Connection.Thing.ThingName}/shadow/update/delta"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": "iot:Connect",
+      "Resource": "arn:aws:iot:eu-central-1:530588299168:client/MyIotThing*"
+    }
+  ]
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Use the sample from AWS github: <a href="https://github.com/aws/aws-iot-device-sdk-python-v2">https://github.com/aws/aws-iot-device-sdk-python-v2</a>, change the file “shadow.py" little bit. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Make the client_id same as thing name, and name is “MyIotThing" </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>if __name__ == '__main__':
+   # Process input args
+   args = parser.parse_args()
+   thing_name = args.thing_name
+   shadow_property = args.shadow_property
+   io.init_logging(getattr(io.LogLevel, args.verbosity), 'stderr')
+   args.client_id = 'MyIotThing'
+   args.thing_name = args.client_id
+   # Spin up resources
+   event_loop_group = io.EventLoopGroup(1)
+   host_resolver = io.DefaultHostResolver(event_loop_group)
+  client_bootstrap = io.ClientBootstrap(event_loop_group, host_resolver)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Start the program as: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ python3 shadow_new.py --root-ca ~/certs/Amazon-root-CA-1.pem --cert ~/certs/device.pem.crt --key ~/certs/private.pem.key --endpoint ax46hv4osw5s3-ats.iot. eu-central-1.amazonaws.com --thing-name any</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Start a test client in AWS</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":317,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2022/01/image-2.png" alt="" class="wp-image-317"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 3. place where we can start a MQTT test client</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Try to change the state in the test</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":315,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2022/01/image.png" alt="" class="wp-image-315"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 4. change device's desire state</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And see the output in the console, it works bi-directionally, input in the client console will update both reported and desired state. Input in the MQTT test client’s delta topic will send a delta message to client, and client will update itself.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":316,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2022/01/image-1.png" alt="" class="wp-image-316"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 5. logs of device, showing that changes from test client takes effect</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>That's all of the post, please leave a reply or comment if have any questions</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>References:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://docs.aws.amazon.com/iot/latest/developerguide/iot-device-shadows.html">https://docs.aws.amazon.com/iot/latest/developerguide/iot-device-shadows.html</a> <a href="https://docs.aws.amazon.com/iot/latest/developerguide/device-shadow-comms-device.html">https://docs.aws.amazon.com/iot/latest/developerguide/device-shadow-comms-device.html</a><br><a href="https://docs.aws.amazon.com/iot/latest/developerguide/device-shadow-data-flow.html">https://docs.aws.amazon.com/iot/latest/developerguide/device-shadow-data-flow.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/01/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

@@ -1,0 +1,144 @@
+---
+layout: post
+title: Customize your wordpress site
+date: 2022-04-27 01:36:54.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Technology
+- Web
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>I want to add website register number in home page. This requires me to do some customization on wordpress themes, I explored ways of doing it. Share to you if you have similar needs.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Preparation:</strong><br>change theme folder file permission from 755 to 777, So that Wordpress program can write files.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ chmod -R 777 html/wp-content/themes</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Upper step is optional, if you have correct file permission for your wordpress, it is not required.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Preliminary Customization:</strong><br>Wordpress already provides some general customization  </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, change site identity: Give a site your name </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, colors </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, header images </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>4, homepage settings </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>With these, we can already make site with our own features</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Below picture shows more options in the menu </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":434,"width":225,"height":363,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full is-resized"><img src="{{site.baseurl}}/assets/2022/04/image-6.png" alt="" class="wp-image-434" width="225" height="363"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>for our selected theme, eg. my “Markup” theme allows us to do further.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>in “Markup Theme options”, we can</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, change footer setting, we can update year in "Copyright All Rights Reserved 2022” </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, single page setting, here we can change page layout </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>There are more things that we can customize on our own theme. Try the features in below pic:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":437,"width":209,"height":274,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full is-resized"><img src="{{site.baseurl}}/assets/2022/04/image-9.png" alt="" class="wp-image-437" width="209" height="274"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Advanced customization:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Further, if upper theme options cannot fulfill our requirement, we can change the theme raw file. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Eg. Replace “Powered by XXX” with our site identity string. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We can do this via: Appearance - Theme File Editor</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Be cautious, changes on the theme raw file may break our page, make a backup before we do it. And you need to have basic knowledge of html, css.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>One more thing, if we upgrade theme to new version, our changes will get lost. Remember to recover those changes after we do upgrade. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>My requirement is to change the theme.footer, and add my Chinese site register number in it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>find the theme.footer in edit mode:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>change below:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>&lt;?php
+   /* translators: 1: Theme name, 2: Theme author. */
+   printf( esc_html__( 'Theme: %1$s by %2$s.', 'markup' ), 'Markup', '&lt;a href="https://www.templatesell.com/"&gt;Template Sell&lt;/a&gt;' );
+?&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>to text like:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>&lt;a href="http://www.beian.miit.gov.cn" rel="nofollow”&gt;{your register no}&lt;/a&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":436,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/04/image-8-1024x440.png" alt="" class="wp-image-436"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>if you previously change the file permission, do change back the folder permission to 755 </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ chmod -R 755 html/wp-content/themes</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Customization Effect </strong><br>Finally, try this out on your new homepage, it already show the register number in footer.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":435,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/04/image-7-1024x203.png" alt="" class="wp-image-435"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have any comment or questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your reading.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><center><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/04/88x31.png"></center></a><center><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.</center><br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

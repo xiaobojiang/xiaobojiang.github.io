@@ -1,0 +1,114 @@
+---
+layout: post
+title: Short introduction to n_neighbors in Umap
+date: 2024-11-12 05:28:08.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Background:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>umap-learn</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Purpose: umap-learn is a Python library for dimensionality reduction, commonly used to simplify high-dimensional data for visualization and clustering.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Key Concept: UMAP stands for Uniform Manifold Approximation and Projection, which is an algorithm designed to reduce complex, high-dimensional data into a lower-dimensional space (often 2D or 3D). It preserves the underlying structure of the data, making it useful for visualizing relationships or clusters.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Common Applications:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Visualizing high-dimensional datasets in 2D or 3D.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Preprocessing for clustering, classification, or other machine learning tasks where lower-dimensional data is useful.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The umap.UMAP(n_neighbors=n) parameter in the UMAP (Uniform Manifold Approximation and Projection) library sets the number of neighboring data points to consider when learning the structure of the data manifold. Here’s a breakdown of what n_neighbors does and its effect:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>What n_neighbors Does</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• n_neighbors defines the local neighborhood size for each data point in the high-dimensional space.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• UMAP tries to preserve the structure of the data by examining the local relationships between points, essentially by connecting each point to its nearest neighbors.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• By setting n_neighbors=n, you specify the number of nearest points each data point should consider when UMAP constructs a lower-dimensional representation.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>How n_neighbors Affects the Output</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Smaller n_neighbors values (e.g., n_neighbors=5) make UMAP focus more on capturing local structure, which may reveal finer details or clusters within the data. This is useful if you want to emphasize small clusters or local relationships.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Larger n_neighbors values (e.g., n_neighbors=50) encourage UMAP to consider broader patterns and more global structure, which can make the embedding more cohesive and better at representing global clusters.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>
+import umap
+import numpy as np
+
+#Example data with 100 points in 10D space
+data = np.random.rand(100, 10)
+
+#Initialize UMAP with a specified n_neighbors value
+n = 15
+reducer = umap.UMAP(n_neighbors=n)
+#Fit and transform the data to 2D
+embedding = reducer.fit_transform(data)
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Setting n_neighbors=15 means each data point will consider its 15 nearest neighbors in the high-dimensional space.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• UMAP will then project these points to a 2D space, preserving local neighborhood relationships based on the specified number of neighbors.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The n_neighbors parameter is one of the main ways to control the focus of the UMAP embedding.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now, you can visualize the data in 2D</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import matplotlib.pyplot as plt
+plt.figure(figsize=(8, 6))
+plt.scatter(embedding[:, 0], embedding[:, 1], s=10, c='blue', alpha=0.7)
+plt.title("2D UMAP Projection")
+plt.xlabel("UMAP Dimension 1")
+plt.ylabel("UMAP Dimension 2")
+plt.show()</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":1025,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2024/11/image-1024x803.png" alt="" class="wp-image-1025"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Please leave a comment if you have any idea to share.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/11/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

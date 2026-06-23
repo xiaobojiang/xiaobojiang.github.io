@@ -1,0 +1,233 @@
+---
+layout: post
+title: ESP32 playground - 1 – setup
+date: 2021-11-04 08:04:50.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Internet of Things
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>ESP32, and its predecessor ESP8266, are famous WiFi SoC for IoT application, which are created and developed by Espressif Systems. It contains WiFi and Bluetooth wireless abilities and stacks, there are also various examples in Github, all these make it very suitable for IoT playground.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And there are also many commercial products embedded with ESP32 moduels.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Recently I purchased one FireBeetle ESP32-E IoT board from Dfrobot.com.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":213,"width":840,"height":824,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><img src="{{site.baseurl}}/assets/2021/11/image.png" alt="" class="wp-image-213" width="840" height="824"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 1. My Dfrobot ESP32 board</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It supports WiFi and Bluetooth dual-mode communication and features a small size, ultra-low power consumption, onboard charging circuit, and easy-to-use interface, which can be conveniently used for smart home IoT, industrial IOT applications, wearable devices and so on. You can easily create your own IoT smart home system when connecting it with an IoT platform like IFTTT.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>ESP32 supports Arduino programming, ESP-IDF programming and also microPython programming.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this post, I will share about the environment setup on your computer. I have tried Arduino on my Ubuntu20.04 and ESP-IDP + Visual Studio Code on windows. Both setup are not complicated, and depends on your favor, you can choose one to start. I talked to few users, most of their impression is: Arduino would be quick for prototype, and ESP-IDF is more product level positioned.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you are a starter, I recommend you start from Arduino, it is extremely convenient and easy to get your hands on.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>ESP32+Arduino</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Arduino, in case you do not know, is an open-source electronics platform based on easy-to-use hardware and software. It starts from Atmel MCU platform, and when it is getting more popular, there are more and more chips are supported, also includes ESP32.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":224,"width":500,"height":600,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><img src="{{site.baseurl}}/assets/2021/11/image-11.png" alt="" class="wp-image-224" width="500" height="600"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 2. Arduino IDE </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Arduino has one IDE, which is cross platform, you can download and install different OS version from its website: https://www.arduino.cc.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, install Arduino IDE on your computer</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, install the ESP32 support using Boards manager.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Open the Preference, in the green rectange “Additional Boards Manager URLs”, paste the json file link. There are two options:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>One from Espressif official (https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html#installing-using-boards-manager): https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>One from Dfrobot (https://wiki.dfrobot.com/FireBeetle_Board_ESP32_E_SKU_DFR0654): <a href="http://download.dfrobot.top/FireBeetle/package_DFRobot_index.json">http://download.dfrobot.top/FireBeetle/package_DFRobot_index.json</a>
+</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>I tried both for experiment, compared to Dfrobot json, Espressif one has more boards supported and very rich examples (also available on its git). First one is really recommended.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Copy&amp;paste the url, click OK.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":215,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-2.png" alt="" class="wp-image-215"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 3. Add board json in Arduino preference</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, Update board, open Tools-&gt;Board-&gt;Board Manager, search the keyword “esp32”, find the item and click “install”</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":216,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/11/image-3.png" alt="" class="wp-image-216"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 4. Install the board in board manager</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It will download three files, total size is few hundreds of Mb, wait until it is completed.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>4, you can find ESP32 boards side by side with Arduino AVR ones, and ready for use:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":218,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-5.png" alt="" class="wp-image-218"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 5. Various ESP32 board supported </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>5, additionally,  there are lots of examples available for ESP32 after the board is installed.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":217,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-4.png" alt="" class="wp-image-217"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 6. always good to start with some examples </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>6, start from an example or new project, select the board (Firebeetle-ESP32), coding, compile and upload, that’s all.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>ESP32 + ESP-IDF + VS Code</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>ESP-IDF is Espressif’s official IoT Development Framework for the ESP32, ESP32-S and ESP32-C series of SoCs. It provides a self-sufficient SDK for any generic application development on these platforms, using programming languages such as C and C++.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Installing esp-idf has several solutions: 1, git clone from github: https://github.com/espressif/esp-idf 2, option of windows installer, <a href="https://dl.espressif.com/dl/esp-idf/?idf=4.4">https://dl.espressif.com/dl/esp-idf/?idf=4.4</a> 3, use Espressif plugin in VS code.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The first or two option works fine, you can  find how-to in the links, once installed, you can use idf shell with shell commands to do config, build and flash. But I would strongly recommend the vs code way, it is so amazing to use.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let me share the setup steps:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, install the vs code, it is also cross OS platform</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, in the market place, search “Espressif IDF”, click install</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, on the left menu bar, find the ESP-IDF icon, and you can see the installation guide.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":223,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-10.png" alt="" class="wp-image-223"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 7. install Espressif IDF plugin in VS code</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>4, choose the “EXPRESS”, and check the options below, normally, you do not need to change anything.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you feel github download is slow, you can choose “Espressif” in “Select download server”.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Click install.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Wait till all the components are ready.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":225,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/11/image-12.png" alt="" class="wp-image-225"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 8. ESP-IDF extension Installation Options </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>5, now look at the interface</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the bottom menu, there are few handy buttons for daily work:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Serial Port Selection</li>
+<li>Chip Selection</li>
+<li>Menu-config</li>
+<li>Clean</li>
+<li>Build</li>
+<li>Flash</li>
+<li>Serial Monitor</li>
+<li>Build, Flash and Monitor</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:image {"align":"center","id":222,"sizeSlug":"large","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img src="{{site.baseurl}}/assets/2021/11/image-9-1024x942.png" alt="" class="wp-image-222"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 9. Handy IDE function in VS code with ESP-IDF extension</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>6, You can code now. Examples are good starting point, their location is /Users/&lt;username&gt;/esp/examples/esp-idf/examples, pick one and play with it. You can also find the latest examples in the github: <a href="https://github.com/espressif/esp-idf">https://github.com/espressif/esp-idf</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>That’s all for this post. If you follow it, you can setup your own ESP32 IDE with Arduino or VS code.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In following post, I will share an interesting example with ESP32 + IFTTT.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Stay tuned. Leave a reply if you have any questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/11/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

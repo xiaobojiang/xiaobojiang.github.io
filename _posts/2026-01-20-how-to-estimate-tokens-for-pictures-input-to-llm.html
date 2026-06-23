@@ -1,0 +1,173 @@
+---
+layout: post
+title: How to estimate tokens for pictures input to LLM
+date: 2026-01-20 05:54:14.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>OpenAI’s vision docs describe how images are tiled into 512×512 patches, with a base 85 tokens plus 170 tokens per tile in detail:"high"; detail:"low" is a flat 85 tokens regardless of size. Most calculators above encode that logic. (Always check the model you’re using—some variants may diverge.)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>What do “patches” / “tiles” mean here?</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Think of a large image (e.g. 1024×768 px, or larger) as being composed of smaller square blocks (“tiles” / “patches”) of size <strong>512×512 px</strong>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The idea is: instead of processing the entire large image as one monolithic input, the model (or the billing logic) splits it into chunks of size up to 512×512, because that’s a convenient granularity for processing or costing.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>If your image fits entirely within <strong>one</strong> 512×512 block (i.e. width ≤ 512 and height ≤ 512), then n = 1. If it’s larger, you need multiple tiles to “cover” it.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Mathematically, for an image of width <em>W</em> and height <em>H</em>, you compute: $$\text{tiles\_width} = \lceil W / 512 \rceil,\quad \text{tiles\_height} = \lceil H / 512 \rceil$$ Then the total number of tiles = tiles_width × tiles_height.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Example: for a 600 × 400 image:<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>tiles_width = ceil(600 / 512) = 2</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>tiles_height = ceil(400 / 512) = 1</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>total tiles = 2 × 1 = 2</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<br>So under “high detail mode” that image would cost ≈ 85 + 170 × 2 = 425 tokens by that formula.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>This “tiling” approach is common in vision systems to keep computations / memory manageable and structured, and also for billing — it’s easier to say “each 512×512 patch costs 170 tokens” than to do a fine per-pixel or per-feature cost.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>What is “detail = high / detail = low” meaning in this context?</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the OpenAI vision / image billing logic (as inferred from documentation + community observations):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>detail = “low”</strong> means a <strong>low resolution / low fidelity</strong> mode. In that mode, the system uses a coarser / simpler representation of the image. In billing terms, the image is treated as though it has only the <strong>base cost of 85 tokens</strong>, <strong>regardless of how big the image is</strong> (i.e. even if the image is much larger than 512×512). This is a way to save token cost (and usually compute) when you don’t need high detail.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>detail = “high”</strong> means a high resolution / high fidelity mode. In that mode, the model (or billing logic) <em>does</em> break the image into 512×512 tiles and charges <strong>170 tokens per tile</strong>, plus the base 85 tokens. So the total is:  $$\text{Total tokens} = 85 + 170 \times \text{(number of 512×512 tiles)}$$ This lets a high-detail image cost more (because you’re effectively representing it at a finer granularity).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The “auto” setting (if supported) might let the system pick low vs high based on the image size or expected usage.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>Why a base 85 tokens? And why 170 per tile?</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>The <strong>base 85 tokens</strong> is like a “fixed surcharge” for having an image at all — perhaps to represent a coarse / thumbnail / overview embedding of the image. Even in “high” mode, the model needs an overall summary or low-res version, so that cost is baked in.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The <strong>170 tokens per 512×512 tile</strong> represents the “extra detail cost” for each chunk. If there are more tiles (i.e. a larger image needing more chunks), you pay more.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The numbers (85, 170) come from OpenAI’s documentation / pricing examples, and from what community users reverse-engineered based on token usage reports. For instance, the official OpenAI vision docs show an example: “4 tiles are needed … so final token cost is 170 × 4 + 85” for some high-detail image. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Also, in community discussions: “Each tile provides 170 tokens … total tokens = 85 + 170 * n” is a repeatedly cited formula. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>Extra complications and caveats (from user reports)</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>In many community reports, token usage doesn’t always scale exactly as the formula — for instance, images beyond certain sizes are downscaled first, or the “short side is clamped to 768 px” before tiling. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Some users report that even with <strong>512×512</strong> images, when “detail = auto” or when no detail parameter is given, the system still charges the higher “high detail / tiled” cost instead of just the 85 token low cost. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>There may be metadata, padding, or internal rounding that causes small deviations from the ideal formula. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example formula:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>def calculate_image_tokens(width, height, detail="high"):
+    if detail == "low":
+        return 85  # minimal cost in some modes
+
+    # Clamp / scale down if bigger than 2048 × 2048
+    max_size = 2048
+    if width &gt; max_size or height &gt; max_size:
+        aspect = width / height
+        if aspect &gt; 1:
+            width = max_size
+            height = int(max_size / aspect)
+        else:
+            height = max_size
+            width = int(max_size * aspect)
+
+    # If width &amp; height both exceed some “minimum” threshold, scale the short side to 768
+    min_size = 768
+    aspect = width / height
+    if width &gt; min_size and height &gt; min_size:
+        if aspect &gt; 1:
+            # width is longer side
+            height = min_size
+            width = int(min_size * aspect)
+        else:
+            width = min_size
+            height = int(min_size / aspect)
+
+    tiles_w = math.ceil(width / 512)
+    tiles_h = math.ceil(height / 512)
+    return 85 + 170 * (tiles_w * tiles_h)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2026/01/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

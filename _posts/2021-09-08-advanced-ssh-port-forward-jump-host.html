@@ -1,0 +1,201 @@
+---
+layout: post
+title: 'Advanced SSH: Port Forward, Jump Host'
+date: 2021-09-08 06:28:53.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>SSH is a handy service that allows user connects to remote computer instance securely, and this is the common way that user logins to cloud EC2.<br>But ssh can do more, imagine following scenario I always encounter: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, expose remote service to local computer </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, login to EC2 within private subnet / Intranet via a jump host</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"large"} --></p>
+<p class="has-large-font-size"><br>Port Forwarding</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>In my daily work, I have encountered those scenarios: 1, access Kubernetes dashboard without deploy ingress 2, access influx db management portal 3, access not public exposed debug APIs. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>SSH can address those requirements.<br>SSH port forwarding is a mechanism in SSH for tunneling application ports from the client machine to server machine, or vice versa. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It can be used for adding encryption to legacy applications, going through firewalls, and some system admin use it to open backdoor into internal network from their home computer. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Port forwarding has two types of usage: local forwarding and remote forwarding.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><br>Local Forwarding</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Local forwarding is used to forward a port from a client machine to server machine. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Basically, the ssh client listens for connections on a configured port, and when it receives a connection, it tunnels the connection to a ssh server. <br>In figure 1, if user want to access web service on the ssh server, it can make the connections on local 8000 forwarded to remote server’s port 80.<br>In openssh, local portfowarding is configured using the -L option.<br>Following line can fulfill the purpose:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ ssh -L 8000:127.0.0.1:80 user@ssh.server.address</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Furthermore, local forwarding can also make local connections forwarded to service which remote ssh server can access. Eg, mysql database in private subnet.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Using this line: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ ssh -L 3306:intra.rds.address:3306 user@ssh.server.address</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"align":"center","id":116,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/09/image-1.png" alt="" class="wp-image-116"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 1: typical local forwarding scenario</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"align":"left","fontSize":"medium"} --></p>
+<p class="has-text-align-left has-medium-font-size"><br>Remote Forwarding</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"align":"left"} --></p>
+<p class="has-text-align-left"><br>In Openssh, remote ssh port forwarding is specified by using -R option. For example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ ssh -R 8080:localhost:80 user@ssh.server.address</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"align":"left"} --></p>
+<p class="has-text-align-left">This allows anyone on the remote server connect to TCP port 8080 of remote server. The connection will be tunneled back to client host, and ssh client makes a TCP connection to port 80 on localhost. Any other host name or IP address could be used instead of localhost to specify the host to connect to.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":118,"width":624,"height":387,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><img src="{{site.baseurl}}/assets/2021/09/image.png" alt="" class="wp-image-118" width="624" height="387"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 2: remote port forwarding scenario</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>This can be helpful for giving someone on the outside access to an intranet web server. Be cautious, this could be done by an employee working at home, or by a malicious attacker.  </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>By default, OpenSSH only allows connecting to remote forwarded ports from the server host. However, the GatewayPorts option in the server configuration file sshd_config can be used to control this. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The following alternatives are possible:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>GatewayPorts no</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This prevents connecting to forwarded ports from outside the server computer.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>GatewayPorts yes</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This allows anyone to connect to the forwarded ports. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If the server is on the public Internet, anyone on the Internet can connect to the port.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>GatewayPorts client</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>specifiedThis means that the client can specify an IP address from which connections to the port are allowed. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The syntax for this is:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ ssh -R 52.191.20.31:8080:localhost:80 host147.aws.example.com </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this example, only connections from the IP address 52.194.1.73 to port 8080 are allowed.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"large"} --></p>
+<p class="has-large-font-size">Jump Host</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Imagine the following scenario, if user want to login to server B which is inside private intranet, is it possible to do so?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here jump host can help solve this issue, by adding a jump host in public subnet, user can login to B via the “jump” server A.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":117,"width":622,"height":258,"sizeSlug":"full","linkDestination":"none","className":"is-style-rounded"} --></p>
+<div class="wp-block-image is-style-rounded">
+<figure class="aligncenter size-full is-resized"><img src="{{site.baseurl}}/assets/2021/09/image-2.png" alt="" class="wp-image-117" width="622" height="258"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 3: login to server B via jump host A</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can do this via two ways:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, editing ssh config file, it is a file located at ~/.ssh/config.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>Host serverB
+      HostName 192.168.0.12
+      User ec2-user
+      IdentityFile /users/keys/serverB.pem
+      ProxyJump serverA
+Host serverA
+      HostName jump.example.com
+      User default 
+      IdentityFile /users/keys/serverA.pem </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, identity file is the private key for ssh identification. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then, you can login to server B via:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ ssh serverB</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, another is command line way</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Openssh provides -J option, works like:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ ssh B -J A </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In most scenarios, you will use key-pair as identity for ssh. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Directly specifying private with ‘-i’ option fails, you will need to translate the -J into long-form proxy command.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ ssh -o ProxyCommand="ssh -i /path/ServerA.pem -W %h:%p user@serverA_host" -i /path/serverB.pem user@serverB</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/09/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

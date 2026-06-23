@@ -1,0 +1,154 @@
+---
+layout: post
+title: Extracting content from Excel file with Azure DI
+date: 2024-10-28 09:30:10.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>It is a common practice to extract content from different file formats, so it can be further processed as corpus for AI.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Azure AI Document Intelligence (formerly known as Azure Form Recognizer) is machine-learning based service that extracts texts (including handwriting), tables, document structures (e.g., titles, section headings, etc.) and key-value-pairs from digital or scanned PDFs, images, Office and HTML files.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Document Intelligence supports PDF, JPEG/JPG, PNG, BMP, TIFF, HEIF, DOCX, XLSX, PPTX and HTML.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, to simplify the code, we leverage langchain wrapped loader class AzureAIDocumentIntelligenceLoader for the task. It can output Langchain documents object, which can be easily connected with other langchain components for next step, eg splitter for chunking.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I tried, Azure DI can support excel format of xlsx, and xls, however xlsm (with macro) extension is out of scope.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Prerequisite:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>-&gt; Azure DI service, you shall have &lt;endpoint&gt; and &lt;key&gt; for next step experiment.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Dive in a little bit how loader part is done.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, Load the document.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>With provisioned api_endpoint, api_key, and file_path, AzureAIDocumentIntelligenceLoader can do the job.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The api model is a interesting part, Azure DI do provide a lot of customer models for specific documents (eg, tax, invoice), check more here: <a href="https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/how-to-guides/use-sdk-rest-api?view=doc-intel-4.0.0&amp;tabs=windows&amp;pivots=programming-language-csharp">https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/how-to-guides/use-sdk-rest-api?view=doc-intel-4.0.0&amp;tabs=windows&amp;pivots=programming-language-csharp</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>    try:
+        loader = AzureAIDocumentIntelligenceLoader(
+            api_endpoint=endpoint, api_key=key, file_path=file_path, api_model="prebuilt-layout",
+            analysis_features=["keyValuePairs"]
+        )
+        documents = loader.load()
+    except Exception as e:
+        print(f"Error loading document, filename: {file_path}, exception: {e}")
+        return parsed_documents</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, split into sheets</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>looking into the content in the documents object.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>all sheets are in one document, splitted by "&lt;!-- PageBreak --&gt;".</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>and sheet name is first section in each part, wrapped with # sheetname \n\n</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>so make regex pattern r"# (.+?)\n\n", and find the first would work very well.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>    page_break = "&lt;!-- PageBreak --&gt;"
+    pattern = r"# (.+?)\n\n"
+    print(f"analyzing document, filename: {file_path}")
+    for document in documents:
+        document_json = json.loads(document.json())
+        file_name = os.path.basename(file_path)
+        content = document_json.get('page_content', None)
+
+        if content:
+
+            sheets = content.split(page_break)
+
+            for sheet in sheets:
+                # Regular expression pattern
+                # Search for the pattern in the text
+                match = re.search(pattern, sheet, re.DOTALL)
+
+                if match:
+                    sheet_name = match.group(1)
+                else:
+                    sheet_name = "No name found"
+
+                sheet_content = sheet
+                parsed_document = ParsedDocument(
+                    file_name=file_name,
+                    sheet_name=sheet_name,
+                    sheet_content=sheet_content
+                )
+                parsed_documents.append(parsed_document)
+    return parsed_documents</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, look at the data generated.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I would say, the format and relationship between column row is got lost.. all data get scanned line by line, and cell and row are unified splitted by \n\n.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I also tried keyvalue features, in the azure doc, it mentioned that "The <a href="https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/prebuilt/layout?view=doc-intel-4.0.0">prebuilt-layout</a> model extracts text and text locations, tables, selection marks, and structure information from documents and images. You can extract key/value pairs using the layout model with the optional query string parameter <code>features=keyValuePairs</code> enabled. "</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I tried, it does not work as I expected, getting people:10, goods: 5.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Result is same. Actually this setting does not even work, I got warning:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>"The current supported features are: ['ocrHighResolution']. Using other features may result in unexpected behavior."</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Anyone who has idea of what wrong is going on, and what can be done better with DI for excel?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1020,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2024/10/image-1024x511.png" alt="" class="wp-image-1020"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Input file</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Generate markdown (rendered)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1021,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2024/10/image-1-450x1024.png" alt="" class="wp-image-1021"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Summary:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, here, we tried Azure DI with Langchain to digest a excel file</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, result is not very desired, relationship of column and row matching are lost in the output. Seems that it is scanning row by row and then cell and row are all splitted by \n\n.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Anyone has idea? please leave a comment. much appreciated.</p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

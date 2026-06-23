@@ -1,0 +1,157 @@
+---
+layout: post
+title: Python min function with sorting method
+date: 2024-07-30 05:52:39.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Min function by default use a numeric sorting to get the minmum number, but we can add a sorting method to make it more customized on what is min, and can work on various object types then.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Take example of find the index of a list of time, which has closest time difference to the specific time point.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The expression: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>min(range(len(time_list)), key=lambda i: abs(time_list[i] - current_utc_time))</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>The expression is to find the index of the element in <code>time_list</code> that is closest to <code>current_utc_time</code>. Here's a step-by-step breakdown:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Components</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<code><strong>range(len(time_list))</strong></code>:<!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Generates a sequence of indices from <code>0</code> to <code>len(time_list) - 1</code>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>For example, if <code>time_list</code> has 5 elements, this will generate <code>[0, 1, 2, 3, 4]</code>.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<code><strong>key=lambda i: abs(time_list[i] - current_utc_time)</strong></code>:<!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>The <code>key</code> parameter in the <code>min</code> function specifies a function to be called on each element before making comparisons.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<code>lambda i: abs(time_list[i] - current_utc_time)</code> is an anonymous function that takes an index <code>i</code> and returns the absolute difference between <code>time_list[i]</code> and <code>current_utc_time</code>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>This function essentially measures how close each element in <code>time_list</code> is to <code>current_utc_time</code>.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<code><strong>min(..., key=...)</strong></code>:<!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>The <code>min</code> function finds the minimum value in an iterable, optionally comparing elements based on a key function.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>In this context, it finds the index <code>i</code> that minimizes <code>abs(time_list[i] - current_utc_time)</code>.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Example</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Suppose <code>time_list</code> contains some timestamps and <code>current_utc_time</code> is the current time. We want to find the timestamp in <code>time_list</code> that is closest to <code>current_utc_time</code>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>time_list = [10, 20, 30, 40, 50] </code>
+<code># Example list of times </code>
+<code>current_utc_time = 32 </code>
+<code># Current time </code>
+<code>closest_index = min(range(len(time_list)), key=lambda i: abs(time_list[i] - current_utc_time)) </code>
+<code>print(closest_index)</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Explanation</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<code><strong>range(len(time_list))</strong></code> produces <code>[0, 1, 2, 3, 4]</code>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The <code>key</code> function <code>lambda i: abs(time_list[i] - current_utc_time)</code> is applied to each index:<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>For <code>i = 0</code>: <code>abs(time_list[0] - 32)</code> → <code>abs(10 - 32)</code> → <code>22</code>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>For <code>i = 1</code>: <code>abs(time_list[1] - 32)</code> → <code>abs(20 - 32)</code> → <code>12</code>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>For <code>i = 2</code>: <code>abs(time_list[2] - 32)</code> → <code>abs(30 - 32)</code> → <code>2</code>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>For <code>i = 3</code>: <code>abs(time_list[3] - 32)</code> → <code>abs(40 - 32)</code> → <code>8</code>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>For <code>i = 4</code>: <code>abs(time_list[4] - 32)</code> → <code>abs(50 - 32)</code> → <code>18</code>
+</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The <code>min</code> function selects the index with the smallest value returned by the key function, which is <code>2</code> (since <code>2</code> is the smallest of <code>[22, 12, 2, 8, 18]</code>).</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Therefore, <code>closest_index</code> is <code>2</code>, indicating that <code>time_list[2]</code> (which is <code>30</code>) is the closest value to <code>current_utc_time</code> (<code>32</code>).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/07/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

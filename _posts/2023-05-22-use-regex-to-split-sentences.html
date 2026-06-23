@@ -1,0 +1,44 @@
+---
+layout: post
+title: Use regex to split sentences
+date: 2023-05-22 05:03:03.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- One Line Tip
+- Python
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>The regex <strong>(?&lt;=[.!?])</strong> is called a positive lookbehind. It is used to match a pattern that is preceded by another pattern. In this case, it matches any position that is immediately preceded by a period, exclamation mark or question mark. This is useful when you want to match a sentence that ends with one of these punctuation marks.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For example, the regex <strong>(?&lt;=[.!?])\s+</strong> matches any whitespace character that follows one of these punctuation marks and can be used to split a string into sentences.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sample Code:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import re
+&gt;&gt;&gt; text = " T?e  qu!ck ' brown 1 fox! jumps-.ver. the 'lazy' doG?  !"
+&gt;&gt;&gt; re.split('(?&lt;=[.!?]) +',text)
+[" T?e  qu!ck ' brown 1 fox!", 'jumps-.ver.', "the 'lazy' doG?", '!']</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>I hope this helps! Let me know if you have any other questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

@@ -1,0 +1,171 @@
+---
+layout: post
+title: MDNS and try it with Python
+date: 2023-01-31 08:29:02.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Let's first know a little bit more on MDns</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The<a rel="noreferrer noopener" href="https://www.ionos.com/digitalguide/server/know-how/name-resolution-online-what-is-a-dns-server/" target="_blank"> Domain Name System (DNS)</a> can be thought of as a very large telephone book: users can enter web addresses in their browser and the system determines the correct IP address. The name resolution works by having one’s own computer query an appropriate DNS server, which stores a list of every host name (thus, that of the web address) and assigns the correct IP address to it. Multicast DNS, however, takes a different route. How does the <strong>alternative to classic DNS</strong> work?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2><strong>How does Multicast DNS work?</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Multicast DNS (mDNS) is a protocol aimed at helping with name resolution in smaller networks. In doing so, it takes a different approach than the well-known DNS. Instead of querying a name server, <strong>all participants in the network are directly addressed</strong>. The appropriate client sends a multicast into the network while asking which network participant matches up with the host name. A multicast is a unique form of communication through which an individual message is directed at a group of recipients. The group can be made up of, for example, the entire network or a sub-network.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this way, the request also goes to the group participant who owns the host name that is being searched for. The latter <strong>responds to the entire network</strong>(also via multicast). All participants are informed of the connection between the name and IP address, and can make a corresponding entry in their mDNS cache. As long as this notation is valid, no one in the network needs to request the host name.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The multicast DNS creates a relatively large amount of traffic, yet attempts to <strong>save active network resources</strong>. For this purpose, the client making the request sends (according to the current cache entry) the reply that, in their opinion, is correct. Only when this is no longer correct, or when the entry is about to expire, does the recipient need to reply. The other participants are already informed before they receive a reply. With this protocol, the traffic within the network can thus be reduced.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In general, only <strong>host names with the ending .local</strong>are possible with multicast DNS. That limits this form of name resolution on local networks. Host names with other top-level domains (TLD) – such as .de or .com – are not processed by mDNS. Web addresses can, therefore, not be resolved in this way.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Multicast DNS was developed in the early 2010s and is described in <a rel="noreferrer noopener" href="https://tools.ietf.org/html/rfc6762" target="_blank">RFC 6762</a>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>MDNS was developed within the context of<strong> zeroconf</strong>(Zero Configuration Networking). The idea behind Zero Configuration Networking is that computers can communicate through humans without too much prior adjustment. Multicast DNS conforms to these restrictions. The multicast process is part of <a rel="noreferrer noopener" href="https://www.ionos.com/digitalguide/server/know-how/introduction-to-tcpip/" target="_blank">TCP/IP</a> and can also function without the appropriate configurations.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2><strong>Advantages of MDNS</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Multicast DNS is designed for small networks and is intended to increase their user-friendliness. The idea is that users can connect devices in secret LANs without any issues. Because all devices exchange information with one another via their IP addresses, <strong>no server or directory has to be established</strong>. In this way, additional devices can be imported in a quick and dynamic manner.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>A popular implementation of mDNS is Apple’s Bonjour. The service is primarily intended to more easily connect network printers to a PC or Mac. Because the devices exchange information via their IP addresses, the user must not <strong>configure the connection independently</strong>. In addition to Apple’s service, you can now also use the open source software Avahi as an mDNS service. This makes it possible to connect different devices without having to perform configurations beforehand. Since Windows 10, mDNS is available as part of the Microsoft operating system.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2><strong>Disadvantages and risks of Multicast DNS</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The easy operation, however, is accompanied by some drawbacks. One problem lies in the multicast process itself. Though it’s true that the protocol tries to keep network traffic low, the computers involved must constantly monitor the network and process the incoming messages. This is a burden on <strong>processing power</strong>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Furthermore, the allocation of the host names is problematic. In principle, one can freely assign a name to each device provided that it ends with ‘.local’. This can (at least theoretically) lead to two network participants being <strong>represented by the same host name</strong>. The developers of mDNS have consciously not implemented a solution for this type of scenario. On the one hand, they assume that this case is rare; on the other hand, the double designation could be intentional.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Another problem is a <strong>hazard source</strong>. In many cases, the mDNS is open. This means that it also reacts to external queries (via the Internet). Cyber criminals can find these types of open services and use them for <a rel="noreferrer noopener" href="https://www.ionos.com/digitalguide/server/know-how/dos-and-ddos-attack-patterns-at-a-glance/" target="_blank">DDoS attacks</a>. The network’s devices are then misused in order to bombard a target server with queries. Furthermore, sensitive data can be discovered via an open multicast DNS. Attackers can, in this way, read the Mac addresses of connected devices, for example, and use this information for further attacks.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let's try MDNS with python.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We need to install a lib: zeroconf</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Some sample code:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import socket
+import time
+from typing import cast
+import zeroconf
+#https://github.com/mnishig/mdns-discover/blob/master/ServiceDiscover.py
+class ZeroconfListener(zeroconf.ServiceListener):
+    def __init__(self) -&gt; None:
+        super().__init__()
+        self.services = []
+
+    def remove_service(self, zc: 'Zeroconf', type_: str, name: str) -&gt; None:
+        # print('{} service: removed'.format(name) )
+        info = zc.get_service_info(type_, name)
+
+        for service in self.services:
+            if service['name'] == name:
+                self.services.remove(service)
+
+    def add_service(self, zc: 'Zeroconf', type_: str, name: str) -&gt; None:
+        info = zc.get_service_info(type_, name)
+        addr_str = []
+        for item in info.addresses:
+            addr_str.append(socket.inet_ntoa(cast(bytes, item)))
+
+        # print(name, addr_str)
+        item = {
+            'name': info.name,
+            'type': info.type,
+            'server': info.server,
+            'addresses': addr_str,
+            'port': info.port,
+        }
+
+        self.services.append(item)
+
+    def update_service(self, zc: 'Zeroconf', type_: str, name: str) -&gt; None:
+        pass
+
+    def get_services(self) -&gt; list:
+        return self.services
+
+class ServiceDiscover:
+    def __init__(self) -&gt; None:
+        # self.zeroconf = zeroconf.Zeroconf()
+        self.browser = None
+
+        self.types = []
+        self.services = []
+        self.get_servicetypes()
+
+    def get_servicetypes(self) -&gt; None:
+        self.types = zeroconf.ZeroconfServiceTypes.find()
+
+    def browse(self) -&gt; None:
+        zc = zeroconf.Zeroconf()
+        listener = ZeroconfListener()
+
+        for type in self.types:
+            counter = 0
+            browser = zeroconf.ServiceBrowser(zc, type, listener)
+            while counter &lt; 5:
+                time.sleep(0.1)
+                counter += 1
+
+            browser.cancel()
+            self.services = listener.services
+
+
+if __name__ == "__main__":
+    sd = ServiceDiscover()
+    sd.browse()
+
+    for item in sd.services:
+        print(item)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sample output:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":647,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2023/01/image-7-1024x51.png" alt="" class="wp-image-647"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Works!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/01/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

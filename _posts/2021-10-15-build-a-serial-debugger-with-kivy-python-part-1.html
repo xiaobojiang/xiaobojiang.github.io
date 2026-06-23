@@ -1,0 +1,262 @@
+---
+layout: post
+title: Build a Serial Debugger with Kivy + Python – part 1
+date: 2021-10-15 06:06:51.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Kivy is a UI library of Python, it can help developer quickly build a GUI program. Basics of Kivy can be found my previous post here (Power tool to build UI with python: Kivy  <a href="https://www.iotcolon.com/?p=142">https://www.iotcolon.com/?p=142</a>)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I spend some time to make a simple serial debugger based on Kivy, it is published on my git (<a href="https://github.com/xiaobojiang/kivy_playground">https://github.com/xiaobojiang/kivy_playground</a>).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In following few posts, I would like to share some experience I learned during the development. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>First post is about UI.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>UI with Kivy Language</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Following is the running UI of the serial debugger, the layout and elements are fully composed with Kivy language.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":187,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/10/image-5-1024x595.png" alt="" class="wp-image-187"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 1. My debugger's UI</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>My method is from macro to micro, always start from the whole GUI, then split the GUI into few main blocks, and in each block, split the block with more detailed elements.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For the serial debugger, the upper level block is like below code. The Root has a box layout, and by default it is horizontal, and this Root box has two elements, both of them are also box layouts. Box1 consume 30% width, by specifying size_hint_x: 0.3, and Box2 consumes other 70%.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>&lt;Root&gt;:
+    BoxLayout:
+        orientation: 'horizontal'
+        spacing: dp(10)
+        canvas.before:
+            Color:
+                rgba: (0.179, 0.191, 0.191, 1)
+            Rectangle:
+                size: self.size
+
+        BoxLayout:  #Box1
+            orientation: 'vertical'
+            size_hint_x: 0.3
+
+            .....
+                
+
+
+        BoxLayout: #Box 2
+            orientation: 'vertical'
+            ....
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":185,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/10/image-3.png" alt="" class="wp-image-185"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 2. Main breakdown of the UI</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Recursively, for the Box1, I split the box into three boxes: Serial setting box Box1-1, Recv setting box Box1-2 and send setting box Box1-2. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And in each box, labels and button are added. For example, in Box1-1, there is a header text: "Serial Setting", following by selection  of port, baudrate, parity, stop bi, data bits and open button.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":184,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/10/image-2.png" alt="" class="wp-image-184"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 3. breakdown of Box1</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Furthermore, in the Serial setting box's selection part, it has two rows, one row is description of various serial port setings, like “port”, and other row is a drop down selection widget. Here, the GridLayout is used to make the alignment happen. Drop down selection utilizes the Spinner widget from Kivy.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>One interesting point is about the checkbox, eg “Append \r\n” in Box1-3. Since I set the background to dark one, this makes the default frame color of the checkbox totally un-identifiable from the background.  </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, the checkbox has special designed canvas to tune the color. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>      CheckBox:
+	size_hint_y: None
+	height: '16dp'
+	id: id_append_linend_send
+	active: False
+	on_active: root.on_append_linend_send_change(self.active)
+	pos: self.parent.center_x - dp(16), self.parent.center_y - dp(16)
+	canvas.before:
+		Color:
+			rgb: 1,1,0
+		Rectangle:
+			pos:self.center_x-dp(8), self.center_y-dp(8)
+			size:[dp(16),dp(16)]
+		Color:
+			rgb: 0.179, 0.191, 0.191
+		Rectangle:
+			pos:self.center_x-dp(7), self.center_y-dp(7)
+			size:[dp(14),dp(14)]</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>And the highlighted effect after light yellow customization:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":188,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/10/image-6.png" alt="" class="wp-image-188"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 4. check box with light yellow color</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the serial setting box, there is an indicator (red/green) to show the serial connection status. A widget is defined in the kv file. The Color attribute is controlled by python file to switch color when status changes.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>&lt;Indicator&gt;:
+    canvas:
+        Color:
+            rgba: self.color
+        Ellipse: 
+            pos: self.center_x / 2 , self.center_y - dp(8)
+            size: dp(16), dp(16)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>On the right Box2, things are more simple, there are two large text area for received data and send data area. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>there is also a checkbox "add timestamp", user can use this to add datetime at head of each receiving line.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>There are also two buttons to clear received and sent text.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the Box 1’s encoding area, user can choose ASCII or HEX encoding of the received and sent text in Box2.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>There is also on handy function in Box 1: “save to file”, it will save all the receiving text into a txt file.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>“SaveDialog” widget in below is design, let user to choose destination folder and specify the file name.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":183,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/10/image-1.png" alt="" class="wp-image-183"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 5. save dialog window</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>&lt;SaveDialog&gt;:
+    text_input: text_input
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserIconView:
+            id: filechooser
+            filters: ['*.txt']
+            rootpath: root.homepath
+            on_selection: text_input.text = self.selection[0] if self.selection else ''
+
+        TextInput:
+            id: text_input
+            size_hint_y: None
+            height: '30dp'
+            multiline: False
+
+        BoxLayout:
+            size_hint_y: None
+            height: '30dp'
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Save"
+                on_release: root.save(filechooser.path, text_input.text)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally, in order to make the UI layout works for different screen resolution, all the size, height, width, padding are in the unit dp (density-dependent pixels)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For some size input, which only takes pixels, a method dp() is used to do the convert.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Hooks with Python script</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In order to make the widget, like button, hooked with python script, one unique id should be assign, and claimed those ids at root level. we will talk abou usage in next post. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>&lt;Root&gt;:
+    console_text: console_text
+    send_text: send_text
+    id_commport: id_commport
+    id_baudrate: id_baudrate
+    id_checksum: id_checksum
+    id_stopbit: id_stopbit
+    id_databit: id_databit
+    id_indicator: id_indicator
+    id_switch_serial: id_switch_serial
+    id_recv_encode: id_recv_encode
+    id_send_encode: id_send_encode
+    id_append_linend_send: id_append_linend_send
+    id_add_timestamp: id_add_timestamp</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>For example, in below code, this spinner can enable user change baudrate, one id "id_baudrate" is assigned. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Furthermore, "on_text" also defines a callback function "root.on_baudrate_change", when Spinner's text changes. If user change the selection of baudrate, this "on_text" function will be called. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>                      Spinner:
+                        id: id_baudrate #unique id assigned
+                        text: '9600'
+                        values: ('1200', '2400', '4800', '9600', '19200', '38400', '57600', '115200')
+                        size_hint_y: None
+                        height: '30dp'
+                        on_text: root.on_baudrate_change(self.text) #callback func when text change
+                        size_hint_x: 0.618</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>What's next</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Please check more detail in my git, and try with yourself. Leave me reply if have any questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Next post will talk about the corresponding python script part.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/10/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

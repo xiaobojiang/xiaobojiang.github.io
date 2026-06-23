@@ -1,0 +1,208 @@
+---
+layout: post
+title: Set Proper Timing of Cookie for Oauth2-Proxy
+date: 2026-05-21 08:47:44.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+- Web
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:heading --><html><body></p>
+<h2 class="wp-block-heading"><strong>🧩 Issue</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>We’re using oauth2-proxy with our IDM to authenticate users and get JWT access tokens and cookies.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>However, we observe the following behavior:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Users can log in successfully.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Their <strong>JWT access token expires after 1 hour</strong> (as set by the IdM).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The <strong>session cookie remains valid much longer</strong>, so oauth2-proxy still considers the session authenticated.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>When calling backend APIs, the forwarded access token is expired → <strong>API requests fail with 401</strong> even though the user appears logged in.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🔍 Root Cause</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>This happens because of how oauth2-proxy manages session cookies vs tokens:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Session cookie lifetime is independent from JWT expiry</strong>By default, oauth2-proxy issues a session cookie that can be valid far longer than the access token. The proxy only checks the cookie — <em>not whether the JWT is still valid</em> — before letting the user through.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>jwt access token expires sooner than the cookie</strong>The backend receives the expired JWT and rejects it, even though oauth2-proxy still sees the session as valid.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Token refresh only happens under certain conditions</strong>oauth2-proxy will refresh tokens <em>only if</em>:<!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>A <strong>refresh token</strong> is present,</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The cookie_refresh threshold is reached,</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>And a <strong>new request arrives</strong> after that threshold.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Without a refresh token or proper settings, the access token <strong>won’t get refreshed automatically</strong>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Changing settings can invalidate existing sessions</strong>When cookie_refresh/cookie_expire are shortened, or the cookie_secret changes, previously issued cookies may no longer match new rules and force users to log in again.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>✅ How to Fix It</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>To ensure users don’t keep a valid session while sending expired JWTs to your backend:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>1. Enable and use the refresh token</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Make sure your IdM issues a refresh token (e.g., include offline_access scope if needed).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Without a refresh token, oauth2-proxy cannot renew the access token.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>2. Tune cookie_refresh relative to access token lifetime</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Because your access token is valid for 1 hour, set:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>cookie_refresh = "55m"</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This tells oauth2-proxy to attempt refresh just before expiration so the JWT remains valid.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>3. Set cookie_expire to match refresh token TTL</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Your IdM refresh token expires in 48 hours, so:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>cookie_expire = "48h"</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This allows the session cookie to remain valid as long as the refresh token does, letting oauth2-proxy continue refreshing.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>4. Understand refresh behavior</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>oauth2-proxy only refreshes <strong>when a request arrives aftercookie_refreshis reached</strong>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>It does <strong>not</strong> refresh in the background without a request.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>If the refresh token itself expires, users will have to re-login.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>5. Config updates and session invalidation</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you shorten cookie values or rotate the cookie secret:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Existing cookies may be considered invalid on the next request.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>That forces users to authenticate again.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧠 Summary Table</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<tbody>
+<tr>
+<th><strong>Setting</strong></th>
+<th><strong>Value</strong></th>
+<th><strong>Purpose</strong></th>
+</tr>
+<tr>
+<td>cookie_refresh</td>
+<td>55m</td>
+<td>Refresh access token shortly before it expires</td>
+</tr>
+<tr>
+<td>cookie_expire</td>
+<td>48h</td>
+<td>Keep session alive as long as the refresh token</td>
+</tr>
+<tr>
+<td>Refresh token</td>
+<td>Present</td>
+<td>Required for renewing the JWT</td>
+</tr>
+<tr>
+<td>Session persistence</td>
+<td>Optional Redis</td>
+<td>Helps with larger sessions but not required</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Hope this helps, feel free to leave a comment</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2026/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

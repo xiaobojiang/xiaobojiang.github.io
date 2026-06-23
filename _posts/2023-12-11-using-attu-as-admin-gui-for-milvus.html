@@ -1,0 +1,82 @@
+---
+layout: post
+title: Using Attu as admin GUI for milvus
+date: 2023-12-11 05:52:54.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Attu is an all-in-one milvus administration tool. With Attu, you can dramatically reduce the cost of managing milvus.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":842,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2023/12/image-2-1024x450.png" alt="" class="wp-image-842"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://github.com/zilliztech/attu/blob/main/.github/images/screenshot.png">https://github.com/zilliztech/attu/blob/main/.github/images/screenshot.png</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Quick start guide for Attu</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>❗ attu version 2.2.3 or higher is incompatible with Milvus versions &lt; v2.2.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you prefer to use a desktop application, you can download the <a href="https://github.com/zilliztech/attu/releases/"><u>desktop version of Attu</u></a>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Running Attu from Docker</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Before you begin, make sure that you have Milvus installed on either <a href="https://milvus.io/docs/install_cluster-docker.md"><u>your server</u></a> or <a href="https://zilliz.com/cloud"><u>Zilliz Cloud</u></a>. Note that Attu only supports Milvus 2.x and some of the features are not supported yet for Zilliz Cloud.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here are the steps to start a container for running Attu:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>docker run -p 8000:3000 -e MILVUS_URL={milvus server IP}:19530 zilliz/attu:v2.3.1</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Make sure that the Attu container can access the Milvus IP address. After starting the container, open your web browser and enter http://{ Attu IP }:8000 to view the Attu GUI.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Start script:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":844,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2023/12/image-4-1024x91.png" alt="" class="wp-image-844"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Start attu with $ sh start_attu.sh</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And you can forward to local port via:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>$ ssh -L 8000:127.0.0.1:8000 remote_host</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now check the GUI in your local browser: <a href="http://locahost:8000">http://locahost:8000</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Done, try to explore your collection and data in GUI:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":843,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2023/12/image-3-1024x800.png" alt="" class="wp-image-843"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading, please leave a reply if you have any questions or comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/12/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

@@ -1,0 +1,110 @@
+---
+layout: post
+title: Grant proper roles to view EKS resources in console
+date: 2022-07-11 07:06:48.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Kubernetes
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>On the aws console, from last year, there is a new feature that you can view resources of EKS cluster in the console.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>However, I find I am blocked from viewing them.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It complains: <em>"Your current user or role does not have access to Kubernetes objects on this EKS cluster This may be due to the current user or role not having Kubernetes RBAC permissions to describe cluster resources or not having an entry in the cluster’s auth config map.Learn more"</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here is the quick solution:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>When you create an Amazon EKS cluster, the AWS Identity and Access Management (IAM) entity user or role, such as a federated user that creates the cluster, is automatically granted system:masters permissions in the cluster's role-based access control (RBAC) configuration in the Amazon EKS control plane. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>-&gt; To grant additional AWS users or roles the ability to interact with your cluster, you must edit the aws-auth ConfigMap within Kubernetes of that EKS cluster. This has to be done assuming the cluster creator (role/user) as only the cluster creator has the admin access over it. To know more information please refer the document [1]. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>-&gt; If you are the cluster creator you can directly edit the aws-auth ConfigMap and if you are not the cluster creator you need to assume the cluster creator and edit the aws-auth configmap of the EKS cluster using the command below. $ kubectl edit configmap aws-auth -n kube-system</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Add the IAM user to mapUsers. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For example: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>mapUsers: |
+- userarn: arn:aws:iam::XXXXXXXXXXXX:user/testuser
+username: testuser
+groups:
+- system:masters</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Or add the IAM role to mapRoles. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For example: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>mapRoles: |
+- rolearn: arn:aws:iam::XXXXXXXXXXXX:role/testrole
+username: testrole
+groups:
+- system:masters</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>-&gt; The detailed process is mentioned in [2] and I recommend you to go through it and perform those steps to resolve the issue. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>-&gt; After performing these steps you should be able to access the EKS cluster resources. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Please note If you are giving system:masters under groups, The system:masters group allows superuser access to perform any action on any resource. Also make sure you are editing the aws-auth ConfigMap for appropriate cluster.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>After add my user into the config, it works fine:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":506,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/07/image-2-1024x400.png" alt="" class="wp-image-506"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[1] <a rel="noreferrer noopener" href="https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html" target="_blank">https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html</a> </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[2] <a rel="noreferrer noopener" href="https://aws.amazon.com/premiumsupport/knowledge-center/eks-api-server-unauthorized-error/" target="_blank">https://aws.amazon.com/premiumsupport/knowledge-center/eks-api-server-unauthorized-error/</a> </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[3] <a rel="noreferrer noopener" href="https://docs.aws.amazon.com/eks/latest/userguide/view-kubernetes-resources.html" target="_blank">https://docs.aws.amazon.com/eks/latest/userguide/view-kubernetes-resources.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have any comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/07/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

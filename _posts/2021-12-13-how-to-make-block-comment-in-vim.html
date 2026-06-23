@@ -1,0 +1,181 @@
+---
+layout: post
+title: How to make block comment in Vim
+date: 2021-12-13 05:19:20.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Vim is a great tool, for me, it especially useful when I am changing files in Linux command line without GUI.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>One of daily usage is to comment and uncomment lines in Vim. I searched and found few nice ways to do this and would like to share in this post. In general, there are two ways: 1, original 2, use plugin</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Original means that we are using some original grammar that vim supports, no further plugin installation is required.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Original Way</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Take one example, I have one file called test.py, I want to comment all 3 lines.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code> 
+print ("hello world")
+print ("hi")</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>There are few steps:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, go to command mode, press ‘v’ to enter visual select mode, press arrows to select few lines that we want to commen</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":285,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/12/image.png" alt="" class="wp-image-285"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, press <strong>:s/^/#</strong>, this make replace the starting of line with character with Python comment char ‘#’. Press enter</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":284,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/12/image-1.png" alt="" class="wp-image-284"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, you have got these lines commented</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":286,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/12/image-2.png" alt="" class="wp-image-286"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>To uncomment these line, procedure is similar, only difference is in step 2, replace the command string with <strong>:s/^#/</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":287,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/12/image-3.png" alt="" class="wp-image-287"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>For C, the comment is “//”, since ‘/’ is a special character in Vim, we need to use ‘\’ to escape.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So the comment command in step 2 is :s/^/\/\/</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And the uncomment command in step 3 is :s/^\/\//</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Plugin way</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I recommend to use nerdcommenter. We can use Vundle to manage vim plugins and install it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Follow the guide in <a href="https://github.com/preservim/nerdcommenter">https://github.com/preservim/nerdcommenter</a>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Installation:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Add Plugin 'preservim/nerdcommenter' to your vimrc file.</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Reload your vimrc or restart</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Run :BundleInstall</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Post Installation</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Make sure that you have filetype plugins enabled, as the plugin makes use of |commentstring| where possible (which is usually set in a filetype plugin). See |filetype-plugin-on| for details, but [count]&lt;leader&gt;cu <strong>|NERDCommenterUncomment|</strong>
+</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Uncomments the selected line(s).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>filetype plugin on</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>How to comment lines with nerdcommenter:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, find your leader key</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Type <strong>:echo mapleader </strong>in the vim command mode.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And the leader key will pop up, for MacOS, it is ‘,’.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, in visual mode, select few lines</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>[count]&lt;leader&gt;cc </li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Comment out the current line or text selected in visual mode.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For my system, for the selected lines, enter <strong>,cc</strong> can comment all lines</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>[count]&lt;leader&gt;cu </li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Uncomments the selected line(s).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For in my system, for the selected lines, enter <strong>,cu</strong> can uncomment all lines</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Similarly, <strong>2,cc  2,cu</strong> can comment/uncomment 2 lines below cursor.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Using plugin is simpler, can it can adapt different languages.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Conclusion</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this post, two ways of comment lines of code are explained.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you daily use Vim on one or two computers, plugin is a nice thing. If you are editing on a new server, using original way is more light weighted.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the end, use one in your preference.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave me a comment or reply if you have any questions. Thanks for your time.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/12/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

@@ -1,0 +1,186 @@
+---
+layout: post
+title: Configuring proxy_pass in Nginx
+date: 2024-07-08 07:26:06.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>When configuring the <code>proxy_pass</code> directive in Nginx, the presence or absence of a trailing slash in the URL affects how paths are handled. If a trailing slash is added after the URL, it indicates an absolute root path. If there is no trailing slash, it indicates a relative path, including the matched part of the location block.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let's explore four different configurations exmaples using the URL <code>http://192.168.1.1/proxy/test.html</code>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example 1:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>location /proxy/ {
+    proxy_pass http://127.0.0.1/;
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Result: <strong>Proxied URL:</strong> <code>http://127.0.0.1/test.html</code></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note: here proxy_pass has no trailing slash, make the location absolution, /proxy/ is replaced with absolute address http://127.0.0.1/ + test.html</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example 2 (without the trailing slash):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>location /proxy/ {
+    proxy_pass http://127.0.0.1;
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Proxied URL:</strong> <code>http://127.0.0.1/proxy/test.html</code></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note: no trailing slash at proxy_pass, just appending the location to the end of target server address http://127.0.0.1 + /proxy/test.html</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example 3:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>location /proxy/ {
+    proxy_pass http://127.0.0.1/aaa/;
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Proxied URL:</strong> <code>http://127.0.0.1/aaa/test.html</code></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note: trailing slash make the absolute path, there /aaa replace the /proxy. Final url is http://127.0.0.1/aaa/test.html</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example 4 (without the trailing slash):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>location /proxy/ {
+    proxy_pass http://127.0.0.1/aaa;
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Proxied URL:</strong> <code>http://127.0.0.1/aaatest.html</code></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>When a client requests <code>http://192.168.1.1/proxy/test.html</code>, Nginx matches this request to the <code>location /proxy/</code> block.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">URL Handling by Nginx:</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<!-- wp:list-item --></p>
+<li>
+<strong>Matching Location Block:</strong><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>The request URI <code>/proxy/test.html</code> matches the <code>location /proxy/</code> block.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Proxy Pass Directive without Trailing Slash:</strong><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li><code>proxy_pass http://127.0.0.1/aaa;</code></li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Since there's no trailing slash after <code>/aaa</code>, Nginx will append the remaining part of the client request URI to the URL specified in <code>proxy_pass</code>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The remaining part of the request URI, after <code>/proxy</code>, is <code>/test.html</code>.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Constructed Proxied URL:</strong><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>Nginx constructs the proxied URL by concatenating <code>http://127.0.0.1/aaa</code> with <code>/test.html</code>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>This results in <code>http://127.0.0.1/aaatest.html</code>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">The fourth example is really above my head. So I setup an example server for testing upper case.
+with nginx config:
+
+ server {
+
+        listen 80;
+        location /proxy/ {
+          proxy_pass http://127.0.0.1:8080/aaa;
+          }
+}</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then write a python server to print out the request url:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import http.server
+import socketserver
+
+PORT = 8080
+
+class RequestHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        print(f"Requested URL: {self.path}")
+        super().do_GET()
+
+with socketserver.TCPServer(("", PORT), RequestHandler) as httpd:
+    print(f"Serving on port {PORT}")
+    httpd.serve_forever()</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally, test the url</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><strong>$</strong> curl localhost:80/proxy/test.html    </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>and we get this log from python test server. Wow, yes, it did append the <code>test.html</code> after path `aaa`!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>Requested URL: /aaatest.html
+127.0.0.1 - - [08/Jul/2024 15:42:13] code 404, message File not found
+127.0.0.1 - - [08/Jul/2024 15:42:13] "GET /aaatest.html HTTP/1.0" 404 -</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/07/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

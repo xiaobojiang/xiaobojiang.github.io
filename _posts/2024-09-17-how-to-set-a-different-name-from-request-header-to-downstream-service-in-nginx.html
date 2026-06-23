@@ -1,0 +1,123 @@
+---
+layout: post
+title: how to set a different name from request header to downstream service in nginx
+date: 2024-09-17 08:56:47.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>To set a different name from a request header to a downstream service in Nginx, you can use the proxy_set_header directive within alocation block. This directive allows you to override or set new headers that will be sent to the proxied server. Here's how you can do it:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Edit your Nginx configuration file</strong>: Typically, this file is located at/etc/nginx/nginx.confor in the/etc/nginx/conf.d/directory.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Add or modify a</strong><strong>location</strong><strong>block</strong>: Inside thelocationblock, you can use theproxy_set_headerdirective to set the new header.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here's an example configuration:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>server {
+
+    listen 80;
+    server_name example.com;
+
+    location / {
+
+        proxy_pass http://backend_server;
+
+        # Set a different name for a header
+        proxy_set_header X-New-Header $http_x_old_header;
+
+        # Optionally, set additional headers or modify existing ones
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+    }
+
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>                                                           </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>proxy_pass <a href="http://backend_server/">http://backend_server</a>; specifies the upstream server to which the request will be proxied.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>proxy_set_header X-New-Header $http_x_old_header; sets the value of the X-New-Header header to the value of the X-Old-Header header from the incoming request.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can replace X-Old-Header and X-New-Header with the actual header names you are working with.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":3} --></p>
+<ol start="3" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Test the configuration</strong>: Before reloading or restarting Nginx, it's a good idea to test the configuration for syntax errors:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo nginx -t</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":4} --></p>
+<ol start="4" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Reload or restart Nginx</strong>: If the configuration test passes, reload or restart Nginx to apply the changes:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo systemctl reload nginx</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>or</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo systemctl restart nginx</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This setup will ensure that the specified header name is changed before the request is forwarded to the downstream service.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading, leave a comment if you have any further queries.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/09/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

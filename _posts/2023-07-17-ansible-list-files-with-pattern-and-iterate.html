@@ -1,0 +1,147 @@
+---
+layout: post
+title: 'Ansible: list files with pattern and iterate'
+date: 2023-07-17 07:02:49.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+tags: []
+meta: {}
+render_with_liquid: false
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>The find module in Ansible is used to search for files, directories, or links based on specific criteria such as age, pattern, or regular expression. One of the features of this module is that you can use the patterns parameter to select files that match a shell-style glob. For example, you can use patterns: '*.txt' to find all the text files in a given path.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Some additional information that might be helpful:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We can use the recurse parameter to enable or disable recursive search.<br>We can use the register keyword to store the output of the find module in a variable for later use.<br>We can use the file_type parameter to filter by file type, such as file, directory, link, socket, etc.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Below is the sample code that:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, find all the tar files in the specified path, and register the result in "find_result"</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, read the file json object list in parameter "files", and use map method to get paths as list</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, now use the list in loop to operate on them.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>---
+# tasks file for application
+- name: Get the current applications running
+  find:
+    paths: /path/to/app
+    file_type: file
+    Patterns: “*.tar"
+  register: find_result
+
+TASK [mongo_update : print find_result] ***********************************************************************************
+ok: [app_node] =&gt; {
+    "find_result.files": [
+        {
+            "atime": 1687334936.0473757,
+            "ctime": 1687333304.560075,
+            "dev": 64515,
+            "gid": 1000,
+            "gr_name": "ecs-user",
+            "inode": 396986,
+            "isblk": false,
+            "ischr": false,
+            "isdir": false,
+            "isfifo": false,
+            "isgid": false,
+            "islnk": false,
+            "isreg": true,
+            "issock": false,
+            "isuid": false,
+            "mode": "0644",
+            "mtime": 1687333304.560075,
+            "nlink": 1,
+            "path": "/home/ecs-user/image_oauth.tar",
+            "pw_name": "ecs-user",
+            "rgrp": true,
+            "roth": true,
+            "rusr": true,
+            "size": 121653760,
+            "uid": 1000,
+            "wgrp": false,
+            "woth": false,
+            "wusr": true,
+            "xgrp": false,
+            "xoth": false,
+            "xusr": false
+        },
+        {
+            "atime": 1687335481.091184,
+            "ctime": 1687335454.2904062,
+            "dev": 64515,
+            "gid": 1000,
+            "gr_name": "ecs-user",
+            "inode": 397035,
+            "isblk": false,
+            "ischr": false,
+            "isdir": false,
+            "isfifo": false,
+            "isgid": false,
+            "islnk": false,
+            "isreg": true,
+            "issock": false,
+            "isuid": false,
+            "mode": "0644",
+            "mtime": 1687335454.2904062,
+            "nlink": 1,
+            "path": "/home/ecs-user/image.nginx.tar",
+            "pw_name": "ecs-user",
+            "rgrp": true,
+            "roth": true,
+            "rusr": true,
+            "size": 191066112,
+            "uid": 1000,
+            "wgrp": false,
+            "woth": false,
+            "wusr": true,
+            "xgrp": false,
+            "xoth": false,
+            "xusr": false
+        }
+    ]
+}
+
+- name: Print find output
+  debug: 
+    var: find_result.files
+
+- name: Print find output
+  debug:
+      msg: "{{ item }}"
+  with_items: "{{ find_result.files|map(attribute='path')|list }}"
+
+ok: [app_node] =&gt; (item=/home/ecs-user/image_oauth.tar) =&gt; {
+    "msg": "/home/ecs-user/image_oauth.tar"
+}
+ok: [app_node] =&gt; (item=/home/ecs-user/image.nginx.tar) =&gt; {
+    "msg": "/home/ecs-user/image.nginx.tar"
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>That's it, hope you find it useful.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/07/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

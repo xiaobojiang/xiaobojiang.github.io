@@ -1,0 +1,74 @@
+---
+layout: post
+title: oauth2-proxy logout
+date: 2023-10-16 08:12:18.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Oauth proxy is a nice light-weight user access management software, it can be earily intergrated with SSO system, for example azure AD, without modifying application code. In the previous post, I shared how to deploy it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this post, I would like to share how to enable logout feature.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To sign the user out, redirect them to /oauth2/sign_out. This endpoint only removes oauth2-proxy's own cookies, i.e. the user is still logged in with the authentication provider and may automatically re-login when accessing the application again. You will also need to redirect the user to the authentication provider's sign out page afterwards using the rd query parameter, i.e. redirect the user to something like (notice the url-encoding!):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>/oauth2/sign_out?rd=https%3A%2F%<a href="http://2Fmy-oidc-provider.example.com%2Fsign_out_page">2Fmy-oidc-provider.example.com%2Fsign_out_page</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Alternatively, include the redirect URL in the X-Auth-Request-Redirect header:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>GET /oauth2/sign_out HTTP/1.1</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>X-Auth-Request-Redirect:<a href="https://my-oidc-provider/sign_out_page">https://my-oidc-provider/sign_out_page</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>...</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>(The "sign_out_page" should be the <a href="https://openid.net/specs/openid-connect-session-1_0.html#rfc.section.2.1">end_session_endpoint</a> from <a href="https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig">the metadata</a> if your OIDC provider supports Session Management and Discovery.)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>BEWARE that the domain you want to redirect to (<a href="http://my-oidc-provider.example.com/">my-oidc-provider.example.com</a> in the example) must be added to the <a href="https://oauth2-proxy.github.io/oauth2-proxy/docs/7.3.x/configuration/overview">--whitelist-domain</a> configuration option otherwise the redirect will be ignored.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Steps for enabling Azure AD logout feature:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, add --whitelist-domain in auth-proxy</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Eg, for azure ad, add <a href="http://login.windows.net/">login.windows.net</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, once user click logout, call GET oauth2/sign_out?rd=<a href="https://login.windows.net/75b2f54b-feff-400d-8e0b-67102edb9a23/oauth2/logout">https://login.windows.net/{1}/oauth2/logout</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>{1} is the tenant-id</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/10/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

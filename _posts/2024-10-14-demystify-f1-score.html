@@ -1,0 +1,109 @@
+---
+layout: post
+title: Demystify F1 score
+date: 2024-10-14 07:31:03.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>The F1 score is a performance metric used to evaluate the accuracy of a classification model, particularly in cases where the dataset is imbalanced (i.e., the classes are not represented equally). It combines precision and recall into a single measure to provide a balanced assessment of the model’s performance.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Key Definitions:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>    1.    Precision: Measures how many of the predicted positive instances are actually correct.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Precision = True Positives/(True Positives + False Positives)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>    2.    Recall (also called Sensitivity or True Positive Rate): Measures how many of the actual positive instances were correctly identified by the model.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Recall = True Positives/(True Positives + False Negatives)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>F1 Score Formula:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The F1 score is the harmonic mean of precision and recall. It gives equal weight to both metrics, and the score ranges from 0 to 1, where 1 is the best possible score, and 0 is the worst.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>F1 Score = 2*(Precision * Recall)/(Precision + Recall)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Why Use the F1 Score?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>    •    Balanced assessment: It balances precision and recall, making it useful in cases where you need to find a tradeoff between false positives and false negatives.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>    •    Imbalanced datasets: When you have an imbalanced dataset (e.g., fraud detection, disease prediction), accuracy alone may not be a good indicator of model performance because it can be misleading. The F1 score helps give a better sense of how well the model is performing with respect to the minority class.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Suppose you have the following confusion matrix:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:table {"className":"is-style-stripes"} --></p>
+<figure class="wp-block-table is-style-stripes">
+<table class="has-fixed-layout">
+<tbody>
+<tr>
+<td></td>
+<td><strong>Predicted Positive</strong></td>
+<td><strong>Predicted Negative</strong></td>
+</tr>
+<tr>
+<td>Actual Positive</td>
+<td>70 (True Positives)</td>
+<td>30 (False Negatives)</td>
+</tr>
+<tr>
+<td>Actual Negative</td>
+<td>10 (False Positives)</td>
+<td>90 (True Negatives)</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>    •    Precision = 70/(70 + 10) = 0.875</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>    •    Recall =  70/(70 + 30) = 0.7</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now, calculate the F1 score:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>F1 Score = 2 * 0.875 * 0.7/(0.875 + 0.7) = 0.777</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this case, the F1 score is 0.777, giving a more balanced view of the model’s performance.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading. Any questions please leave a comment.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/10/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

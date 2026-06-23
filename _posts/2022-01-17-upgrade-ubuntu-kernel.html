@@ -1,0 +1,147 @@
+---
+layout: post
+title: Upgrade Ubuntu Kernel
+date: 2022-01-17 05:35:39.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Our lab purchase one most up-to-date ASUS Z690 motherboard, and it has many fantastic features: support inter i9-12900KF, DDR5, and WiFi 6.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We installed latest Ubuntu 20.04 LTS on this tower server, every peripherals works fine, except WiFi6.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>There is not WiFI device identified by the system.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I believed that it is due to lack of driver, I searched a lot on the internet, there is only a windows version on ASUS website, not linux one.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally I found a post which shares that you can upgrade your linux kernel to 5.15. it will support.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So yes, let me share the result first, upgrade the kernel really solves the problem.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>What I have tried:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, first, some post said, latest Ubuntu 21.10 has 5.15 embedded. Not true, current 21.10 comes with kernel 5.13, and it cannot find the proper WiFi driver.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, I tried to upgrade the kernel in Ubuntu 21.10, and by solving some issues, it worked out:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let me share some tips for kernel upgrade:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>1, download the kernel packages from Ubuntu website</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We will need four packages: linux header, linux headers all, linux image, linux modules.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can find these packages with different version at: <a href="https://kernel.ubuntu.com/~kernel-ppa/mainline">https://kernel.ubuntu.com/~kernel-ppa/mainline</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I have downloaded lasted ones on 2022-1-10, version is 5.15.13 to one folder, with following commands:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>wget -c https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.15.13/amd64/linux-headers-5.15.13-051513-generic_5.15.13-051513.202201050731_amd64.deb
+wget -c https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.15.13/amd64/linux-headers-5.15.13-051513_5.15.13-051513.202201050731_all.deb
+wget -c https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.15.13/amd64/linux-image-unsigned-5.15.13-051513-generic_5.15.13-051513.202201050731_amd64.deb
+wget -c https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.15.13/amd64/linux-modules-5.15.13-051513-generic_5.15.13-051513.202201050731_amd64.deb</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>2, install all the packages in the folder by following command:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>sudo dpkg -i *.deb</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>It should complete without errors, unfortunately for me, I encountered linux header generic package installation error issue.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Try </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$sudo apt upgrade</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>it will show the error of dependency issue libssl3.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It means that this lib has issue, I tried, it is not available by apt install.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>One solution found by me is that:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>2.1 download the deb file from below website:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://packages.ubuntu.com/jammy/amd64/libssl3/download">https://packages.ubuntu.com/jammy/amd64/libssl3/download</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>this is the amd64 version, if we need arm version, please go upper layer and find it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Download via: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ wget -c http://kr.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl3_3.0.0-1ubuntu1_amd64.deb</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>2.2 then install it </strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>via: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo dpkg -i libssl3_3.0.0-1ubuntu1_amd64.deb</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>after this, install generic package again:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>sudo dpkg -i linux-headers-5.15.13-051513-generic_5.15.13-051513.202201050731_amd64.deb</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>That is, try again with $sudo apt upgrade, you will find it works fine!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>3, Then reboot your machine, it will work perfectly.</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>One more thing, is this package is missing, or you did not install it, when I install nvidia driver, it will not work, and $nvidia-smi command fails and showing driver version not correct.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Once we fix the generic header package installation issue, and after reboot, it will just work fine.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if have any questions, I would be happy to share my thoughts.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for reading</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/01/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

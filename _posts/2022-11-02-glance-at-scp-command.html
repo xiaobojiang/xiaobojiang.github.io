@@ -1,0 +1,98 @@
+---
+layout: post
+title: Glance at SCP command
+date: 2022-11-02 01:33:06.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- One Line Tip
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>SCP (secure copy) command is used to copy files between servers in a secure way. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It used the same authentication and security as it is used in SSH (security shell)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Full syntax:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>scp [-346BCpqrTv] [-c cipher] [-F ssh_config] [-i identity_file] [-l limit] [-o ssh_option] [-P port] [-S program] [[user@]host1:]file1 … [[user@]host2:]file2</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>
+<strong>cp –P port: </strong>Specifies the port to connect on the remote host.</li>
+<li>
+<strong>scp –p: </strong>Preserves modification times, access times, and modes from the original file.</li>
+<li>
+<strong>scp –q: </strong>Disables the progress meter.</li>
+<li>
+<strong>scp –r: </strong>Recursively copy entire directories.</li>
+<li>
+<strong>scp –S program: </strong>Name of program to use for the encrypted connection. The program must understand ssh(1) options.</li>
+<li>
+<strong>scp –v: </strong>Verbose mode. Causes <em>scp </em>and <em>ssh </em>to print debugging messages about their progress. This is helpful in debugging connection, authentication, and configuration problems.</li>
+<li>
+<strong>scp -f</strong>: if there is file with same name in the destination, then it will be deleted before copy action</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Several typical usage:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Copy single file from local to remote server</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ scp ~/Download/sample.txt root@192.168.100.100:/file/path</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>or -i with ssh private key</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ scp -i ~/.ssh/iotolon.pem ~/Download/sample.txt root@192.168.100.100:/file/path</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Copy single file from remote server to local</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ scp  root@192.168.100.100:/file/path/sample.txt ~/Download/file/path</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Or provided with ssh private key </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ scp -i ~/.ssh/iotolon.pem  root@192.168.100.100:/file/path/sample.txt ~/Download/file/path</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Copy a folder, add -r</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Eg, copy a folder from local to remote server</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ scp -r ~/Download/folder root@192.168.100.100:/file/path</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your reading, please leave a reply if you have any question or comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/11/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

@@ -1,0 +1,260 @@
+---
+layout: post
+title: Jenkins Installation on Ubuntu
+date: 2022-10-17 06:54:20.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph {"fontSize":"large"} --><html><body></p>
+<p class="has-large-font-size"><strong>Add debian repository</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Online installation</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This is the Debian package repository of Jenkins to automate installation and upgrade. To use this repository, first add the key to your system:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ curl -fsSL https://pkg.jenkins.io/debian/jenkins.io.key | sudo tee \
+    /usr/share/keyrings/jenkins-keyring.asc &gt; /dev/null</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then add a Jenkins apt repository entry:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+    https://pkg.jenkins.io/debian binary/" | sudo tee \
+    /etc/apt/sources.list.d/jenkins.list &gt; /dev/null</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Update your local package index, then finally install Jenkins:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo apt-get update
+#below is optional if already have those
+$ sudo apt-get install fontconfig openjdk-11-jre. 
+$ sudo apt-get install jenkins</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Offline Installation</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Download the deb file</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ wget https://pkg.jenkins.io/debian/binary/jenkins_2.369_all.deb
+$ sudo apkg -i deb.file</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>The apt packages were signed using this key:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>pub   rsa4096 2020-03-30 [SC] [expires: 2023-03-30]
+      62A9756BFD780C377CF24BA8FCEF32E745F2C3D5
+uid                      Jenkins Project 
+sub   rsa4096 2020-03-30 [E] [expires: 2023-03-30]</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"large"} --></p>
+<p class="has-large-font-size"><strong>Start Jenkins </strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let’s start Jenkins by using <a href="https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units">systemctl</a>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo systemctl start jenkins</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Since systemctl doesn’t display status output, we’ll use the status command to verify that Jenkins started successfully:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo systemctl status jenkins</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Copy</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If everything went well, the beginning of the status output shows that the service is active and configured to start at boot:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Output</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>Output
+● jenkins.service - LSB: Start Jenkins at boot time
+   Loaded: loaded (/etc/init.d/jenkins; generated)
+   Active: active (exited) since Fri 2020-06-05 21:21:46 UTC; 45s ago
+     Docs: man:systemd-sysv-generator(8)
+    Tasks: 0 (limit: 1137)
+   CGroup: /system.slice/jenkins.service</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now that Jenkins is up and running, let’s adjust our firewall rules so that we can reach it from a web browser to complete the initial setup.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"large"} --></p>
+<p class="has-large-font-size"><strong>Configure Firewall</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To set up a UFW firewall, visit <a href="https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-20-04#step-4-%E2%80%94-setting-up-a-basic-firewall">Initial Server Setup with Ubuntu 20.04, Step 4- Setting up a Basic Firewall</a>. By default, Jenkins runs on port 8080. We’ll open that port using ufw:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo ufw allow 8080</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Note:</strong> If the firewall is inactive, the following commands will allow OpenSSH and enable the firewall:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo ufw allow OpenSSH
+$ sudo ufw enable</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Check ufw’s status to confirm the new rules:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo ufw status</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>You’ll notice that traffic is allowed to port 8080 from anywhere:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>Output
+Status: active
+
+To                         Action      From
+--                         ------      ----
+OpenSSH                    ALLOW       Anywhere
+8080                       ALLOW       Anywhere
+OpenSSH (v6)               ALLOW       Anywhere (v6)
+8080 (v6)                  ALLOW       Anywhere (v6)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>With Jenkins installed and our firewall configured, we can complete the installation stage and dive into Jenkins setup.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"large"} --></p>
+<p class="has-large-font-size"><strong>Basic Setting Up of Jenkins</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To set up your installation, visit Jenkins on its default port, 8080, using your server domain name or IP address: <a href="http://your_server_ip_or_domain:8080/">http://your_server_ip_or_domain:8080</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You should receive the <strong>Unlock Jenkins</strong> screen, which displays the location of the initial password:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":569,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-1-1024x566.png" alt="" class="wp-image-569"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the terminal window, use the cat command to display the password:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo cat /var/lib/jenkins/secrets/initialAdminPassword</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Copy the 32-character alphanumeric password from the terminal and paste it into the <strong>Administrator password</strong> field, then click <strong>Continue</strong>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Configure the proxy if the server is in Intranet</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":570,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-2-1024x736.png" alt="" class="wp-image-570"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Configuration is same as http proxy setting in Ubuntu</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Set the no proxy host properly in intranet (eg .intra.example.com)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":571,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-3-1024x743.png" alt="" class="wp-image-571"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>The next screen presents the option of installing suggested plugins or selecting specific plugins:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":572,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-4-1024x667.png" alt="" class="wp-image-572"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>We’ll click the <strong>Install suggested plugins</strong> option, which will immediately begin the installation process.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":573,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-5-1024x638.png" alt="" class="wp-image-573"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>When the installation is complete, you’ll be prompted to set up the first administrative user. It’s possible to skip this step and continue as admin using the initial password we used above, but we’ll take a moment to create the user.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Note:</strong> The default Jenkins server is NOT encrypted, so the data submitted with this form is not protected. Refer to <a href="https://www.digitalocean.com/community/tutorials/how-to-configure-jenkins-with-ssl-using-an-nginx-reverse-proxy-on-ubuntu-20-04">How to Configure Jenkins with SSL Using an Nginx Reverse Proxy on Ubuntu 20.04</a> to protect user credentials and information about builds that are transmitted via the web interface.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":574,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-6-1024x737.png" alt="" class="wp-image-574"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Enter the name and password for your user:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":575,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-7-1024x739.png" alt="" class="wp-image-575"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>You’ll receive an <strong>Instance Configuration</strong> page that will ask you to confirm the preferred URL for your Jenkins instance. Confirm either the domain name for your server or your server’s IP address:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":576,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-8-1024x744.png" alt="" class="wp-image-576"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>After confirming the appropriate information, click <strong>Save and Finish</strong>. You’ll receive a confirmation page confirming that <strong>“Jenkins is Ready!”</strong>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":577,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-9-1024x291.png" alt="" class="wp-image-577"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Click <strong>Start using Jenkins</strong> to visit the main Jenkins dashboard:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":578,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-10-1024x363.png" alt="" class="wp-image-578"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>At this point, you have completed a successful installation of Jenkins.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Create a regular job</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Follow the convention of crontab setting (nice online editor <a href="https://crontab.guru/">https://crontab.guru/</a>)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":579,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-11-1024x417.png" alt="" class="wp-image-579"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Steps Shell</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":580,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/10/image-12-1024x445.png" alt="" class="wp-image-580"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In next post, we will talk about Jenkins home directory, default running user, and maven configuration.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Keep posted.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have any comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/10/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

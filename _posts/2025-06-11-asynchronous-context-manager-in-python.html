@@ -1,0 +1,129 @@
+---
+layout: post
+title: Asynchronous context manager in Python
+date: 2025-06-11 06:21:01.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>AsyncExitStack is an asynchronous context manager provided by Python’s contextlib module, introduced in Python 3.7. It facilitates the management of multiple context managers, both synchronous and asynchronous, within a single async with statement. This is particularly useful when the number of context managers is not predetermined or when they need to be handled dynamically.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Key Features of AsyncExitStack:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Dynamic Context Management: Allows for the dynamic entering and exiting of context managers, accommodating scenarios where the exact number of context managers is determined at runtime.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Mixed Context Support: Capable of managing both synchronous and asynchronous context managers, providing flexibility in handling various resource types.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Centralized Cleanup: Ensures that all registered context managers and callbacks are properly exited or called in the reverse order of their registration, even if exceptions occur during their execution.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Basic Usage Example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import asyncio
+
+from contextlib import AsyncExitStack, asynccontextmanager
+
+@asynccontextmanager
+
+async def async_resource(name):
+
+    print(f"Acquiring resource: {name}")
+
+    yield name
+
+    print(f"Releasing resource: {name}")
+
+async def main():
+
+    async with AsyncExitStack() as stack:
+
+        # Dynamically enter multiple asynchronous context managers
+
+        resource1 = await stack.enter_async_context(async_resource('Resource1'))
+
+        resource2 = await stack.enter_async_context(async_resource('Resource2'))
+
+        print(f"Using {resource1} and {resource2}")
+
+asyncio.run(main())</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>output:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>Acquiring resource: Resource1
+Acquiring resource: Resource2
+Using Resource1 and Resource2
+Releasing resource: Resource2
+Releasing resource: Resource1</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Explanation:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Defining an Asynchronous Context Manager: The async_resource function is an asynchronous context manager that simulates the acquisition and release of a resource.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Using AsyncExitStack: Within the main coroutine, an AsyncExitStack instance is used to manage multiple asynchronous context managers. The enter_async_context method is called to enter each context manager, and the resources are used as needed.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Automatic Cleanup: Upon exiting the async with block, AsyncExitStack ensures that all entered context managers are exited in the reverse order of their entry, properly releasing all resources.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Methods of AsyncExitStack:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• enter_async_context(cm): Enters the supplied asynchronous context manager and adds its <strong>aexit</strong> method to the stack.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• push_async_exit(exit): Registers an asynchronous exit callback, typically an <strong>aexit</strong> method, to the stack.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• push_async_callback(callback, *args, **kwds): Registers an arbitrary coroutine function and arguments as an exit callback.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• aclose(): Asynchronously invokes all registered exit callbacks in the reverse order of their registration.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Considerations:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Asynchronous Cleanup: The aclose() method must be used for cleanup, as the synchronous close() method is not implemented in AsyncExitStack.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Exception Handling: AsyncExitStack ensures that all context managers are exited properly, even if exceptions occur within the async with block.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>By leveraging AsyncExitStack, developers can effectively manage multiple resources that require asynchronous cleanup, enhancing the robustness and maintainability of asynchronous Python applications.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It would be useful that for resource lifecycle management, eg, used in fastapi and mcp client initialization.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/06/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

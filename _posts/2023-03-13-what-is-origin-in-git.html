@@ -1,0 +1,161 @@
+---
+layout: post
+title: What is origin in Git?
+date: 2023-03-13 03:05:30.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+tags: []
+meta:
+  _oembed_dfbf344ce3a83feef07278801f42a1b5: "{{unknown}}"
+  _oembed_9e7849676b6152bd4db06732a1b1381a: "{{unknown}}"
+  _oembed_af9e00fa3dadb2872d5087b030567a5e: "{{unknown}}"
+  _oembed_200b7fd70878aa763f8a34ca365e95d7: "{{unknown}}"
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Let's start from below scenario, imagine your company has two git servers, one is in intranet, address is:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p> http://192.168.1.101</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>and the other is in internet, address is:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>https://git.iotcolon.com</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Suppose we ae working on a project, called "startgit". I am the owner, name is xiaobo.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now I am gonna create a git repository for this project. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>After setting up framework and creating folder "startgit", I will do git initialization and commit</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ cd startgit
+$ git init
+$ git add .
+$ git commit -m "first commit"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now in order to collaborate with team members, we need to push it to server, the first step is to add remote address.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>First, we need to create a repository in the intranet git server, and add this to your local git repository, we call it <strong>intragit</strong>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ git remote add intragit http://192.168.1.101/xiaobo/startgit.git</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then, for the public git server, we can also add it for later push, we create it in the public git server, and add it with name <strong>publicgit</strong>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ git remote add publicgit https://git.iotcolon.com/xiaobo/startgit.git</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now, we have already added two remote servers, we can do push.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>we can push it first to intranet server's master branch, (-u intragit, means push to intranet git server, here intragit is the alias for the long url: http://192.168.1.101/xiaobo/startgit.git).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ git push -u intragit master</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Later, when the work is done and proper test has been passed, we can push the stable branch to public server (-u publicgit)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ git push -u publicgit stable</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note: the formula is git push -u [remote server alias] [branch name]</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, we may found this command is different from what we normally observe in git turtorial.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ git push -u origin master</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>well, now you must get the point, "intragit", "publicgit" and "origin" are just the same thing, they represent the remote git urls with a human-friendly name.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In fact, upper commands that push to remote server, can also be called like:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ git push http://192.168.1.101/xiaobo/startgit.git master
+$ git push https://git.iotcolon.com/xiaobo/startgit.git stable</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Using the alias can really improve efficiency, because human cannot remember the full url. the concept is similar to relationship between Domain name and IP.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Furthermore, this alias are also reflected in our folder structure.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If we pull code from intragit it actually updates data to .git/refs/remote/intragit folder from intranet git server.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In .refs/remote, we can also found intragit and publicgit folder, so corresponding action on data happens here.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We can also check these in the /git/config</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ cat .git/config                                                                                                                         
+[core]
+        repositoryformatversion = 0
+        filemode = true
+        bare = false
+        logallrefupdates = true
+        ignorecase = true
+        precomposeunicode = true
+[remote "intragit"]
+        url = http://192.168.1.101/xiaobo/startgit.git
+        fetch = +refs/heads/*:refs/remotes/intragit/*
+[remote "publicgit"]
+        url = https://git.iotcolon.com/xiaobo/startgit.git
+        fetch = +refs/heads/*:refs/remotes/publicgit/*</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>take intragit as example, parameter url is git repository address. Parameter fetch in this example is:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>+refs/heads/*:refs/remotes/intragit/*</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>What does this line means? The part at left side of colon "refs/heads" is local working folder, and part at right side("refs/remotes/intragit") is the remote repo ('s local cache folder). </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If we do fetch from public remote git server http://192.168.1.101/xiaobo/startgit.git, it will pull code update to corresponding branch in folder refs/remotes/intragit. when we do git merge, it will merge code at corresponding branch in refs/remotes/intragit/ to corresponding branch in refs/heads.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Come back to the first question in the title, what is origin in git? When you clone, git needs to create a folder in .git/refs/remotes/, and cache data. <strong>origin</strong> is just the default name, meaning where is comes from.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Please leave a reply if you have any comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/03/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

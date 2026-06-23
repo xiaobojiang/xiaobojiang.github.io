@@ -1,0 +1,182 @@
+---
+layout: post
+title: Magic Commands in Jupyter Notebook
+date: 2025-12-09 05:35:11.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:heading --><html><body></p>
+<h2 class="wp-block-heading">What are magic commands?</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>When you use a Jupyter Notebook (or its underlying IPython kernel), you have access to special “magic” commands. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Magic commands start with <strong>%</strong> or <strong>%%</strong>.<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Line magics</strong> (single-line) start with % and apply only to that line.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Cell magics</strong> (multi-line) start with %% and apply to the whole cell. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>They make common tasks easier and faster — e.g. timing code, loading files, debugging, running shell commands — without leaving your notebook. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🔧 Some of the Most Useful Magic Commands (and what they do)</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:table {"hasFixedLayout":false} --></p>
+<figure class="wp-block-table">
+<table>
+<tbody>
+<tr>
+<th><strong>Magic Command</strong></th>
+<th><strong>What it does / Why it’s useful</strong></th>
+</tr>
+<tr>
+<td>%matplotlib inline</td>
+<td>Makes plots created with Matplotlib appear inside the notebook, not as separate windows. Great for visualizing data inline. </td>
+</tr>
+<tr>
+<td>%time</td>
+<td>Measures how long a single line or expression takes to run (one execution). Good for rough timing. </td>
+</tr>
+<tr>
+<td>%timeit</td>
+<td>Runs a line many times and gives statistically stable measurement (average, variance). Good for benchmarking and comparing snippets. </td>
+</tr>
+<tr>
+<td>%load</td>
+<td>Loads code from an external file (or URL) into the current cell — useful if you want to bring in a .py script to edit/run inside notebook. </td>
+</tr>
+<tr>
+<td>%run</td>
+<td>Runs an external Python script as if you ran it from command-line — but inside the notebook. Handy to execute full modules or scripts. </td>
+</tr>
+<tr>
+<td>%magic or %quickref</td>
+<td>Lists all available magic commands (built-in) — a quick way to explore what you can do. </td>
+</tr>
+<tr>
+<td>Cell magics like %%bash, %%html, %%latex, etc.</td>
+<td>Let you run non-Python code (e.g. shell commands via Bash, HTML, LaTeX rendering) directly inside a notebook cell. Useful if you want to mix languages or embed formatted output. </td>
+</tr>
+<tr>
+<td>%debug</td>
+<td>Launches an interactive debugger when something goes wrong — helps you inspect variables and step through code. </td>
+</tr>
+<tr>
+<td>%reset</td>
+<td>Clears all variables, functions, and imports — basically cleans your “workspace”. Useful if you want to start fresh. </td>
+</tr>
+<tr>
+<td>%history</td>
+<td>Shows the commands you have run in the notebook, with line numbers — useful for reviewing or saving your work history. </td>
+</tr>
+<tr>
+<td>%who, %whos</td>
+<td>Shows which variables are currently defined; %who lists names, %whos gives extra info (type, value, etc.). Useful for checking your workspace contents. </td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>There are many more — line and cell magics — but these give a good idea of the power and convenience magics add. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>📚 Simple Example: Why Magic Commands Help</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Imagine you’re analyzing some data, doing calculations, and plotting the results inside a notebook. With magic commands, your workflow can look like this:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># 1. Make plots show up inside the notebook
+%matplotlib inline
+import matplotlib.pyplot as plt
+import numpy as np
+
+# 2. Create some data and plot
+x = np.linspace(0, 10, 200)
+y = np.sin(x)
+plt.plot(x, y)
+plt.title("Sine wave")
+plt.show()
+
+# 3. Check how fast a small calculation runs
+%time result = sum([i**2 for i in range(1000000)])
+
+# 4. Try a faster approach and benchmark
+%timeit sum(i**2 for i in range(1000000))
+
+# 5. Load external helper code from a file, if you have one.
+# %load helper_functions.py
+
+# 6. Run a full script with more code
+# %run data_preprocessing.py
+
+# 7. When you're done &amp; want to clean up workspace:
+# %reset -f</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":1287,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/12/BA3237AD-1982-4ADD-AA31-CC8B162E25B5-1024x828.png" alt="" class="wp-image-1287"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>This way, you can visualize, profile performance, run external code, and manage your workspace — all without leaving the interactive notebook environment.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>✅ Why Use Magic Commands — Key Benefits</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>They <strong>save time and keystrokes</strong> compared to writing full Python or shell code for common tasks.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>They make experiments, testing and debugging <strong>faster and easier</strong>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>They keep everything <strong>inside the notebook</strong> — code, plots, debugging, external scripts — making your work well organized and reproducible.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>They are especially helpful when working with data, plotting, or trying different code approaches rapidly.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/12/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

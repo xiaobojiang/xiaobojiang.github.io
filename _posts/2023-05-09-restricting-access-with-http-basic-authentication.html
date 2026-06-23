@@ -1,0 +1,68 @@
+---
+layout: post
+title: Restricting Access with HTTP Basic Authentication
+date: 2023-05-09 03:27:33.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+- Web
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>To restrict access to your website using HTTP Basic Authentication with nginx, you can follow these steps:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<!-- wp:list-item --></p>
+<li>Create a password file: This file contains the usernames and passwords that are allowed to access your website.Verify thatapache2-utils(Debian, Ubuntu) orhttpd-tools(RHEL/CentOS/Oracle Linux) is installed.. For example, to create a user named “john” with the password “password”, you would run the following command: <strong>htpasswd -c /path/to/.htpasswd john</strong>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Configure nginx: You need to configure nginx to use the .htpasswd file for authentication. You can do this by adding the following lines to your nginx configuration file:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>location / {
+
+    auth_basic "Restricted Content";
+
+    auth_basic_user_file /path/to/.htpasswd;
+
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":3} --></p>
+<ol start="3">
+<!-- wp:list-item --></p>
+<li>Restart nginx: After making changes to your nginx configuration file, you need to restart nginx for the changes to take effect.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:image {"id":722,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2023/05/image.png" alt="" class="wp-image-722"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>That’s it! Now when someone tries to access your website, they will be prompted for a username and password.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I hope this helps! Let me know if you have any other questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

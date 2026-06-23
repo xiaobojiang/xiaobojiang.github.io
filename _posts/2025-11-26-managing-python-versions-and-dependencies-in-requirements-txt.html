@@ -1,0 +1,204 @@
+---
+layout: post
+title: Managing Python Versions and Dependencies in requirements.txt
+date: 2025-11-26 03:34:29.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>When working on Python projects, managing dependencies involves more than listing packages—it also means ensuring compatibility with specific Python versions. Clear version management helps maintain consistent development and deployment environments, reducing the risk of unexpected incompatibilities.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This guide explains how to specify Python version requirements and manage package versions in a requirements.txt file using operators such as ~=, ==, and &gt;=.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>Python Version Compatibility in </strong><strong>requirements.txt</strong><br />
+</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Although requirements.txt does <strong>not</strong> enforce Python versions directly, including Python version information serves as helpful documentation for contributors, automated deployment processes, and environment setup scripts.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Below are common strategies for indicating Python version compatibility.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>1. Requiring an Exact Python Version</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>To specify a single, exact Python version:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>python==3.9.7</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This communicates that the project is intended to run on Python <strong>3.9.7 exactly</strong>. While pip won’t enforce it, this line makes the intended environment clear.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>2. Setting a Minimum Python Version</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>To indicate that the project requires at least a particular Python version:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>python&gt;=3.7</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This allows any version <strong>3.7 or newer</strong>, including 3.8, 3.9, and 3.10. However, it also includes future versions like Python 4.x, which may introduce breaking changes—something to keep in mind.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>3. Restricting Python to a Version Range</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>To ensure compatibility only within the Python 3.x series, for example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>python&gt;=3.7,&lt;4.0</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This allows all versions from <strong>3.7 up to (but not including) 4.0</strong>, ensuring compatibility with upcoming 3.x releases while avoiding potential issues from a major version jump.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>Using </strong><strong>~=</strong><strong> for Compatible Release Versioning</strong><br />
+</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The ~= operator—also known as the<em>compatible release operator</em>—is a powerful way to manage dependency updates safely. It allows automatic patch or minor updates while preventing major version upgrades that could break compatibility.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>1. Minor Version Compatibility</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>package~=1.4</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Equivalent to:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>package&gt;=1.4,==1.*</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This allows versions <strong>1.4 and above</strong>, but only within the <strong>1.x</strong> series (e.g., 1.5.2, 1.9.9). Versions 2.0+ are excluded.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>2. Patch Version Compatibility</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>package~=1.4.2</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Equivalent to:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>package&gt;=1.4.2,==1.4.*</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This restricts updates to the <strong>1.4.x</strong> patch range, allowing updates like 1.4.3 or 1.4.9, but excluding 1.5 and above.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>Combining Python and Package Version Requirements</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>A requirements.txt file may include both Python version indicators and dependency constraints:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># Python compatibility (informational)
+
+python&gt;=3.8,&lt;4.0
+
+# Dependency versioning with compatible release specifiers
+
+requests~=2.25.1
+
+numpy~=1.19.5</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this setup:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Python must be between <strong>3.8 and 4.0</strong> (not including 4.0).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The requests package may upgrade within the <strong>2.x</strong> version range.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The numpy package may upgrade within the <strong>1.x</strong> version range.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>Why These Strategies Matter</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Using version constraints effectively provides a balance between stability and flexibility:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Stability:</strong>Avoid breaking changes from major or incompatible minor updates.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Flexibility:</strong>Allow safe patch upgrades, which often include bug fixes and security patches.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Clarity:</strong>Help teams and automation tools understand the expected environment.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Future-proofing:</strong>Safeguard against unintentional upgrades to incompatible Python versions.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>This approach is especially valuable in collaborative settings or production deployments where precise version management is critical.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>Conclusion</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thoughtful version management in requirements.txt—using operators like ==, &gt;=, &lt;, and ~=—helps create reliable and maintainable Python environments. By clearly documenting Python version compatibility and controlling how dependencies can update, you ensure smoother development workflows and reduce the risk of version-related issues.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Adopting these practices will help keep your projects stable, predictable, and easier to maintain across different environments.</p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

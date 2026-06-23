@@ -1,0 +1,97 @@
+---
+layout: post
+title: Programatic accessing MS sharepoint - Code
+date: 2025-08-01 07:13:05.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Follow previous post, once you have set the correct permission to access Microsoft Sharepoint, now we can use ms graph lib to do actual file operations.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Assume that files are in the root path ETQ_ATTACHMENT_FOLDER_NAME (eg, XX_Attachment), not in "Shared Documents"</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1209,"width":"302px","height":"auto","sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large is-resized"><img src="{{site.baseurl}}/assets/2025/08/image-839x1024.png" alt="" class="wp-image-1209" style="width:302px;height:auto"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Logic: list all items in the root folder, and find the</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In order to access non default "shared document folder", you can use</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>class MSFileSync():
+    
+    def __init__(self):
+        self.credentials = ClientSecretCredential(
+                                tenant_id,
+                                client_id,
+                                client_secret,
+                            )
+        self.scopes = ['https://graph.microsoft.com/.default']
+        self.client = GraphServiceClient(credentials=self.credentials, scopes=self.scopes)
+        self.drive_id = None
+        self.root_id = None
+    async def get_drive_id(self) -&gt; str:
+        drive = await self.client.sites.by_site_id(sharepoint_site_id).drive.get()
+        self.drive_id = drive.id  
+        return self.drive_id
+
+    async def get_root_id(self) -&gt; str:
+        root_id = await self.client.drives.by_drive_id(self.drive_id).root.get()
+        self.root_id = root_id.id
+        return self.root_id
+
+    async def get_file(self, sharepoint_file: SharepointFile):
+        file_stream = await self.client.drives.by_drive_id(self.drive_id).items.by_drive_item_id(sharepoint_file.file_id).content.get()
+        return file_stream</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading">Follow the nextLink to get the next page</h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p># help doc: <a href="https://github.com/microsoftgraph/msgraph-sdk-python/blob/58f61a0384bf8070a3cd51a82b23eb77c31bc21d/README.md?plain=1#L191">https://github.com/microsoftgraph/msgraph-sdk-python/blob/58f61a0384bf8070a3cd51a82b23eb77c31bc21d/README.md?plain=1#L191</a><br>While there are more pages, keep retrieving the nextLink, until none found. This could ensure that we fetch a full list.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>async def get_drive_items(self, item_id) -&gt; list:
+        all_items = []
+        response = await self.client.drives.by_drive_id(self.drive_id).items.by_drive_item_id(item_id).children.get()
+        all_items.extend(response.value)
+        # Follow nextLink if present
+        # While there are more pages, keep retrieving the nextLink
+        # help doc: https://github.com/microsoftgraph/msgraph-sdk-python/blob/58f61a0384bf8070a3cd51a82b23eb77c31bc21d/README.md?plain=1#L191
+        while response is not None and response.odata_next_link is not None:
+            # Follow the nextLink to get the next page
+            response = await self.client.drives.by_drive_id(self.drive_id).items.by_drive_item_id(item_id).children.with_url(response.odata_next_link).get()
+            all_items.extend(response.value)
+        return all_items</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Hope you find this helpful</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/08/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

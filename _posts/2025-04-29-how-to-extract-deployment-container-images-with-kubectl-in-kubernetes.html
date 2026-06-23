@@ -1,0 +1,182 @@
+---
+layout: post
+title: How to Extract Deployment Container Images with kubectl in Kubernetes
+date: 2025-04-29 02:50:42.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Kubernetes
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>In Kubernetes, managing deployments effectively means understanding the exact container images running in your environment. This information is crucial for security, troubleshooting, and upgrading applications. Fortunately, kubectl—the Kubernetes command-line tool—offers a quick way to retrieve deployment details, including container image names and tags, all within a specific namespace.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>Why Extract Container Image Tags?</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Knowing which versions (tags) of container images are being used across your deployments helps ensure that:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Version Control</strong>: You’re running the expected version of an application.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Security</strong>: You can identify and address vulnerabilities tied to specific image versions.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Troubleshooting</strong>: Pinpoint issues that may be related to a particular image or tag.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Upgrades/Rollbacks</strong>: Manage application lifecycle changes more effectively.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>Extracting Container Image Information with </strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>kubectl</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>To retrieve deployment names along with their associated container image names and tags, you can use a simple kubectl command with jsonpath formatting. Here’s the basic command:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kubectl get deployments -n &lt;namespace&gt; -o=jsonpath='{range .items<em>[]}{.metadata.name}{" -&gt; "}{.spec.template.spec.containers[]</em>.image}{"\n"}{end}'</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading"><strong>Command Breakdown:</strong></h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>kubectl get deployments: Retrieves a list of all deployments in your cluster.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>-n &lt;namespace&gt;: Specifies the namespace you want to query. Replace &lt;namespace&gt; with your desired namespace name.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>-o=jsonpath='{...}': This flag formats the output using JSONPath, which allows you to extract specific fields from the returned JSON object.<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>{range .items[*]}: Loops through all deployment items returned in the response.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>{.<a href="http://metadata.name">metadata.name</a>}: Extracts the name of each deployment.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>{" -&gt; "}: Adds a separator between the deployment name and the container image.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>{.spec.template.spec.containers[*].image}: Retrieves the container image(s) used in each deployment, including the version tag (e.g., nginx:1.21).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>{"\n"}: Adds a newline after each output to ensure clarity and separation between deployments.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>{end}: Marks the end of the iteration.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>Example Output</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Assume you’re interested in the prod namespace. Running the command would return output like this:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kubectl get deployments -n prod -o=jsonpath='{range .items<em>[]}{.metadata.name}{" -&gt; "}{.spec.template.spec.containers[]</em>.image}{"\n"}{end}'</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Output:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>my-app-deployment -&gt; my-app:1.3.0
+
+nginx-deployment -&gt; nginx:1.21.4
+
+redis-deployment -&gt; redis:6.2.5</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this example, you see the deployment name followed by the container image and tag, which is extremely useful for auditing and managing your deployments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>Customizing Your Query</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>While the above query works in most cases, you can customize it based on your needs. Here are a few modifications you might find useful:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading"><strong>Filter for a Specific Deployment</strong></h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you need to retrieve image information for a specific deployment, you can narrow your query:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kubectl get deployment &lt;deployment-name&gt; -n &lt;namespace&gt; -o=jsonpath='{.spec.template.spec.containers[*].image}'</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>For example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kubectl get deployment my-app-deployment -n prod -o=jsonpath='{.spec.template.spec.containers[*].image}'</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This will only show the container image(s) used by the my-app-deployment.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading"><strong>Handle Multiple Containers in a Deployment</strong></h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>If your deployment contains multiple containers, the command will list all of them. For example, if you have a deployment with sidecar containers, this will capture all the images:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kubectl get deployments -n &lt;namespace&gt; -o=jsonpath='{.items<em>[].metadata.name}{" -&gt; "}{.spec.template.spec.containers[]</em>.image}'</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading"><strong>Add More Fields to the Output</strong></h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can extend the jsonpath query to include additional deployment details, such as labels. This is useful for adding context to the image information:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>kubectl get deployments -n &lt;namespace&gt; -o=jsonpath='{range .items<em>[]}{.metadata.name}{" -&gt; "}{.spec.template.spec.containers[]</em>.image}{" -&gt; "}{.metadata.labels}{"\n"}{end}'</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This will show the deployment names, images, and associated labels.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>Conclusion</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Using kubectl with JSONPath is an efficient way to extract detailed information about the container images running in your Kubernetes deployments. Whether you’re performing an audit, upgrading applications, or troubleshooting, this command helps ensure that you’re using the correct container versions across your environments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Next time you need to check container image tags in your deployments, simply use the command outlined above, and you’ll have a clear overview of your Kubernetes applications in no time.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/04/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

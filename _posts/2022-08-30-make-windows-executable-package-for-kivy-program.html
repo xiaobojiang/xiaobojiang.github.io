@@ -1,0 +1,178 @@
+---
+layout: post
+title: Make Windows executable package for kivy program
+date: 2022-08-30 05:48:31.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Kivy is a easy to use, and cross platform library, packaging in Macos is mentioned in previous post (<a href="https://www.iotcolon.com/?p=203">https://www.iotcolon.com/?p=203</a>).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this post, let’s talk about packaging executable for Window platform.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>First of all, using pip to install pyinstaller, this software package is the key to build.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ pip install pyinstaller</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then let’s use the pyinstaller to generate one basic spec file for our program.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ python -m pyInstaller --onefile -w --name apploger --icon ..\applelightbaker\DataLoggerApp\icon.png ..\applelightbaker\DataLoggerApp\main.py</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, some instructions on the parameters:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>--onefile: this will enfore pyinstaller to generate one exe file which contains all referenced libs and data files</li>
+<li>-w (--windowed, --no-console): do not provide console window for standard io. Without this option, you will see one additional black console besides our kivy GUI window.</li>
+<li>--name: target name of final executable</li>
+<li>--icon: file path of desired application icon image.</li>
+<li>&lt;…main.py&gt;: this is the path of target python script file we would like to build executable</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>After we run this command, we will get a file: apploger.spec</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We need to make additional changes to make it run correctly.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, bundling data files in Analysis</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>add data files, eg:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>datas=[
+    ('..\\applelightbaker\\DataLoggerApp\\icon.png','.'),
+    ('..\\applelightbaker\\DataLoggerApp\\font.ttf','.')
+],
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, The datas is a list of tuple. Each tuple contains two elements: 1, the data file we would like to add in the executable (eg, icon.png will be used in the program as avatar) 2, the path, ‘.’ Means that the file is copied in the same folder as python script file, you can specify ‘db’ to copy the file to the folder ‘db’</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, For kivy packaging, let’s add the dependencies hooks to correctly build the exe. Open the spec file and add these lines at the beginning of the spec (assuming sdl2 is used, the default now):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from kivy_deps import sdl2, glew</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, add Tree, and exclude files</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>find COLLECT() and add the data for our ap loger: Change the line to add a Tree() object, e.g. Tree('examples-path \\'). This Tree will search and add every file found in the examples-path directory to your final package.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To add the dependencies, before the first keyword argument in COLLECT add a Tree object for every path of the dependencies. E.g. *[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)] </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This step is important, it copes other important files to the executable, eg, kv files. If this steps is missing, you will get a frustrating error: “SDL2 cannot load”.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Also maintain the excludes list to remove those virtual environment and other temp files, so that the final executable size is optimized.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It will look like:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>exe = EXE(
+    pyz,
+    Tree('..\\DataLoggerApp\\',
+        excludes=['venv','.idea','*.txt','log','saved_data','*.cfg']),
+    a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    name='apploger',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    *[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon='..\\DataLoggerApp\\icon.png',
+)
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>4, Cool, now we can build windows executable with this simple command</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ pyinstaller ./apploger.spec</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In later phase, if we change the script file, we do not need to repeate step 1-3, just running step 4 is sufficient.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Special tips:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>How to find the bundled data files by the windows executable in the runtime?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the runtime, these bundled data files can be found by your program by os.path.dirname(__file__), it is a temp folder for one file build, normally it is in C:\User\you\AppData\Local\Temp\_MEIXXX folder</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So you can find the icon file or font file by the path: os.path.dirname(__file__)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the standard document, you can also do this by:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import os, sys
+from kivy.resources import resource_add_path, resource_find
+if __name__ == '__main__':
+    if hasattr(sys, '_MEIPASS'):
+        resource_add_path(os.path.join(sys._MEIPASS))
+YourApp().run()
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted"><strong> </strong></pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:paragraph --></p>
+<p>OK, with those steps, you can already build a nice and running windows executable program.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Have fun!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have any comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/08/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

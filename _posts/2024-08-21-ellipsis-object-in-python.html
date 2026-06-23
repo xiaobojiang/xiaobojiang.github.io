@@ -1,0 +1,107 @@
+---
+layout: post
+title: Ellipsis object(...) in Python
+date: 2024-08-21 06:03:06.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>The triple dot <code>...</code> in Python, also known as the <strong>Ellipsis</strong> object, is a special singleton value of the built-in <code>Ellipsis</code> type. It can be used in various ways depending on the context:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">1. <strong>Placeholder</strong><br />
+</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>In incomplete code or functions that haven't been implemented yet, the triple dot can act as a placeholder.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>def some_function():  </code>
+    ...
+<code># or </code>
+<code>def some_function(): </code>
+    pass </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">2. <strong>Slicing</strong><br />
+</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>In multi-dimensional arrays, such as those in NumPy, the ellipsis can be used to represent multiple colons (<code>:</code>) for slicing.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>import numpy as np </code>
+<code># Create a 3-dimensional array </code>
+<code>array = np.arange(27).reshape(3, 3, 3) </code>
+<code># Use ellipsis to slice </code>
+<code>sliced_array = array[..., 1] </code>
+<code>print(sliced_array)</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">3. <strong>Abstract Methods</strong><br />
+</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>In abstract base classes, the ellipsis can be used as a placeholder for methods that must be overridden by subclasses.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>from abc import ABC, abstractmethod </code>
+<code>class AbstractClass(ABC): </code>
+    @abstractmethod
+    def some_method(self):
+        ...</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">4. <strong>Special Meaning in Custom Code</strong><br />
+</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can define your own custom behavior using the ellipsis. For instance, you might encounter it in advanced libraries or frameworks where it has a specific meaning.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Example:</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>def example_function(arg1, arg2, ...): 
+    pass 
+def handle_ellipsis(*args): 
+    if Ellipsis in args: 
+        print("Ellipsis found!") 
+    else: 
+        print("No ellipsis.") 
+
+handle_ellipsis(1, 2, Ellipsis) 
+handle_ellipsis(1, 2, 3)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Summary</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The <code>...</code> in Python, or the <code>Ellipsis</code> object, is a versatile tool that can be used as a placeholder, in slicing, in abstract methods, or in custom contexts within libraries. Its usage largely depends on the specific needs of the code or the conventions of the framework or library being used.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/08/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

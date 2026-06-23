@@ -1,0 +1,386 @@
+---
+layout: post
+title: Install and Configure wordpress with Docker from scratch
+date: 2021-08-04 05:24:53.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Technology
+- Web
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"small"} --></p>
+<p class="has-small-font-size">Wordpress is the tool and currently I am using to build this site.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Prerequisite:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>- domain name.<br>   You can purchase one from Godaddy.com, or apply a free one from freenom.com<br>- cloud server instance.<br>   I purchased on Centos 8 instance from Vultr, 1 core 2G is minimum to start with.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>What you will go through and hands on during the journey: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, set up Nginx and Let’s encrypt on the host machine </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, set up docker  </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, set up mysql and wordpress in docker env </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>4, config nginx and wordpress</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let’s dive into each step with more details</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"25px"}}} --></p>
+<p class="has-text-align-center" style="font-size:25px"><br><strong>Nginx and Let’s encrypt </strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Nginx is a very nice reverse proxy, let’s encrypt provides free TLS certificates. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Nginx and Let’s encrypt works together to provide secure https access to your site.<br>When I start to play with, I did not plan to go all for docker, thus, nginx and let’s encrypt are installed on the host machine. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It is not that hard to pack them into a customized docker image.<br>First, let’s install these packages: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#install nginx 
+$ yum install nginx -y 
+$ systemctl start nginx
+$ systemctl enable nginx
+#install certbot 
+$ yum install certbot -y</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Create https certificates </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$certbot certonly —nginx </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Follow the cli guide, fill in the domain name(s), and it will create certificates in /etc/letsencrypt/live/iotcolon.com.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>iotcolon.com is my domain name.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this folder,  you will find the fullchain.pem and privacy.pem. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>These files will be used for later use.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The certificates from Let’s encrypt have a valid period of 3 months.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We need a cronjob to regularly refresh https certificates<br>Add a script in root folder, named it as renew_certbot.sh</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#!/bin/sh
+certbot renew --pre-hook "service nginx stop" --post-hook "service nginx start" </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>add cron job</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$crontab -e 
+#in the pop, add following line
+55 6,18 * * * /root/renew_certbot.sh</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"25px"}}} --></p>
+<p class="has-text-align-center" style="font-size:25px"><br><strong>setup docker</strong> </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Later, I found it is better to host wordpress and mysql in docker instead of host machine. This can bring a lot of benefits.<br>Steps to install docker on Centos 8/RHEL 8 </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, remove the podman </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>podman is the replacement of docker in  Centos 8/RHEL 8, theoretically it is compatible with docker command, and provide non-root runtime.  </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>However, docker is the most familiar tool I used for years.  </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You cannot directly install docker, this will conflict with podman, use below commands to remove it first.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, install docker</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>detail shell comands as below:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#remove podman 
+$yum remove podman buildah -y
+#install docker
+$ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo 
+$ yum remove podman buildah -y$ yum install -y yum-utils device-mapper-persistent-data lvm2
+$ yum -y install docker-ce
+#start docker and make it autostart
+$ systemctl start docker
+$ systemctl enable docker</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"25px"}}} --></p>
+<p class="has-text-align-center" style="font-size:25px"><strong>deploy mysql and wordpress in docker</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"align":"left"} --></p>
+<p class="has-text-align-left">Please find the example code <br>Start mysql export </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#!/bin/sh
+
+export MYSQL_PASSWORD=&lt;password&gt;
+
+if [ $( docker ps -a | grep mysql | wc -l ) -gt 0 ]; then
+	docker stop mysql | xargs docker rm ;
+fi
+
+docker run -p 3306:3306 --name mysql --restart=always -v ~/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD} -e MYSQL_DATABASE=wordpress -d mysql:5.7 --max_allowed_packet=64M --max-connections=1000 --sql-mode=""
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Start wordpress </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#!/bin/sh
+export MYSQL_PASSWORD=&lt;password&gt;
+export MYSQL_HOST=&lt;mysql host&gt;
+
+
+if [ $( docker ps -a | grep wordpress | wc -l ) -gt 0 ]; then
+	docker stop wordpress | xargs docker rm ; 
+fi
+
+docker run --restart=always  -e WORDPRESS_DB_USER=root -e WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD} -e WORDPRESS_DB_HOST=${MYSQL_HOST} \
+	-e WORDPRESS_CONFIG_EXTRA="define('WP_HOME', 'https://www.iotcolon.com'); define('WP_SITEURL', 'https://www.iotcolon.com');" \
+	--name wordpress -m 512m  -p 8080:80 -v "/root/html":/var/www/html -d wordpress
+
+
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Note: set WP_HOME and WP_SITEURL with your desired https address, this can avoid wordpress redirect to http or localhost</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"25px"}}} --></p>
+<p class="has-text-align-center" style="font-size:25px"><br><strong>config nginx and wordpress </strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the nginx config file, specify the domain name you want to use.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And add sections of ssl, which uses the previous generate https keys.    </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>the nginx conf file location: /etc/nginx/nginx.conf</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>listen [::]:443 ssl ipv6only=on; # managed by Certbot
+listen 443 ssl; # managed by Certbot
+ssl_certificate /etc/letsencrypt/live/iotcolon.com/fullchain.pem; # managed by Certbot
+ssl_certificate_key /etc/letsencrypt/live/iotcolon.com/privkey.pem; # managed by Certbot
+include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>you can find my full nginx.conf here:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># For more information on configuration, see:
+#   * Official English Documentation: http://nginx.org/en/docs/
+#   * Official Russian Documentation: http://nginx.org/ru/docs/
+
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+# Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+    
+    server_tokens off;
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
+    proxy_cookie_path / "/; HTTPOnly; Secure";
+
+	
+
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+    keepalive_timeout   120;
+    types_hash_max_size 2048;
+
+    client_max_body_size 100m;
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+
+    gzip   on;
+    gzip_disable "msie6";
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_http_version 1.0;
+    gzip_min_length 256;
+    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript application/vnd.ms-fontobject application/x-font-ttf font/opentype image/svg+xml image/x-icon;    
+
+
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+    include /etc/nginx/conf.d/*.conf;
+
+    map $http_upgrade $connection_upgrade {
+            default upgrade;
+	    ''      close;
+       }  
+
+    server {
+        server_name www.iotcolon.com; # managed by Certbot
+
+    
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/iotcolon.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/iotcolon.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+	location / {
+	    proxy_pass http://172.17.0.1:8080;
+		proxy_redirect   off;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Host $server_name;
+                    proxy_set_header X-Forwarded-Proto https;
+            	}
+
+
+    }
+
+
+   server {
+        listen 80; 
+        server_name www.iotcolon.com;
+# listen for ACME challenge from Certbot
+            location ^~ /.well-known/acme-challenge/ {
+                    # No HTTP authentication
+                    allow all;
+
+                    default_type "text/plain";
+            }
+
+            location = /.well-known/acme-challenge/ {
+                    return 404;
+            }
+
+            # Redirect other HTTP traffic to HTTPS
+            location / {
+                    access_log off;
+                    return 301 https://$host$request_uri;
+            }
+    }
+
+
+   server {
+        listen 80;
+        server_name iotcolon.com;
+		# listen for ACME challenge from Certbot
+            location ^~ /.well-known/acme-challenge/ {
+                    # No HTTP authentication
+                    allow all;
+
+                    default_type "text/plain";
+            }
+
+            location = /.well-known/acme-challenge/ {
+                    return 404;
+            }
+
+            # Redirect other HTTP traffic to HTTPS
+            location / {
+                    access_log off;
+                    return 301 https://www.$host$request_uri;
+            }	
+}
+
+
+}
+
+
+
+
+
+
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Wordpress configures</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<li>Create admin and new user</li>
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:image {"id":23,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/08/image.png" alt="" class="wp-image-23"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:list {"ordered":true,"start":2} --></p>
+<ol start="2">
+<li>Select template and customize, in appearance/themes</li>
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>there are few local themes, you can search for more online</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":24,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/08/image-1-1024x538.png" alt="" class="wp-image-24"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, enjoy and start your first post</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for reading, if you have any questions, please raise in comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><center><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/08/88x31.png"></center></a><center><br />
+<br>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.</center><br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

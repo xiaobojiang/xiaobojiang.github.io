@@ -1,0 +1,330 @@
+---
+layout: post
+title: Parameter store in AWS EKS
+date: 2022-06-14 02:23:26.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Kubernetes
+- Technology
+tags: []
+meta:
+  _oembed_ab9f3c5bb1908a3e9b7822ea5b36c85e: "{{unknown}}"
+  _oembed_221cd4d94b51a169d0fd65fcc221779a: "{{unknown}}"
+  _oembed_3a04336be85149eb0afc1044c98d6e9a: "{{unknown}}"
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Parameter Store, a capability of AWS Systems Manager, provides secure, hierarchical storage for configuration data management and secrets management. You can store data such as passwords, database strings, Amazon Machine Image (AMI) IDs, and license codes as parameter values. You can store values as plain text or encrypted data. You can reference Systems Manager parameters in your scripts, commands, SSM documents, and configuration and automation workflows by using the unique name that you specified when you created the parameter.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sounds good for system security, maintainability and scalability.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let’s try it out:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Step 1:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To install the Kubernetes Secrets Store CSI Driver, run the following commands. For full installation instructions, see <a href="https://secrets-store-csi-driver.sigs.k8s.io/getting-started/installation.html">Installation</a> in the Kubernetes Secrets Store CSI Driver Book. For information about installing Helm, see <a href="https://docs.aws.amazon.com/eks/latest/userguide/helm.html">Using Helm with Amazon EKS</a>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+$ helm install -n kube-system csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>To validate the installer is running as expected, run the following commands:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ kubectl get po --namespace=kube-system</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>You should see the Secrets Store CSI driver pods running on each agent node, like:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>csi-secrets-store-qp9r8         3/3     Running   0          4m
+csi-secrets-store-zrjt2         3/3     Running   0          4m</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you are using fargate eks, those pods will not be created (why? Please read on)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Step 2:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To install the ASCP, use the YAML file in the GitHub repository deployment directory. For information about installing kubectl, see <a href="https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html">Installing kubectl</a> .</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>kubectl apply -f <a href="https://raw.githubusercontent.com/aws/secrets-store-csi-driver-provider-aws/main/deployment/aws-provider-installer.yaml">https://raw.githubusercontent.com/aws/secrets-store-csi-driver-provider-aws/main/deployment/aws-provider-installer.yaml</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You should see the following CRDs (customer resource definition) deployed:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ kubectl get crd -n kube-system</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":481,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/06/image-6-1024x201.png" alt="" class="wp-image-481"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Step 3: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Set up access control</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html">https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3.1 create policy</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This policy allow get and describe on parameters with specific pattern, which starts with "xiaobo-"</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>{
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Deny",
+                        "Action": [
+                            "ssm:PutParameter",
+                            "ssm:DeleteParameter",
+                            "ssm:DeleteParameters",
+                            "ssm:DescribeParameters"
+                        ],
+                        "Resource": "*"
+                    },
+                    {
+                        "Effect": "Allow",
+                        "Action": [
+                            "ssm:GetParameterHistory",
+                            "ssm:GetParametersByPath",
+                            "ssm:GetParameters",
+                            "ssm:GetParameter",
+                        ],
+                        "Resource": "arn:aws:ssm:"+Aws.REGION+":"+Aws.ACCOUNT_ID+":parameter/brightsite-*"
+                    }
+                ]
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>3.2  create IAM role for service account</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>use eksctl, similar as:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ eksctl create iamserviceaccount \
+    --name my-service-account \
+    --namespace my-namespace \
+    --cluster my-cluster \
+    --role-name "my-role-name" \
+    --attach-policy-arn arn:aws:iam::111122223333:policy/my-iam-policy \
+    --approve \
+    --override-existing-serviceaccounts</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Step 3.1 &amp; 3.2 can be done via cdk, sample code:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>param_store_policy_document_json = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+           "Effect": "Allow",
+           "Action": [
+               "ssm:DescribeParameters"
+           ],
+           "Resource": "*"
+         },
+         {
+            "Effect": "Allow",
+            "Action": [
+               "ssm:GetParameters"
+            ],
+            "Resource": "arn:aws:ssm:"+Aws.REGION+":"+Aws.ACCOUNT_ID+":parameter/brightsite-*"
+         }
+    ]
+}
+
+param_store_policy_document =          iam.PolicyDocument.from_json(param_store_policy_document_json)
+
+param_store_policy = iam.Policy(self,
+    'paramStorePolicy',
+    policy_name='paramStorePolicy',
+    document=param_store_policy_document
+)
+
+#use service account way, , you need to specify sa in pod yaml, eg: serviceAccountName: serviceaccount-paramstore-brightsite
+namespace='xiaobo'
+#create service account
+eksParamStoreServiceAccount =self.ekscluster.add_service_account(
+    'serviceaccount-paramstore-'+namespace,
+    name='serviceaccount-paramstore-'+namespace,
+    namespace=namespace
+)
+                      
+         
+eksParamStoreServiceAccount.role.attach_inline_policy(param_store_policy)
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Step 4:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then create a parameter store </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ aws ssm put-parameter --name “xiaobo-test" --value "EKS parameter" --type String --region "$Region"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Step 5:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Create the store class yaml file: SecretProviderClass.yaml</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+    name: aws-secrets
+spec:
+    provider: aws
+    parameters:
+        objects: |
+            - objectName: "xiaobo-test"
+              objectType: "ssmparameter"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>make it deployed:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ kubectl apply -f SecretProviderClass.yaml</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Step 6:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Prepeare a nginx deployment yaml file: nginx.yaml</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-blue
+  namespace: xiaobo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+      version: blue
+  template:
+    metadata:
+      name: nginx
+      labels:
+        app: nginx
+        version: blue
+    spec:
+      serviceAccountName: serviceaccount-paramstore-xiaobo
+      containers:
+      - name: nginx
+        image: nginx:1.13
+        ports:
+        - containerPort: 80
+        
+        volumeMounts:
+        - mountPath: /env/
+          name: secrets-store-inline
+
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "aws-secrets"
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>apply it on the cluster</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ kubectl apply -f nginx.yaml</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Step Unhappy:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I notice this pod always is pending, and not ready, when I describe this pod, I saw this error:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>Warning  FailedScheduling  101s  fargate-scheduler  Pod not supported on Fargate: volumes not supported: secrets-store-inline is of an unsupported volume Type</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Searched a lot for this issue. Conclusion use parameter store is not possible for my fargate EKS right now.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Root cause: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The Secret store CSI driver does not support Fargate. This is due to the fact that the Secret store CSI driver is deployed as a daemon set and EKS fargate do not support daemon sets.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://github.com/aws/secrets-store-csi-driver-provider-aws#requirements">https://github.com/aws/secrets-store-csi-driver-provider-aws#requirements</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I raised a request in AWS for this: <a href="https://github.com/aws/containers-roadmap/issues/1764">https://github.com/aws/containers-roadmap/issues/1764</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>However, it will work on EC2 based EKS.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Final note:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Well, this experiment leaves a loose end. I also planned earlier to try the secure string parameter, it is not possible now.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Since I cannot afford create another EKS EC2 cluster, I will leave it here, and try later.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>LoL, if someone can sponsor me, I can finish the experiment and write a follow up post.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Reference:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://secrets-store-csi-driver.sigs.k8s.io/topics/best-practices.html">https://secrets-store-csi-driver.sigs.k8s.io/topics/best-practices.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html">https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.htmlhttps://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have any comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/06/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

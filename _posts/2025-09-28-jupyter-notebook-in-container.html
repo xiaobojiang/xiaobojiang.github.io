@@ -1,0 +1,109 @@
+---
+layout: post
+title: Jupyter Notebook in Container
+date: 2025-09-28 06:05:52.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>I personally like to run jupyter notebook inside a container, it offers flexibility and security isolation to use.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here’s a ready-to-use podman run command for a persistent Jupyter Notebook setup with sudo access and a podman volumne:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Step 1, create a volume</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>podman volume create notebookvolume</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Step 2, create jupyter notebook container with volume and sudo access</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>podman run -d \
+
+  --name jupyter \
+
+  -p 10000:8888 \
+
+  -v notebookvolume:/home/jovyan/work:Z \
+
+  -e JUPYTER_TOKEN="change-me" \
+
+  -e GRANT_SUDO=yes \
+
+  -e NB_UID=$(id -u) \
+
+  -e NB_GID=$(id -g) \
+
+  -e TZ=$(cat /etc/timezone 2&gt;/dev/null || echo "UTC") \
+
+  --user root \</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>  quay.io/jupyter/minimal-notebook:latest</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>🔑 Key parts explained</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>-v ~/work:/home/jovyan/work:Z Mounts your host’s ~/work into the container, persisting notebooks. :Z makes it SELinux-safe (mandatory on Fedora/RHEL-style distros).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>-e GRANT_SUDO=yes + --user root Grants the default jovyan user passwordless sudo. The container entrypoint will drop back to jovyan after setup.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>-e NB_UID=$(id -u) -e NB_GID=$(id -g) Ensures files created in /home/jovyan/work are owned by <strong>your host user</strong>, not root.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>-e JUPYTER_TOKEN="change-me" Sets a login token. You can also use JUPYTER_PASSWORD if you prefer a fixed password.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>-e TZ=... Matches your host’s timezone for correct timestamps in notebooks/logs.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>--restart-policy=always (Podman equivalent of Docker’s --restart unless-stopped) If you want auto-restart, you can either use this flag or generate a systemd service.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>✅ Suggested extras</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Pin the image version</strong>: e.g. <a href="http://quay.io/jupyter/minimal-notebook:lab-4.2.5">quay.io/jupyter/minimal-notebook:lab-4.2.5</a> instead of :latest.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Access logs</strong>: podman logs -f jupyter.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Hope you find it useful.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/09/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

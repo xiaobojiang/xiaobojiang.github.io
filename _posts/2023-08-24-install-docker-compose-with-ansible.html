@@ -1,0 +1,77 @@
+---
+layout: post
+title: Install docker compose with ansible
+date: 2023-08-24 06:25:43.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, we use a YAML file to configure our application’s services. Then, with a single command, we create and start all the services from our configuration. Compose works in all environments; production, staging, development, testing, as well as CI workflows. It also has commands for managing the whole lifecycle of our application: Start, stop, and rebuild services. View the status of running services Stream the log output of running services.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here provide an ansible playbook that can install docker compose on the remote machine.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>- name: Check that the docker compose exists
+stat:
+path: /usr/local/bin/docker-compose
+register: docker_compose_result
+
+- name: install docker compose if not exist
+get_url:
+url: https://github.com/docker/compose/releases/download/v2.20.3/docker-compose-linux-x86_64
+dest: /usr/local/bin/docker-compose
+mode: 'u+x,g+x'
+when: not docker_compose_result.stat.exists
+become: yes
+
+- name: change docker-compose permission
+shell: chgrp docker /usr/local/bin/docker-compose
+become: yes
+
+- name: allow docker group users to execute it
+shell: chmod 750 /usr/local/bin/docker-compose
+become: yes</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the first step, we do existance check on the local docker compose binary file.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In second step, if no binary is found, we will use script to download the binary from github, and modify its user access. We can get the url of latest version from here: https://github.com/docker/compose/releases. Remember to choose the right architure for your remote host. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In thrid step, we make sure that all users in user group "docker" can also have running access of docker compose</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In last step, allow docker group users to execute it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>From second step and fourth step, we need super user access to run these command, "become: yes" is added.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Put these in an ansible playbook, and run it against the target host, then docker compose is ready for use!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading this! hope this is useful.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/08/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

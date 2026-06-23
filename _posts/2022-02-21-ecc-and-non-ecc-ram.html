@@ -1,0 +1,107 @@
+---
+layout: post
+title: ECC and non-ECC RAM
+date: 2022-02-21 07:53:47.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>It is orginated from my personal story.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I have obtained a HP Z820 server from my colleague, and it equips with 4*4G DDR3 RAM.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I was running some pytorch program, then the RAM ran out. I thought this is simple, I purchased 4 * 8G Samsung DDR3 1600MHz. The replacement is easy, but the sad story begins, the server cannot start, and cpu fan goes crazy after the boot, and of course the booting fails.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The root cause is related to the post topic: memory ECC feature.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>What is ECC</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Error Correction Code (ECC) memory, it is a kind of RAM that often found in workstations and servers. It has ability to automatically detect and correct memory errors, thus fighting data corruption. It is also supposed to lead to less crashes of a server workstation over non-ecc memory.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>ECC vs non-ECC</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>They have some difference:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, Reliability</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Though ECC memory is theoretically more stable and reliable compared with traditional RAM. The failure rate of non-ECC memory is higher than that of ECC in the past 3 years.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, Performance</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>As claimed by many memory manufacturers, ECC memory is 2% slower than standard RAM because the additional time it takes for the system to check for any memory errors.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, Price</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Due to the additional memory chip and the inherently more complicated nature of ECC RAM, it charges higher than non-ECC memory. The amount varies according to the size of the memory stick. My real experience, from the same vendor, the same RAM volume, ECC charges 80% more.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>How to differentiate?</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>As a non professional in RAM, I cannot tell the ECC or non-ECC from the label. However, please do not worry, there is one easy way to differentiate: number of chips on the RAM stick.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Non-ecc type RAM has 8 chips, and ECC type shall have 9 chips. ECC’s additional chip is used for error detection and correction among the other eight memory chips.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":372,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/02/image-1024x711.png" alt="" class="wp-image-372"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 1: chip number difference between ECC and non-ECC RAM</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Can they use together</strong>?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>No</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Can they replace each other</strong>?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Depends. From that I searched on the internet, for certain mother board, in the BIOS setting, the ECC feature can be turned off. For my Z820, unfortunately, these is no such option, which means ECC seems to be a must.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Story end</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In order to upgrade the server, I returned the non-ECC RAM, spend 80% more to get 4*8G ECC RAM.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So, please also pay attention when you face the similar scenario..</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And, consulting the seller is always best option before you take the real action.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/02/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

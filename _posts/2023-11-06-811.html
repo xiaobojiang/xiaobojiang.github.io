@@ -1,0 +1,97 @@
+---
+layout: post
+title: How to run the python script in the background
+date: 2023-11-06 07:32:24.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>To run a Python script in the background on a Linux system, you can use several methods, such as using the <strong>&amp;</strong> operator, <strong>nohup</strong>, or tools like <strong>screen</strong> or <strong>tmux</strong>. Here are some common methods:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Using <strong>&amp;</strong> operator: You can start a Python script in the background by simply adding an ampersand (<strong>&amp;</strong>) at the end of the command when you run the script. For example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>python your_script.py &amp;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This will run your Python script in the background, and you will get your terminal prompt back immediately.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Using <strong>nohup</strong> (no hang up): The <strong>nohup</strong> command is used to run a command or script in the background and prevent it from being terminated when you log out or close your terminal. You can use it like this:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>nohup python your_script.py &amp;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Using nohup has few additional benifits: the log will be to nohup.out, console will be very clean. It will also not pop up a python program icon in the system bar. Truly in the background.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Using <strong>screen</strong> or <strong>tmux</strong> (for more control): <strong>screen</strong> and <strong>tmux</strong> are terminal multiplexer tools that allow you to create and manage multiple terminal sessions. They are useful for running long-term or persistent background processes.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>First, install <strong>screen</strong> or <strong>tmux</strong> if you haven't already:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>sudo apt-get install screen 
+# For screen 
+sudo apt-get install tmux 
+# For tmux</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then, you can create a new session and run your Python script inside it: For <strong>screen</strong>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>screen -S mysession python your_script.py</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>To detach from the <strong>screen</strong> session and leave the script running, press <strong>Ctrl+A</strong> followed by <strong>d</strong>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To reattach to the session later:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>screen -r mysession</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>For<strong> tmux</strong>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>tmux new-session -s mysession python your_script.py</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>To detach from the <strong>tmux</strong> session, press <strong>Ctrl+B</strong> followed by <strong>d</strong>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To reattach to the session later:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>tmux attach-session -t mysession</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Choose the method that best fits your requirements and workflow. The <strong>&amp;</strong> operator is the simplest for running a script in the background, while <strong>nohup</strong>, <strong>screen</strong>, and <strong>tmux</strong>provide more control and persistence.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading, hope it is useful!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/11/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

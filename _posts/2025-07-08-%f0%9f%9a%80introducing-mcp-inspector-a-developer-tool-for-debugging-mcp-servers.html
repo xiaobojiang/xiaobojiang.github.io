@@ -1,0 +1,98 @@
+---
+layout: post
+title: "\U0001F680Introducing MCP Inspector: A Developer Tool for Debugging MCP Servers"
+date: 2025-07-08 03:27:42.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>The<strong>MCP Inspector</strong>is a powerful, browser-based tool for testing and debugging MCP (Model Context Protocol) servers. Whether your server runs over stdio, SSE, or streamable-http, this tool provides an interactive UI and a CLI mode for full visibility and control.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>🧪 Quick Start (UI Mode)</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Launch the Inspector UI in seconds:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>npx @modelcontextprotocol/inspector</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1187,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/07/image-1024x162.png" alt="" class="wp-image-1187"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then open the inspector with token pre-filled url:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1192,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/07/119f7602cadeb04cfa14b9f56e3b9628-1024x858.png" alt="" class="wp-image-1192"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then you can select one of three transport type and connect for testing: Stdio, SSE (to be deprecated), Streamable https.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Take stdio io as example, we can connect to a server via GUI configuration:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Put command eg: uv inside, and then arguments (uv command arguments) : --directory /Users/xiaobo/MyGit/mcp_playground/weather run weather.py (this is the example from MCP official site)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then, click connect, it will trigger initialization.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then if we go to tool tab, click button "List Tools", now this tool presents two tools in this server: "get_alerts" and "get_forecast"</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Great!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1193,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/07/449B0354-D34E-4A83-9338-0077261E34D2-1024x536.png" alt="" class="wp-image-1193"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p> Follow similar way, we can connect to Streamable http server, be care to put the link and set the auth setting (eg bearer token).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Another way to connect a MCP server is via command line.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We can also the same stdio server by configuring below command:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>$ npx @modelcontextprotocol/inspector uv --directory /Users/xiaobo/MyGit/mcp_playground/weather run <a href="http://weather.py">weather.py</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This could auto fill the stdio parameters in the url.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally, we can select a tool, fill in the parameter and run the tool.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Cool! As in the screen, I can get the weather alerts from California.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1194,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/07/image-4-1024x621.png" alt="" class="wp-image-1194"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>With this we can quickly testing the MCP server and move on to integrate into your AI agent!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Hope you enjoy this!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/07/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

@@ -1,0 +1,182 @@
+---
+layout: post
+title: "\U0001F539 Python Annotated and Validation with FastAPI &amp; Pydantic"
+date: 2025-11-04 02:54:29.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:heading --><html><body></p>
+<h2 class="wp-block-heading"><strong>What is Annotated?</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Introduced in <strong>PEP 593</strong>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Lets you attach <strong>metadata</strong> to type hints.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Python itself <strong>does not enforce</strong> these rules — it just stores them.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Frameworks (like <strong>FastAPI</strong> and <strong>Pydantic</strong>) read the metadata and act on it.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>At the Python level:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Annotated[BaseType, *metadata]</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>…is just a container.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Python stores both parts (base type and metadata), and the framework decides how to interpret that metadata.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>#Pydantic interprets Field(...)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Annotated[str, Field(min_length=3)]</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>#LangChain interprets InjectedToolCallId</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Annotated[str, InjectedToolCallId]</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Both are syntactically identical but semantically unrelated — the framework reads the metadata differently.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Detailed examples in different frameworks:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>Example 1: Python alone (no enforcement)</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from typing import Annotated, get_type_hints
+
+MyInt = Annotated[int, "must be positive"]
+
+def foo(x: MyInt): 
+    return x
+
+print(foo(-5))              # Works fine
+
+print(get_type_hints(foo))  # {'x': typing.Annotated[int, 'must be positive']}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>👉 Python keeps the "must be positive" note, but doesn’t validate.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>Example 2: FastAPI</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from typing import Annotated
+from fastapi import FastAPI, Query
+app = FastAPI()
+@app.get("/items/")
+def read_items(
+    q: Annotated[str | None, Query(min_length=3, max_length=50)] = None
+):
+    return {"q": q}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>If you send /items/?q=hi, FastAPI returns <strong>422 Validation Error</strong>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>FastAPI uses Annotated metadata (Query(...)) for <strong>validation + docs</strong>.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>Example 3: Pydantic v2</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from typing import Annotated
+
+from pydantic import BaseModel, Field
+
+class User(BaseModel):
+
+    name: Annotated[str, Field(min_length=3, max_length=50)]
+
+    age: Annotated[int, Field(gt=0, lt=120)]
+
+print(User(name="Alice", age=25))   # ✅ OK
+
+print(User(name="Al", age=-1))      # ❌ ValidationError</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Pydantic enforces rules from Field(...).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>But <strong>text-only metadata</strong> is ignored:</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>age: Annotated[int, "must be &gt; 0"]  # ⚠️ No validation</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>✅ Summary</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Python itself</strong>: Annotated = metadata only, no enforcement.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>FastAPI</strong>: uses metadata (Query(...)) for request validation &amp; docs.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Pydantic</strong>: uses metadata (Field(...), validators) for model validation.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Text notes</strong> inside Annotated are ignored by Pydantic — only structured objects matter.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:paragraph --></p>
+<p>👉 Use Annotated when you need type + validation/metadata in a single, clean definition.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/11/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

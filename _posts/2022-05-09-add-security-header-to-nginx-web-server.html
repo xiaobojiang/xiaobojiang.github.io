@@ -1,0 +1,239 @@
+---
+layout: post
+title: Add Security Header to Nginx Web Server
+date: 2022-05-09 07:17:19.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Technology
+- Web
+tags: []
+meta:
+  _oembed_dad0f4b7a67ce5db78f3d2e8ff3fee45: "{{unknown}}"
+  _oembed_ef739f01f8703a97ca6d98ad624b005f: "{{unknown}}"
+  _oembed_2d8aff2e8784af0c287be3a140e0e2a7: "{{unknown}}"
+  _oembed_36077bf519a0e2b73a41251c55a98d63: "{{unknown}}"
+  _oembed_6c94715d57c06f38e7e33b1effea11f7: "{{unknown}}"
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Let’s talk about the common security headers in the response. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here I list 5 most commonly used, and you can find more details in the MDN link for each one.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security">Strict-Transport-Security</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy">Content-Security-Policy</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options">X-Content-Type-Options</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options">X-Frame-Options</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection">X-XSS-Protection</a></li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>These security headers will normally be required for security purpose, and you can scan it out on your website by this public tool: <a href="https://github.com/koenbuyens/securityheaders#security-headers">https://github.com/koenbuyens/securityheaders#security-headers</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you found those headers are missing, you shall add them with proper value.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In next section, I will use Nginx as example, to explain what are and how to add them.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>HTTP Strict Transport Security (HSTS) </strong><strong></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>When a user enters a web domain manually (providing the domain name without the <strong>http://</strong> or <strong>https://</strong> prefix) or follows a plain <strong>http://</strong> link, the first request to the website is sent unencrypted, using plain HTTP. Most secured websites immediately send back a redirect to upgrade the user to an HTTPS connection, but a well‑placed attacker can mount a man‑in‑the‑middle (MITM) attack to intercept the initial HTTP request and can control the user’s session from then on.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>HSTS seeks to deal with the potential vulnerability by instructing the browser that a domain can only be accessed using HTTPS. Even if the user enters or follows a plain HTTP link, the browser strictly upgrades the connection to HTTPS</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Configuring HSTS in NGINX </strong><strong></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Add this line below to the server block, Once you’re done save your changes and reload Nginx.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>add_header Strict-Transport-Security "max-age=31536000; includeSubDomains"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>The Nginx config file should lock like this.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>upstream portal {
+
+    server localhost:8080;
+
+}
+server 
+{
+   listen 80;
+
+   server_name portal.test;
+
+   add_header Strict-Transport-Security "max-age=31536000” always;   
+   location / {
+
+        proxy_pass http://portal;
+
+    }
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, by adding “always”, nginx can respond with this header for non-200 code.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>X-XSS-Protection </strong><strong></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>X-XSS is also known as a Cross-Site Scripting header is used to defend against Cross-Site Scripting attacks. XSS Filter is enabled by default in modern web browsers such as Chrome, IE, and Safari. This header stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can implement XSS protection using the three options depending on the specific need.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>X-XSS-Protection: 0</strong>: This will disable the filter entirely.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>X-XSS-Protection: 1</strong>: This will enable the filter but only sanitizes potentially malicious scripts.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>X-XSS-Protection: 1; mode=block</strong>: This will enable the filter and completely blocks the page.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Configuring XSS-Protection in NGINX </strong><strong></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To enable the X-XSS-Protection header in your Nginx Web Server, add the following line in your config file, Once you’re done, save your changes and reload Nginx.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>add_header X-XSS-Protection "1; mode=block” always;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>X-Frame-Options </strong><strong></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The X-Frame-Options header is used to defend your website from clickjacking attacks by disabling iframes on your site. Currently, it is supported by all major web browsers. With this header, you tell the browser not to embed your web page in frame/iframe.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>There are three ways to configure X-Frame-Options:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>DENY:</strong> This will disable iframe features completely.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>SAMEORIGIN:</strong> iframe can be used only by someone of the same origin.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>ALLOW-FROM:</strong> This will allow pages to be put in iframes only from specific URLs.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To enable the X-Frame-Options header in your Nginx Web Server, add the following line in your config file, Once you’re done, save your changes and reload Nginx.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>add_header X-Frame-Options “SAMEORIGIN" always;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>X-Content-Type-Options </strong><strong></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If a response specifies an incorrect content type then browsers may process the response in unexpected ways. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If the content type is specified to be a renderable text-based format, then the browser will usually attempt to interpret the response as being in that format, regardless of the actual contents of the response. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Additionally, some other specified content types might sometimes be interpreted as HTML due to quirks in particular browsers. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This behaviour might lead to otherwise “safe” content such as images being rendered as HTML, enabling cross-site scripting attacks in certain conditions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To enable the X-Content-Type-Options header in your Nginx Web Server, add the following line in your config file, Once you’re done, save your changes and reload Nginx.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>add_header X-Content-Type-Options “nosniff” always;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong><em>Content-Security-Policy</em></strong><strong></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>CSP</strong> is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross-Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft, to site defacement, to malware distribution.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Configuring CSP in NGINX </strong><strong></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Add this line below to the server block, Once you’re done, save your changes and reload Nginx.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>add_header Content-Security-Policy "default-src 'self';" always;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>I would say, it is the most complicated part in the security header. For the common case, “default-src ’self’" would be sufficient for website. However, if your website embedded map or 3rd party js file or img file. Then be cautious, you need to list the whitelist for different resource.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>By default, those directives (find more detail here <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy">https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy</a>), if you do not specify the source list, it will fallback to “default-src” scope. take one setting from <a href="https://gist.github.com/joseluisq/3b52f684206a25bb6a15">https://gist.github.com/joseluisq/3b52f684206a25bb6a15</a> as example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://ssl.google-analytics.com https://assets.zendesk.com https://connect.facebook.net; img-src 'self' https://ssl.google-analytics.com https://s-static.ak.facebook.com https://assets.zendesk.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://assets.zendesk.com; font-src 'self' https://themes.googleusercontent.com; frame-src https://assets.zendesk.com https://www.facebook.com https://s-static.ak.facebook.com https://tautt.zendesk.com; object-src 'none'";</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>It allows javascript from self (same site), and allow scripts from <a href="https://ssl.google-analytics.com/"><em>https://ssl.google-analytics.com</em></a><em> </em><a href="https://assets.zendesk.com/"><em>https://assets.zendesk.com</em></a><em> </em><a href="https://connect.facebook.net/"><em>https://connect.facebook.net</em></a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, it does not mention “fetch-src”, so it will fall back to “default-src”, its scope is ’self'</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Utilze Chrome Debug tool</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The real case is more complicated, but chrome’s debug tool can really help you. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Try browse the website, if anything is blocked, it will be highlighted in the issue, and also the ‘Directive’ will be shown.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For below example, you can add “font-src: ’self’ data: “ to allow the source.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":446,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/05/image-1024x548.png" alt="" class="wp-image-446"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em><strong>Thanks for below referene and author's work:</strong></em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://gist.github.com/joseluisq/3b52f684206a25bb6a15">https://gist.github.com/joseluisq/3b52f684206a25bb6a15</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/example-function-add-security-headers.html">https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/example-function-add-security-headers.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://faun.pub/how-to-configure-security-headers-in-nginx-aac883201ff2#:~:text=Content-Security-Policy%20CSP%20is%20an%20added%20layer%20of%20security,defacement%2C%20to%20malware%20distribution.%20Configuring%20CSP%20in%20NGINX">https://faun.pub/how-to-configure-security-headers-in-nginx-aac883201ff2#:~:text=Content-Security-Policy%20CSP%20is%20an%20added%20layer%20of%20security,defacement%2C%20to%20malware%20distribution.%20Configuring%20CSP%20in%20NGINX</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://blog.sucuri.net/2021/10/how-to-set-up-a-content-security-policy-csp-in-3-steps.html">https://blog.sucuri.net/2021/10/how-to-set-up-a-content-security-policy-csp-in-3-steps.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://raymii.org/s/tutorials/HTTP_Strict_Transport_Security_for_Apache_NGINX_and_Lighttpd.html">https://raymii.org/s/tutorials/HTTP_Strict_Transport_Security_for_Apache_NGINX_and_Lighttpd.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have any comments or questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

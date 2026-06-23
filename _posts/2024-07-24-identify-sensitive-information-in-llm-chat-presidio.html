@@ -1,0 +1,232 @@
+---
+layout: post
+title: Identify sensitive information in LLM chat - Presidio
+date: 2024-07-24 06:36:20.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>In today's digital age, the proliferation of Artificial Intelligence (AI) has revolutionized how we interact with technology, offering convenience and efficiency across various platforms. One significant area where AI is increasingly integrated is in chat interfaces, where users engage in conversations ranging from customer support queries to personal assistance. However, amidst the benefits lie critical concerns regarding the protection of privacy data.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I found this tool - Presidio from Microsoft which can help this.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Presidio can help identify sensitive/PII data in un/structured text.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Presidio (Origin from Latin praesidium ‘protection, garrison’) helps to ensure sensitive data is properly managed and governed. It provides fast identification and anonymization modules for private entities in text such as credit card numbers, names, locations, social security numbers, bitcoin wallets, US phone numbers, financial data and more.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Git link: <a href="https://github.com/microsoft/presidio">https://github.com/microsoft/presidio</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let's try this.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Installation:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ pip install presidio_analyzer
+
+$ pip install presidio_anonymizer
+
+$ python -m spacy download en_core_web_lg</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>It utlizes spacy to download model en_core_web_lg (around 500+ MB) and use it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sample code</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from presidio_analyzer import AnalyzerEngine
+
+from presidio_anonymizer import AnonymizerEngine
+
+text="My phone number is 212-555-5555"
+
+#Set up the engine, loads the NLP module (spaCy model by default) and other PII recognizers
+
+analyzer = AnalyzerEngine()
+
+Call analyzer to get results
+
+results = analyzer.analyze(text=text,
+
+                          entities=["PHONE_NUMBER"],
+
+                          language='en')
+
+print(results)
+
+Analyzer results are passed to the AnonymizerEngine for anonymization
+
+anonymizer = AnonymizerEngine()
+
+anonymized_text = anonymizer.anonymize(text=text,analyzer_results=results)
+
+print(anonymized_text)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Result:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>[type: PHONE_NUMBER, start: 19, end: 31, score: 0.75]
+
+text: My phone number is &lt;PHONE_NUBMER&gt;
+
+items:
+
+[
+
+{'start': 19, 'end': 33, 'entity_type': 'PHONE_NUMBER', 'text': '', 'operator': 'replace'}
+
+]</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Supported Entities: <a href="https://microsoft.github.io/presidio/supported_entities">https://microsoft.github.io/presidio/supported_entities/</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Global</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:table {"hasFixedLayout":false} --></p>
+<figure class="wp-block-table">
+<table>
+<tbody>
+<tr>
+<th><strong>Entity Type</strong></th>
+<th><strong>Description</strong></th>
+<th><strong>Detection Method</strong></th>
+</tr>
+<tr>
+<td>CREDIT_CARD</td>
+<td>A credit card number is between 12 to 19 digits. <a href="https://en.wikipedia.org/wiki/Payment_card_number">https://en.wikipedia.org/wiki/Payment_card_number</a>
+</td>
+<td>Pattern match and checksum</td>
+</tr>
+<tr>
+<td>CRYPTO</td>
+<td>A Crypto wallet number. Currently only Bitcoin address is supported</td>
+<td>Pattern match, context and checksum</td>
+</tr>
+<tr>
+<td>DATE_TIME</td>
+<td>Absolute or relative dates or periods or times smaller than a day.</td>
+<td>Pattern match and context</td>
+</tr>
+<tr>
+<td>EMAIL_ADDRESS</td>
+<td>An email address identifies an email box to which email messages are delivered</td>
+<td>Pattern match, context and RFC-822 validation</td>
+</tr>
+<tr>
+<td>IBAN_CODE</td>
+<td>The International Bank Account Number (IBAN) is an internationally agreed system of identifying bank accounts across national borders to facilitate the communication and processing of cross border transactions with a reduced risk of transcription errors.</td>
+<td>Pattern match, context and checksum</td>
+</tr>
+<tr>
+<td>IP_ADDRESS</td>
+<td>An Internet Protocol (IP) address (either IPv4 or IPv6).</td>
+<td>Pattern match, context and checksum</td>
+</tr>
+<tr>
+<td>NRP</td>
+<td>A person’s Nationality, religious or political group.</td>
+<td>Custom logic and context</td>
+</tr>
+<tr>
+<td>LOCATION</td>
+<td>Name of politically or geographically defined location (cities, provinces, countries, international regions, bodies of water, mountains</td>
+<td>Custom logic and context</td>
+</tr>
+<tr>
+<td>PERSON</td>
+<td>A full person name, which can include first names, middle names or initials, and last names.</td>
+<td>Custom logic and context</td>
+</tr>
+<tr>
+<td>PHONE_NUMBER</td>
+<td>A telephone number</td>
+<td>Custom logic, pattern match and context</td>
+</tr>
+<tr>
+<td>MEDICAL_LICENSE</td>
+<td>Common medical license numbers.</td>
+<td>Pattern match, context and checksum</td>
+</tr>
+<tr>
+<td>URL</td>
+<td>A URL (Uniform Resource Locator), unique identifier used to locate a resource on the Internet</td>
+<td>Pattern match, context and top level url validation</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>Change the case to email address, and test it</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>text="I want to order this product, name is John, email address is <a href="mailto:john.doe@gmail.com">john.doe@gmail.com</a>, post code is 200000"</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Set up the engine, loads the NLP module (spaCy model by default)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>and other PII recognizers</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>analyzer = AnalyzerEngine()</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":1} --></p>
+<h1 class="wp-block-heading">Call analyzer to get results</h1>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>results = analyzer.analyze(text=text,
+                      entities=["PHONE_NUMBER","EMAIL_ADDRESS", "PERSON"],
+                      language='en')</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Result, it help identify the phone number in the chat, and anonymized it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>[type: EMAIL_ADDRESS, start: 61, end: 79, score: 1.0, type: PERSON, start: 38, end: 42, score: 0.85]
+
+text: I want to order this product, &lt;PERSON&gt;, email address is &lt;EMAIL_ADDRESS&gt;, post code is 200000
+
+items:
+
+[
+
+{'start': 65, 'end': 80, 'entity_type': 'EMAIL_ADDRESS', 'text': '', 'operator': 'replace'},
+
+{'start': 38, 'end': 46, 'entity_type': 'PERSON', 'text': '', 'operator': 'replace'}
+
+]</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Quite cool, try to use similar tool when you programically talk with LLM.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading, please leave a comment if any questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/07/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

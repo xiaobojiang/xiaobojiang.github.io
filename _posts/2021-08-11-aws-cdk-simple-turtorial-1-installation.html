@@ -1,0 +1,161 @@
+---
+layout: post
+title: AWS CDK simple turtorial 1 - installation
+date: 2021-08-11 08:08:02.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Cloud
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Infrasture as code, this concept enables that infrastructure resource eg, VPN, EC2, security groups, RDS, EKS can be managed and deployed with code. This can helps OP guys quickly replicate infrastructure quickly.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>AWS already provides a way called cloudformation, by writing the xml, user can define and deploy with this concept. However, writing cloudformation from scratch is really painful, and this leads to hundreds of lines even for a simple feature.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Cloud developer kit (CDK) was release by AWS on 31 July 2018. CDK was written in Typescript, with JSII it can support Python and other languages.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>With CDK, user can write few lines to bring up a VPC, EC2, and a lot of things.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>I started CDK usage from March 2021, together with ansible, it helped me in the project to quickly deploy environment and applications.<br>This is the first post on installation and project creation with CDK python.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Environment preparation<br>Before we start exploring the CDK features, you need to install some necessary packages:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"style":{"typography":{"fontSize":"12px"}}} --></p>
+<ul style="font-size:12px">
+<li>Python 3</li>
+<li>pip</li>
+<li>virtualenv</li>
+<li>Nodejs</li>
+<li>aws-cdk</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>I am using MacBook, you may need to adpat a little for your OS.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Let’s start from Python, it is pre-installed with python2.7 in Mac OS. Python3 is more recommended since Python2 is a sunsetting product, and it does not receive any bug fix and changes.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>However, if you use Homebrew to install python3 and let homebrew to maintain python3 updates, you will face night-mares of package management and dependencies.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>I use PyEnv (<a href="https://github.com/pyenv/pyenv">https://github.com/pyenv/pyenv</a>) to manage python versions, I may write one separate post on how-to.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Let’s assume you already have your python3 and pip ready on your computer.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Next is to install virtualenv for python, this can help you manage different package and version for different projects. It is simple to install: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ pip install virtualenv</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>All AWS CDK applications require Node.js 10.13 or later, even if you work in Python, Java, or C#. Here, let’s install the latest version of Node.js Download and install the corresponding package from: <a href="https://nodejs.org/en/download/current/">https://nodejs.org/en/download/current/</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Use following commands to verify nodejs installation, you should get something similar:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":67,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/08/image-3.png" alt="" class="wp-image-67"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>After installing Node.js, install the AWS CDK toolkit (you can use cdk command then): $ sudo npm install -g aws-cdk Verify your installation by:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":66,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/08/image-2.png" alt="" class="wp-image-66"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now everything is ready, you can start your first project. $mkdir my-project $cd my-project $cdk init app —language python Now you can see such a folder:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":69,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/08/image-5.png" alt="" class="wp-image-69"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>After initializing the project, activate the project's virtual environment. This allows the project's dependencies to be installed locally in the project folder, instead of globally. source .venv/bin/activate<br>Now, you can install CDK libraries for use. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For example, you can install aws-ec2.  </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ pip install aws-cdk.aws-ec2 </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This will also download linked packages:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":70,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/08/image-6-1024x489.png" alt="" class="wp-image-70"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Suggest manually update the requirement.txt inside the folder, avoid use pip freeze or piperqs, this will bring you two many circular depencies.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Add lines like:<br>aws-cdk.aws-ec2==1.118.0<br>Later, you can user pip install -r requirements.txt to install packages.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Now, edit the my_projects/my_project_stack.py, let's create a VPC: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from aws_cdk import core as cdk
+from aws_cdk import aws_ec2 as ec2
+class VpcStack(cdk.Stack):
+
+    def __init__(self, scope: cdk.Construct, construct_id: str, cidr_range, **kwargs) -&gt; None:
+        super().__init__(scope, construct_id, **kwargs)
+
+
+        self.vpc = ec2.Vpc(self,
+            'brightsite-vpc', # VPC id
+            cidr=cidr_range, # CIDR
+            max_azs=3,  # 3 aza
+            nat_gateways=1 # create NAT Gateway
+        )</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, I strongly recommend Visual Studio Code + AWS Toolkit. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It can help you with hints, and autocomplete, it really improves efficiency!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":73,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/08/image-7.png" alt="" class="wp-image-73"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Before you run the upper code, you need to have an AWS profile provisioned. $aws configure —profile test_profile # fill the account id and key, zones, and format info. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ export AWS_PROFILE=test_profile</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Then run the code to create a VPC right now, go the my_project root folder: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ cdk bootstrap 
+$ cdk deploy</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>You can optionally use “cdk diff” to see the difference. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And the generate Cloudformation code is located in the cdk.out folder.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Enjoy your first VPC created, you can check it in the AWS console:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":68,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/08/image-4.png" alt="" class="wp-image-68"></figure>
+<p><!-- /wp:image --><br />
+</body></html></p>

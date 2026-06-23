@@ -1,0 +1,284 @@
+---
+layout: post
+title: AWS IOT core MQTT turtorial - pub/sub
+date: 2021-12-27 03:00:53.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Cloud
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Let’s try something cool in this post, we will use one Raspberry Pi connected to AWS iot core via MQTT. The AWS provides easy to use and scalable platform for devices to connect, the core service is AWS IOT. With device connected, we can also use data analytics and other value added service to devices.<br>MQTT is a industry standard, and it message model is broker-client model, all the client subscribe and publish topics in the broker. MQTT is light weight and highly stable, which makes it very suitable for IOT applications.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":304,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/12/image-9-1024x302.png" alt="" class="wp-image-304"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 1, example of MQTT messaging, source: https://mqtt.org</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>AWS IoT provides MQTT based connectivity:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":302,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/12/image-8.png" alt="" class="wp-image-302"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 2, supported protocol and ports, source: <a href="http://docs.aws.amazon.com">docs.aws.amazon.com</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"align":"left"} --></p>
+<p class="has-text-align-left"><br>In this post, we will use MQTT over port 8883, whose authentication is based on X509 certificates. Let’s try one publish and subscribe example.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"align":"left","fontSize":"medium"} --></p>
+<p class="has-text-align-left has-medium-font-size">Before we do the coding, we need to make some configuration the AWS IoT: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<li>Create the policy, as the starting point, we can make the policy simple as:</li>
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:image {"align":"center","id":305,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/12/image-11.png" alt="" class="wp-image-305"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 3. Create an example policy</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iot:Connect",
+        "iot:Receive",
+        "iot:Publish",
+        "iot:Subscribe"
+      ],
+      "Resource": "*"
+    }
+  ]
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, connect/receive are the action that MQTT requires, check here for more details: <a href="https://docs.aws.amazon.com/iot/latest/developerguide/iot-policy-actions.html">https://docs.aws.amazon.com/iot/latest/developerguide/iot-policy-actions.html</a>, and full action resources are listed here:<a href="https://docs.aws.amazon.com/iot/latest/developerguide/iot-action-resources.html">https://docs.aws.amazon.com/iot/latest/developerguide/iot-action-resources.html</a> With the combination, the policy can specify what actions can do on what resources. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the upper policy, basically it is not a secure one, it enables device can connect/receive/publish/subscribe to any topics/resources. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":2} --></p>
+<ol start="2">
+<li>Next is to create a thing object in the IOT console</li>
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:image {"align":"center","id":303,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/12/image-10.png" alt="" class="wp-image-303"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 4. Create a thing </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Specify a name for this thing instance, please be noted that this name cannot be modified after creation. Keep additional configuation and Device Shadow with default values.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":301,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/12/image-7.png" alt="" class="wp-image-301"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 5. properties of a new thing</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And in the device certificate window, choose auto-generate a new certificate.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":300,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/12/image-6.png" alt="" class="wp-image-300"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 6. Create certificate for the created thing, choose recommended </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And remember to download the device cert (rename to device.pem.crt), puiblic key (rename to public.pem.key), private key (rename to private.pem.key) and RSA CA cert (Amazon-root-CA-1.pem). These certs and keys will be used in client. If you check the certs assigned, you will find the root CA expires on  2038-1-17</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":308,"width":689,"height":200,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><img src="{{site.baseurl}}/assets/2021/12/image-14.png" alt="" class="wp-image-308" width="689" height="200"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 7. sample ca certificate from AWS IOT</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>  The device cert expires on 2049-12-31</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":306,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/12/image-12.png" alt="" class="wp-image-306"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 8. sample device certificate from AWS IOT</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Root CA actually has shorter valid time than device certificate, which means you need to refresh certs in your devices after 2038… that’s already long time after.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":3} --></p>
+<ol start="3">
+<li>all the resource have been created in the AWS cloud.  Next optional step is to improve the policy with policy variables</li>
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>AWS IoT Core defines policy variables that can be used in AWS IoT Core policies in the Resource or Condition block. When a policy is evaluated, the policy variables are replaced by actual values. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For example, if a device is connected to the AWS IoT Core message broker with a client ID of 100-234-3456, the <strong>iot:ClientId</strong> policy variable is replaced in the policy document by 100-234-3456</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Below is a better policy, which resticts devices with client id prefix “gateway-“ can connect to broker, and all the device can only pub/sub topic with rules <strong>brightsite/gateway/${iot:ClientId}/*</strong>. This makes the device can do action at topic within his client id as prefix, blocks it listening message from other client.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>As a note, only one device with same client id can access AWS iot.<br>Policy:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iot:Publish",
+        "iot:Receive"
+      ],
+      "Resource": [
+        "arn:aws:iot:eu-central-1:accountid:topic/brightsite/gateway/${iot:ClientId}/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iot:Subscribe"
+      ],
+      "Resource": [
+        "arn:aws:iot:eu-central-1:accountid:topicfilter/brightsite/gateway/${iot:ClientId}/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iot:Connect"
+      ],
+      "Resource": [
+        "arn:aws:iot:eu-central-1:accountid:client/gateway-*"
+      ]
+    }
+  ]
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Next part is on device side</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I choose Raspberry PI 4B as the client. there are few steps:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, Install the latest Raspbian, it contains python 3.9.2 as default, execute “apt update” and “apt upgrade” to update system. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, Install necessary packages: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo apt-get install git
+$ sudo apt-get install cmake 
+$ sudo apt-get install libssl-dev
+$ pip install awsiotsdk</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p> <br>3, pull the sample code from github</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ cd ~ 
+$ git clone https://github.com/aws/aws-iot-device-sdk-python-v2.git</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p> <br>4, create a folder called certs, and put previous keys and certs inside </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>5, change the code, and update the policy and topics to updated policy. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example pubsub.py code, I made few small changes on it client id and pub/sub topic, so it can works together with the improved policy:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#only difference is pasted
+if __name__ == '__main__':
+    # Spin up resources
+    event_loop_group = io.EventLoopGroup(1)
+    host_resolver = io.DefaultHostResolver(event_loop_group)
+    client_bootstrap = io.ClientBootstrap(event_loop_group, host_resolver)
+
+    <em>#override args parameter
+    args.client_id = 'gateway-'+ str(uuid4())
+    args.topic = 'brightsite/gateway/'+args.client_id+'/ping'</em>
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>6, execute the code  </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ python3 pubsub.py --root-ca ~/certs/Amazon-root-CA-1.pem --cert ~/certs/device.pem.crt --key ~/certs/private.pem.key --endpoint your-iot-endpoint —-port 8883</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>It use the certificates in the cert folder, and further more,And you could see outputs like:</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":307,"sizeSlug":"large","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img src="{{site.baseurl}}/assets/2021/12/image-13-1024x170.png" alt="" class="wp-image-307"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 9. console output of pubsub.py code</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>This means that the device connected the AWS broker, and it can publish and receive the message on the same topic.</em><br>As a final note, during the code execution, if it complains client connect closed, most of the time it is due to policy issue. AWS iot core rejects the connection, and pub/sub, check the policy and adjust.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave me a post if you have any comments or ideas.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Reference: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://docs.aws.amazon.com/iot/latest/developerguide/create-iot-resources.html">https://docs.aws.amazon.com/iot/latest/developerguide/create-iot-resources.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://docs.aws.amazon.com/iot/latest/developerguide/certificate-policy-examples.html">https://docs.aws.amazon.com/iot/latest/developerguide/certificate-policy-examples.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://github.com/aws/aws-iot-device-sdk-python-v2/tree/main/samples#pubsub">https://github.com/aws/aws-iot-device-sdk-python-v2/tree/main/samples#pubsub</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://docs.aws.amazon.com/iot/latest/developerguide/basic-policy-variables.html">https://docs.aws.amazon.com/iot/latest/developerguide/basic-policy-variables.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/12/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

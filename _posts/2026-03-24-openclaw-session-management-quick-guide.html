@@ -1,0 +1,98 @@
+---
+layout: post
+title: OpenClaw session management - quick guide
+date: 2026-03-24 03:12:49.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>OpenClaw session management is simple once you separate session keys from session IDs.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>A good working model is:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Create / use a session:</strong> run /session &lt;name&gt; in TUI. If that key does not already exist, OpenClaw starts using it as that session namespace. Session keys are stored as agent:&lt;agentId&gt;:&lt;sessionKey&gt;. So /session main expands to the current agent’s main session, while /session agent:other:main jumps across agents. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>List / switch sessions:</strong> use /sessions or press <strong>Ctrl+P</strong> to open the session picker. The picker shows sessions for the <strong>current agent</strong> only. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Start TUI directly in a named session:</strong> openclaw tui --session bugfix. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>The part that often confuses people is /new vs /reset.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the TUI docs, both are documented as resetting the session. In the session docs, exact /new or /reset starts a fresh session ID. That means they are effectively the same for clearing active context. The one important difference is that /new can also take a model argument, like /new claude or /new openai/gpt-5, to start the fresh session on a different model.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So the practical workflow is:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>/session feature-x → create or move into a named working session</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>/sessions → see what exists</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Ctrl+P → switch quickly</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>/reset → hard reset current conversation</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>/new → hard reset current conversation, optionally with a new model </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>One more useful detail: OpenClaw persists sessions in two layers on the Gateway host:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>sessions.json tracks metadata for each session key</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>&lt;sessionId&gt;.jsonl stores the actual transcript</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>That is why session management feels clean in the UI while still keeping durable history under the hood.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>A compact version:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In OpenClaw, use /session &lt;name&gt; to create or enter a named session, /sessions or Ctrl+P to list and switch, and /reset or /new to start fresh. /new is basically /reset plus optional model switching. Session keys identify the workspace; session IDs identify the actual conversation instance. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2026/03/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

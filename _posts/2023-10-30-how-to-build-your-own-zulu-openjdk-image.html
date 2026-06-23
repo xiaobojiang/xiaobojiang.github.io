@@ -1,0 +1,90 @@
+---
+layout: post
+title: How to build your own zulu openjdk image - with multi-arch support
+date: 2023-10-30 07:45:25.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Preparation</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I encountered  issue of wget Zulu repository key.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So I wget locally, and copy inside</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>wget --quiet<a href="https://cdn.azul.com/public_keys/alpine-signing@azul.com-5d5dc44c.rsa.pub">https://cdn.azul.com/public_keys/alpine-signing@azul.com-5d5dc44c.rsa.pub</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Someone mentioned wget issue in buildx may link to MTU size (reduce the size)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So I addcat /etc/docker/daemon.json</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>{</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>"mtu":1300</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>}</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I think it is optional, try it if you face apk download issue.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Docker file </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>FROM alpine:3.15
+
+ENV LANG en_US.UTF-8
+
+ENV LANGUAGE en_US:en
+
+ENV LC_ALL en_US.UTF-8
+
+COPYalpine-signing@azul.com-5d5dc44c.rsa.pub/etc/apk/keys
+
+RUN apk --repositoryhttps://repos.azul.com/zulu/alpine--no-cache add zulu17-ca-jdk-headless~=17.0.2-r1 tzdata
+
+ENV JAVA_HOME=/usr/lib/jvm/zulu17-ca</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, compared to the original docker build file in GitHub(<a href="https://github.com/zulu-openjdk/zulu-openjdk/tree/master/alpine/17.0.2-17.32.13">https://github.com/zulu-openjdk/zulu-openjdk/tree/master/alpine/17.0.2-17.32.13</a>):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I did not install the zulu17-jdk, because it brings both zulu-ca-jdk, zulu-ca-jdk-headless, also zulu-jdk, zulu-jdk-headless.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Which from runing and license view, is not necessary.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So only the zulu17-ca-jdk-headless is installed, since UI is not required.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I use buildx to build multi-arch images</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Build script:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>docker buildx build -o type=registry --platform linux/arm64/v8,linux/amd64 --tagregistry.cn-shanghai.aliyuncs.com/sigcbp/zulujdkheadless:17.0</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Done</p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

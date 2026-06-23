@@ -1,0 +1,61 @@
+---
+layout: post
+title: How to run panel app out of jupyter notebook
+date: 2024-02-19 05:08:28.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>If you want to run a Panel app outside of a Jupyter notebook, you can use the <strong>panel serve</strong> command. Let's modify the example to include instructions for running the app without Jupyter:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import panel as pn
+
+# Define a function that returns a Panel object
+def greeting(name):
+    return pn.pane.Markdown(f"## Hello, {name}!")
+
+# Create an interactive widget
+name_input = pn.widgets.TextInput(name="Enter your name:", placeholder="Type here")
+
+# Combine the widget and function to create a reactive Panel app
+app = pn.Column(name_input, greeting)
+
+# Display the app in a standalone mode (without Jupyter)
+if __name__ == "__main__":
+    app.servable()</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>With this modification, you can run your app as a standalone application using the following command in the terminal:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$panel serve app.py</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This command will start a local server, and you can view your app by navigating to <a href="http://localhost:5006/">http://localhost:5006</a> in your web browser.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now, the <strong>if __name__ == "__main__":</strong> block ensures that the <strong>app.servable()</strong> line is only executed when the script is run directly, not when it's imported as a module in another script.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Feel free to run this script from the terminal, and you should see your Panel app running as a standalone web application.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/02/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

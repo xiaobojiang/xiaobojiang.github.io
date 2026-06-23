@@ -1,0 +1,288 @@
+---
+layout: post
+title: Manage Python versions with Conda
+date: 2021-11-24 05:51:45.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta:
+  _oembed_fed431f36d4fdc4368466e9219c31468: "{{unknown}}"
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph {"fontSize":"medium"} --><html><body></p>
+<p class="has-medium-font-size"><strong>Why Conda?</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Why shall I need to manage python versions, since I already have the python3 some version installed on the OS, why bother a new one?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I have one pain point that I use Ansible a lot, ansible insalled via pip which has high dependency on python version, older python3 version (&lt;3.6) will only allow you install ansible in lower version. And most of time it works fine, but sometimes, incompatibilty occurs and make the program suffers. To be honest, upgrading python3 version in the OS is not that easy, install new version does not repleace old one, and it will has a weird executable name python3.9, you need to do softlink, and easily breaks system.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For these circumstances, manage the python version with some tool, and switch version with the tool will be fantasic. Previously I use pyenv on my mac, and later I found conda, which is more universal across OS.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Conda is an open-source package management system and environment management system that runs on Windows, macOS, and Linux. Conda quickly installs, runs, and updates packages and their dependencies. Conda easily creates, saves, loads, and switches between environments on your local computer. It was created for Python programs but it can package and distribute software for any language.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Conda as a package manager helps you find and install packages. If you need a package that requires a different version of Python, you do not need to switch to a different environment manager because conda is also an environment manager. With just a few commands, you can set up a totally separate environment to run that different version of Python, while continuing to run your usual version of Python in your normal environment.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Conda Choice</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Conda installation has two choice: miniconda and anaconda. To make it short, miniconda is a minimal installation of python, anaconda comes with a lot of modules. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":262,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-34.png" alt="" class="wp-image-262"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 1. Main difference between miniconda and anaconda</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Anaconda VS. Miniconda </strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Anaconda is an open-source python distribution. It is purpose-built for such applications as machine learning, data science, and large-scale data processing. This distribution includes the core Python language, along with more than <a href="https://docs.anaconda.com/anaconda/packages/pkg-docs/">200 packages</a>, and a package management tool.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>While this is one of the most comprehensive Python distributions, it is also very large. (The installation file is about 200MB and will require about 2GB of disk space once installed). The Anaconda Python distribution also comes with several other software additions like the Anaconda Navigator—a graphical user interface. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You will also get qtconsole—a terminal-like solution that is capable of making graphs inline—with the Anaconda distribution. These are some of the Extra packages you will get on your Anaconda distribution, depending on the installer you choose: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>250+ packages will be automatically installed with every Anaconda installation </li>
+<li>More than 7,500 open-source packages, including R, will be available at the Anaconda repository. You may download and install any of these additional packages individually using the Conda install command feature </li>
+<li>You will have access to thousands of packages from the Anaconda Cloud as well.</li>
+<li>Using the conda build command feature, you can customize your packages, and then share them by uploading to such repositories as PyPI or Anaconda Cloud.</li>
+<li>If you have the pip package manager installed with your Anaconda distribution, you can download additional packages through the pip install command. However, you should always give preference to conda packages as opposed to pip packages. </li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>What of Miniconda? </strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Miniconda is a slimmed-down distribution version of Anaconda. It has all the components of the Anaconda distribution, except the 200+ pre-installed data science applications. With the various Mini condo installers, you will get the core Python language, and a package manager tool (Conda).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Install Miniconda with lastest python</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Hands on and let’s have a try</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Download: <a href="https://docs.conda.io/en/latest/miniconda.html#linux-installers">https://docs.conda.io/en/latest/miniconda.html#linux-installers</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code> $ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.10.3-Linux-x86_64.sh</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Install</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ bash Miniconda3-py39_4.10.3-Linux-x86_64.sh</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the console, press Enter to proceed.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":263,"width":468,"height":88,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full is-resized"><img src="{{site.baseurl}}/assets/2021/11/image-35.png" alt="" class="wp-image-263" width="468" height="88"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Accept the license and proceed next steps.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":264,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/11/image-36.png" alt="" class="wp-image-264"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you'd prefer that conda's base environment not be activated on startup, set the auto_activate_base parameter to false:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ conda config --set auto_activate_base false</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, check python version and preinstalled package in miniconda.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":265,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/11/image-37.png" alt="" class="wp-image-265"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>the pre installed packages is very few.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":266,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/11/image-38.png" alt="" class="wp-image-266"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Install some packages, eg, if you interested in pytorch, you can use conda to install pytorch packages.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>One interesting point, miniconda comes with smaller package size, and anaconda brings more package at sacrifice of large installation package.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":267,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-39.png" alt="" class="wp-image-267"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 2. Anaconda installer size</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":269,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/11/image-41.png" alt="" class="wp-image-269"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 3. Miniconda installer size</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Install arbitary python version with conda</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>First, you can view a list of available Python versions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To list the versions of Python that are available to install, in your terminal window or an Anaconda Prompt, run:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ conda search python</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This lists all packages whose names contain the text python.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To list only the packages whose full name is exactly python, add the --full-name option. In your terminal window or an Anaconda Prompt, run:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ conda search --full-name python</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Installing a different version of Python</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To install a different version of Python without overwriting the current version, create a new environment and install the second Python version into it:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>1, Create the new environment:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To create the new environment for Python 3.9, in your terminal window or an Anaconda Prompt, run:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ conda create -n py39 python=3.9 anaconda</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>Note</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>Replace py39 with the name of the environment you want to create. anaconda is the metapackage that includes all of the Python packages comprising the Anaconda distribution. python=3.9 is the package and version you want to install in this new environment. This could be any package, such as numpy=1.19, or multiple packages.</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To create the new environment for Python 2.7, in your terminal window or an Anaconda Prompt, run:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ conda create -n py27 python=2.7 anaconda</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>2, Activate the new environment.</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To activate an environment: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ conda activate myenv</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Verify that the new environment is your current environment.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To verify that the current environment uses the new Python version, in your terminal window or an Anaconda Prompt, run:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ python --version</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Sharing an environment</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You may want to share your environment with someone else---for example, so they can re-create a test that you have done. To allow them to quickly reproduce your environment, with all of its packages and versions, give them a copy of your environment.yml file.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Creating an environment from an environment.yml file</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Use the terminal or an Anaconda Prompt for the following steps:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Exporting the environment.yml file</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Activate the environment to export: conda activate &lt;envname&gt;</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Export your active environment to a new file:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ conda env export &gt; environment.yml</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This file handles both the environment's pip packages and conda packages.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Email or copy the exported environment.yml file to the other person.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Create the environment from the environment.yml file:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ conda env create -f environment.yml</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Updating or Upgrading Python</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Use the terminal or an Anaconda Prompt for the following steps.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you are in an environment with Python version 3.8.6, the following command updates Python to the latest version in the 3.8 branch:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ conda update python</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>upgrades Python to another branch---3.9---by installing that version of Python. It is not recommended, rather it is preferable to create a new environment. The resolver has to work very hard to determine exactly which packages to upgrade. But it is possible, and the command is:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ conda install python=3.9</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Please leave me a reply if you have any questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/11/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

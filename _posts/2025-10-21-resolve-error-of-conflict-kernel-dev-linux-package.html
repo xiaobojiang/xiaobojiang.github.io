@@ -1,0 +1,118 @@
+---
+layout: post
+title: Resolve error of conflict kernel-dev linux package
+date: 2025-10-21 02:47:52.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>This is a real issue I encountered during my linux system upgrade, my ssh connection halt and new connection cannot be rebuild for &gt;5 minutes during yum update.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>After system reboot, I got this error message everything I tried "yum update": "problem with installed package kernel-devel-5.4.119-19.0009.54.tl3.x86_64</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>  - cannot install both kernel-devel-5.4.241-24.0017.14.tl3.x86_64 from BaseOS and kernel-devel-5.4.119-19.0009.54.tl3.x86_64 from @System "</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The system reboot breaks the upgrade (sad). if you face the similar issue, follow below thread to resolve.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This issue occurs because there is a conflict between two versions of the kernel-devel package in your system: one installed (5.4.119-19.0009.54) and one you’re trying to install (5.4.241-24.0017.14). The conflict arises when the package manager tries to handle both versions simultaneously.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Steps to Resolve the Issue</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1.<strong>Identify the Installed</strong> kernel-devel <strong>Package:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Run the following command to check the currently installed version:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ rpm -qa | grep kernel-devel</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>2.<strong>Remove the Conflicting</strong> kernel-devel <strong>Version:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you’re trying to install the newer version (5.4.241-24.0017.14), remove the older version (5.4.119-19.0009.54) that is causing the conflict:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sudo dnf remove kernel-devel-5.4.119-19.0009.54.tl3.x86_64</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>3.<strong>Install the Desired</strong> kernel-devel <strong>Package:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>After removing the conflicting package, install the desired version:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>sudo dnf install kernel-devel-5.4.241-24.0017.14.tl3.x86_64</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>4.<strong>Ensure Compatibility with the Current Kernel:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Make sure the kernel-devel version matches the running kernel. To check the current kernel version, run:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ uname -r</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>If the kernel-devel version does not match, update your kernel to align with the desired kernel-devel package (can always do this):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>sudo dnf update kernel
+
+sudo reboot</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In my case, after step 4 without reboot, yum update command has already restore to normal.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>5.<strong>Clear Metadata Cache (Optional):</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If conflicts persist, clear the package manager’s metadata cache to avoid stale information causing the problem:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>sudo dnf clean all</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>6.<strong>Reinstall the Correct</strong> kernel-devel <strong>Version (If Necessary):</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If both versions are still causing issues, force the package manager to reinstall the desired version:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>sudo dnf reinstall kernel-devel</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Cool!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>That's it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note: this is the co-solution from me and Chatgpt, AI do help on solving issue.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/10/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

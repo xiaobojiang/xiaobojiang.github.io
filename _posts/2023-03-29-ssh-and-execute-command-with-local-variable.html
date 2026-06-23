@@ -1,0 +1,106 @@
+---
+layout: post
+title: ssh and execute command with local variable
+date: 2023-03-29 05:54:53.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>In previous post <a href="https://www.iotcolon.com/?p=515">Remote ssh and execute command</a>, I shared how to remote ssh login and execute some command.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Recently, I am trying to prepare some Jenkins pipleline, which will update container image's tag after docker build job is done.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Well, I tried to search a way like k8s to update the container of docker run tag only, but failed to do so.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally, I found a way to do this.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>First, prepare a script to stop and start container with a specified tag from environment parameter.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Script can be, name is "deploy.sh":</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>check_docker_pull_errs()
+{
+  # Function. Parameter 1 is the return code
+  # Para. 2 is text to display on failure.
+  if [ "${1}" -ne "0" ]; then
+    echo "### ERROR ### ${1} : Please make sure image url correct and tag existed on the repo: ${2}"
+    # as a bonus, make our script exit with the right error code.
+    exit ${1}
+  fi
+}
+
+
+docker pull registry.cn-shanghai.aliyuncs.com/XXX/YYY:${APP_TAG}
+check_docker_pull_errs $? "registry.cn-shanghai.aliyuncs.com/XXX/YYY:${APP_TAG}"
+
+if [ $( docker ps -a | grep app_deploy_dev | wc -l ) -gt 0 ]; then
+  docker stop app_deploy_dev | xargs docker rm ; 
+fi 
+
+docker run  -d -m2G --name app_deploy_dev --restart=always -v ~/appdev:/appdev  -p 18080:6000 registry.cn-shanghai.aliyuncs.com/XXX/YYY:${APP_TAG}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, suppose we can run this script with proper APP_TAG provisioned, we can make app_deploy_dev container deployed with new tag.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This APP_TAG comes from Jenkins build machine's build running parameter, JENKINS_BUILD_TAG.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Refer to previous script, we can write as:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>ssh user@host 'export APP_TAG=${JENKINS_BUILD_TAG};sh ~/.deploy.sh'</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This will not work, becuase all command in '' alreadys runs in docker run machine, not in Jenkins server, thus JENKINS_BUILD_TAG is empty and not known on docker run machine.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let's user xargs</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Following is working one:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>echo “export APP_TAG=${JENKINS_BUILD_TAG};sh ~/.deploy.sh” | xargs ssh user@host</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Use echo command at Jenkins server to output desired shell commands, and pipeline with xargs to run on remote machine via ssh.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>An improvement is to avoid host key verification, '-o StrictHostKeyChecking=no'</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Final command example is:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>echo “export APP_TAG=${JENKINS_BUILD_TAG};sh ~/.deploy.sh” | xargs ssh -o StrictHostKeyChecking=no user@host</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>That is it. this works perfectly on the machine!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/03/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

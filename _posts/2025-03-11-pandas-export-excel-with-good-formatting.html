@@ -1,0 +1,103 @@
+---
+layout: post
+title: Pandas export excel with good formatting
+date: 2025-03-11 07:46:26.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Note: recently I am super busy with daily work, then I find I have not updated the blog for a long while. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This post is really about make your pandas output excel files more beatiful and easy to read for humans.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Did you know you can format exported Excel files effortlessly using Python? Here’s a quick guide on how to:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>✅ <strong>Set the cell format as a string</strong> ✅ <strong>Enable text wrapping</strong> ✅ <strong>Adjust column width</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import pandas as pd
+from openpyxl import load_workbook
+from openpyxl.styles import Alignment
+
+# Sample DataFrame with leading zeroes and long text
+data = {
+    'id': ['0123', '0456', '0789'],
+    'description': [
+        'This is a very long text that should wrap within the cell.',
+        'Another long text that we expect to wrap properly in Excel.',
+        'Short text.'
+    ],
+    'age': ['25', '30', '35']
+}
+df = pd.DataFrame(data)
+
+# Save DataFrame to Excel with openpyxl engine
+with pd.ExcelWriter('output.xlsx', engine='openpyxl') as writer:
+    df.to_excel(writer, index=False, sheet_name='Sheet1')
+
+    # Load the workbook and select the sheet
+    workbook = writer.book
+    worksheet = workbook['Sheet1']
+    
+    # Set the width for each column and format cells as text with wrapping enabled
+    column_settings = {
+        'A': 10,  # Width for 'id' column
+        'B': 40,  # Width for 'description' column
+        'C': 10   # Width for 'age' column
+    }
+
+    for col_letter, width in column_settings.items():
+        worksheet.column_dimensions[col_letter].width = width
+
+    # Apply text wrapping and string formatting to all cells in the data range
+    for row in worksheet.iter_rows(min_row=2, max_row=worksheet.max_row, min_col=1, max_col=worksheet.max_column):
+        for cell in row:
+            cell.value = str(cell.value)               # Convert cell value to string
+            cell.number_format = '@'                   # Set cell format as text
+            cell.alignment = Alignment(wrap_text=True) # Enable text wrapping
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Explanation</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1.<strong>Column Widths</strong>:worksheet.column_dimensions[col_letter].width = widthsets specific widths for each column.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2.<strong>String Format</strong>:cell.number_format = '@'ensures each cell is treated as text, preserving leading zeroes.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3.<strong>Text Wrapping</strong>:cell.alignment = Alignment(wrap_text=True)enables text wrapping for each cell.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This code will make sure that each cell displays as text, wraps long text within the cell, and applies specified widths to each column.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Check sample output in below pic, it is much better than default style.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1114,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/03/image-1024x272.png" alt="" class="wp-image-1114"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading, hope it is useful.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/03/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

@@ -1,0 +1,913 @@
+---
+layout: post
+title: ESP32 Playground -III - IFTTT on ESP-IDF
+date: 2021-11-17 08:26:53.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Internet of Things
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>This is the third post on ESP32, in previous two ESP32 posts, we talked about the IDE setup with Arduino and VS code, one interesting example of IFTTT was also illustrated with Arduino + ESP32.  </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Although the Arduino is very handy to those who are familiar with the eco-system. If you aims for production code development with ESP32, espressif recommends ESP-IDF, with writes C code and compiles with gcc toolchain. The VS code plugin makes the setup much easier, and make it user friedly with GUI.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Another todo of the Arduino example is that we hard code the WiFI ssid and password, which is not the way for massive production, and not possible for customer distribution and configuration. In the post, some WiFi provisioning method that ESP32 will also be touched.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let’s still use the IFTTT as the example user case.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>How to configure WiFi on ESP32</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I studied the available document of ESP32, in short, there are three technologies:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>SmartConfig</li>
+<li>WiFi Easy Connect(DPP)</li>
+<li>BluFi</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>SmartConfig</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The SmartConfig<sup>TM</sup> is a provisioning technology developed by TI to connect a new Wi-Fi device to a Wi-Fi network. It uses a mobile app to broadcast the network credentials from a smartphone, or a tablet, to an un-provisioned Wi-Fi device.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The advantage of this technology is that the device does not need to directly know SSID or password of an Access Point (AP). This information is provided using the smartphone. This is particularly important to headless device and systems, due to their lack of a user interface.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>WiFi Easy Connect</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Wi-Fi Easy Connect<sup>TM</sup>, also known as Device Provisioning Protocol (DPP) or Easy Connect, is a provisioning protocol certified by Wi-Fi Alliance. It is a secure and standardized provisioning protocol for configuration of Wi-Fi Devices. With Easy Connect adding a new device to a network is as simple as scanning a QR Code. This reduces complexity and enhances user experience while onboarding devices without UI like Smart Home and IoT products. Unlike old protocols like WiFi Protected Setup (WPS), Wi-Fi Easy Connect incorporates strong encryption through public key cryptography to ensure networks remain secure as new devices are added. Easy Connect brings many benefits in the User Experience:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Simple and intuitive to use; no lengthy instructions to follow for new device setup</li>
+<li>No need to remember and enter passwords into the device being provisioned</li>
+<li>Works with electronic or printed QR codes, or human-readable strings</li>
+<li>Supports both WPA2 and WPA3 networks</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Please refer to Wi-Fi Alliance’s official page on <a href="https://www.wi-fi.org/discover-wi-fi/wi-fi-easy-connect">Easy Connect</a> for more information.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>ESP32 supports Enrollee mode of Easy Connect with QR Code as the provisioning method. A display is required to display this QR Code. Users can scan this QR Code using their capable device and provision the ESP32 to their Wi-Fi network. The provisioning device needs to be connected to the AP which need not support Wi-Fi Easy Connect™. Easy Connect is still an evolving protocol. Of known platforms that support the QR Code method are some Android smartphones with Android 10 or higher. To use Easy Connect no additional App needs to be installed on the supported smartphone.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>BluFi</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The BluFi for ESP32 is a Wi-Fi network configuration function via Bluetooth channel. It provides a secure protocol to pass Wi-Fi configuration and credentials to the ESP32. Using this information ESP32 can then e.g. connect to an AP or establish a SoftAP.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Fragmenting, data encryption, checksum verification in the BluFi layer are the key elements of this process.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can customize symmetric encryption, asymmetric encryption and checksum support customization. Here we use the DH algorithm for key negotiation, 128-AES algorithm for data encryption, and CRC16 algorithm for checksum verification.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can also find the diagram illustrating BluFi’s flow chart, we skip those details in the post.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":251,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/11/image-28-1024x937.png" alt="" class="wp-image-251"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Details of implementation</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this post, we will use BluFi to configure WiFi, and if it succeeds, the ssid and password are stored in the flash, thus next reboot it will not require user to provision again.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The whole code are built based on the example from Espressif: <a href="https://github.com/espressif/esp-idf/tree/master/examples/bluetooth/blufi">https://github.com/espressif/esp-idf/tree/master/examples/bluetooth/blufi</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the Blufi example, do not worry about the long code, it actually did following things:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Initialize wifi, register the callback of wifi event and ip event</li>
+<li>Initialize blufi, start Bluetooth controller and blufi host, and register the callback of bluFi event</li>
+<li>Handle event of WiFi</li>
+<li>Handle event of IP</li>
+<li>Handle event of BluFi</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Basically, we can leave those code untouched, which can work well for BluFi purpose. We will add few new features:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Helper functions: WiFi config save (), delete, and read () in flash</li>
+<li>Enable button pin interrupt, a queue to send message from ISR</li>
+<li>A thread waiting for the button press message and send IFTTT request</li>
+<li>Helper function: send https request to IFTTT cloud</li>
+<li>Compose logic inside
+<ul>
+<li>at startup, read wifi config from flash, if the flag is not set, then start blufi flow</li>
+</ul>
+<ul>
+<li>if valid wifi config already present, then skip blufi and start wifi joining</li>
+</ul>
+<ul>
+<li>when IP is retrieved from AP, start the button press waiting thread</li>
+</ul>
+</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the below chart, a detailed flow char is illustrated. IFTTT flow is same as previous post, just skip it here.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":257,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/11/blufi.drawio-243x1024.png" alt="" class="wp-image-257"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Provision WiFi with App</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>When it is in BluFi workflow, you can use the test app from Espressif (<a href="https://github.com/EspressifApp/EspBlufi">https://github.com/EspressifApp/EspBlufi</a>).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Open the Bluetooth, start the app, refresh the page, we should be able to see a new device discovered.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":252,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/11/image-29-478x1024.png" alt="" class="wp-image-252"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then select the device, and click connect (“连接”).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":253,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/11/image-30-478x1024.png" alt="" class="wp-image-253"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Click configure network(“配网”), to configure network ssid and password.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":254,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/11/image-31-478x1024.png" alt="" class="wp-image-254"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally, the log will show that device connected successful.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":255,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/11/image-32-478x1024.png" alt="" class="wp-image-255"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>HTTPS cert</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>There is also one interesting thing about https certificates, in modern browser or openssl lib, there are pre-set few root certificates, which can help verify all signed certificate of public website.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>ESP-IDF provides few ways to embed certificates into ESP32: 1, put the server root cert in the file, and use EMBED_TXTFILES to compile into and used in code. 2, same file put, and use it as global ca store 3, using esp crt bundle, The bundle comes with the complete list of root certificates from Mozilla’s NSS root certificate store. Using the gen_crt_bundle.py python utility the certificates’ subject name and public key are stored in a file and embedded in the ESP32 binary.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the example, I use the third way to enable https, for the simplicity. I also tried with different methods, the difference is that compared to third one, first and second will make a smaller bin file.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":256,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/11/image-33.png" alt="" class="wp-image-256"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>ToDo</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Some todo of this example: 1, there shall be a mechanism to clear wifi config in the flash, can be the button pressed for long time, 2, secure the BluFi channel.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Others</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For other two WiFi provisioning technologies, if you are also interested, there are also example code and app on the Github.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Full Code</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The complete reference code is in below.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>/*
+   This example code is in the Public Domain (or CC0 licensed, at your option.)
+
+   Unless required by applicable law or agreed to in writing, this
+   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+   CONDITIONS OF ANY KIND, either express or implied.
+*/
+
+
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/event_groups.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
+#include "esp_bt.h"
+
+#include "esp_blufi_api.h"
+#include "blufi_example.h"
+
+#include "esp_blufi.h"
+
+#include "esp_netif.h"
+
+#include "lwip/err.h"
+#include "lwip/sockets.h"
+#include "lwip/sys.h"
+#include "lwip/netdb.h"
+#include "lwip/dns.h"
+
+#include "esp_tls.h"
+#include "esp_crt_bundle.h"
+
+#include "driver/gpio.h"
+#include "freertos/queue.h"
+
+
+#define GPIO_INPUT_IFTTT_BUTTON    27 //D4
+#define GPIO_INPUT_PIN_SEL         (1ULL&lt;&lt;GPIO_INPUT_IFTTT_BUTTON)
+
+#define ESP_INTR_FLAG_DEFAULT      0
+
+static xQueueHandle gpio_evt_queue =  NULL;
+
+static void example_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_param_t *param);
+
+static void https_request_task(void *pvparameters);
+
+static const char *TAG = "ifttt_example";
+
+
+#define WEB_SERVER "maker.ifttt.com"
+#define WEB_PORT "443"
+#define WEB_URL  "https://maker.ifttt.com/trigger/button_pressed/with/key/your_key"
+
+
+
+static int counter_pressed = 0;
+        
+
+#define WIFI_LIST_NUM   10
+
+static wifi_config_t sta_config;
+static wifi_config_t ap_config;
+
+/* FreeRTOS event group to signal when we are connected &amp; ready to make a request */
+static EventGroupHandle_t wifi_event_group;
+
+/* The event group allows multiple bits for each event,
+   but we only care about one event - are we connected
+   to the AP with an IP? */
+const int CONNECTED_BIT = BIT0;
+
+/* store the station info for send back to phone */
+static bool gl_sta_connected = false;
+static bool ble_is_connected = false;
+static uint8_t gl_sta_bssid[6];
+static uint8_t gl_sta_ssid[32];
+static int gl_sta_ssid_len;
+
+
+wifi_config_t wifi_config_stored;
+static uint8_t wifi_flag = 0;
+
+static void read_wifi_config(void)
+{
+    nvs_handle handle;
+    esp_err_t err;
+    static const char *NVS_CUSTOMER = "customer data";
+    static const char *DATA1 = "param 1";
+    memset(&amp;wifi_config_stored, 0x0, sizeof(wifi_config_stored));
+    uint32_t len = sizeof(wifi_config_stored);
+    // Open
+    err =nvs_open(NVS_CUSTOMER, NVS_READWRITE, &amp;handle);
+    if (err != ESP_OK) return;
+    err = nvs_get_blob(handle, DATA1, &amp;wifi_config_stored, &amp;len);
+    if (err == ESP_ERR_NVS_NOT_FOUND) 
+    {
+        wifi_flag=0;
+    }
+    else if(err == ESP_OK)
+    {
+        wifi_flag=1;   
+        nvs_close(handle);
+    }
+
+}
+
+static void write_wifi_config(wifi_config_t* wifi_config_tosave)
+{
+    nvs_handle handle;
+    static const char *NVS_CUSTOMER = "customer data";
+    static const char *DATA1 = "param 1";
+    ESP_ERROR_CHECK( nvs_open( NVS_CUSTOMER, NVS_READWRITE, &amp;handle) );
+    ESP_ERROR_CHECK( nvs_set_blob( handle, DATA1, wifi_config_tosave, sizeof(wifi_config_t)) );
+    ESP_ERROR_CHECK( nvs_commit(handle) );
+    nvs_close(handle);
+}
+
+static void clear_wifi_config(void)
+{
+    nvs_handle handle;
+    static const char *NVS_CUSTOMER = "customer data";
+    static const char *DATA1 = "param 1";
+    ESP_ERROR_CHECK( nvs_open( NVS_CUSTOMER, NVS_READWRITE, &amp;handle) );
+    ESP_ERROR_CHECK(  nvs_erase_key(handle,DATA1));
+    usleep(5000*1000);
+    ESP_ERROR_CHECK( nvs_erase_all(handle));
+    usleep(5000*1000);
+    ESP_ERROR_CHECK( nvs_commit(handle) );
+    nvs_close(handle);
+    esp_restart();
+}
+
+
+static void ip_event_handler(void* arg, esp_event_base_t event_base,
+                                int32_t event_id, void* event_data)
+{
+    wifi_mode_t mode;
+
+    switch (event_id) {
+    case IP_EVENT_STA_GOT_IP: {
+        esp_blufi_extra_info_t info;
+
+        xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
+        esp_wifi_get_mode(&amp;mode);
+
+        memset(&amp;info, 0, sizeof(esp_blufi_extra_info_t));
+        memcpy(info.sta_bssid, gl_sta_bssid, 6);
+        info.sta_bssid_set = true;
+        info.sta_ssid = gl_sta_ssid;
+        info.sta_ssid_len = gl_sta_ssid_len;
+        if (ble_is_connected == true) {
+            esp_blufi_send_wifi_conn_report(mode, ESP_BLUFI_STA_CONN_SUCCESS, 0, &amp;info);
+        } else {
+            BLUFI_INFO("BLUFI BLE is not connected yet\n");
+        }
+        //really got ip
+        xTaskCreate(&amp;https_request_task, "https_get_task", 8192, NULL, 5, NULL);
+        break;
+    }
+    default:
+        break;
+    }
+    return;
+}
+
+static void wifi_event_handler(void* arg, esp_event_base_t event_base,
+                                int32_t event_id, void* event_data)
+{
+    wifi_event_sta_connected_t *event;
+    wifi_mode_t mode;
+
+    switch (event_id) {
+    case WIFI_EVENT_STA_START:
+        esp_wifi_connect();
+        break;
+    case WIFI_EVENT_STA_CONNECTED:
+        gl_sta_connected = true;
+        event = (wifi_event_sta_connected_t*) event_data;
+        memcpy(gl_sta_bssid, event-&gt;bssid, 6);
+        memcpy(gl_sta_ssid, event-&gt;ssid, event-&gt;ssid_len);
+        gl_sta_ssid_len = event-&gt;ssid_len;
+        break;
+    case WIFI_EVENT_STA_DISCONNECTED:
+        /* This is a workaround as ESP32 WiFi libs don't currently
+           auto-reassociate. */
+        gl_sta_connected = false;
+        memset(gl_sta_ssid, 0, 32);
+        memset(gl_sta_bssid, 0, 6);
+        gl_sta_ssid_len = 0;
+        esp_wifi_connect();
+        // if(wifi_flag == 1)
+        // {
+        //     //try with the setting again
+        //     esp_wifi_connect();
+        // }
+        // else
+        // {
+        //     //clear and reboot
+        //     clear_wifi_config();
+        // }
+        xEventGroupClearBits(wifi_event_group, CONNECTED_BIT);
+        break;
+    case WIFI_EVENT_AP_START:
+        esp_wifi_get_mode(&amp;mode);
+
+        /* TODO: get config or information of softap, then set to report extra_info */
+        if (ble_is_connected == true) {
+            if (gl_sta_connected) {
+                esp_blufi_send_wifi_conn_report(mode, ESP_BLUFI_STA_CONN_SUCCESS, 0, NULL);
+            } else {
+                esp_blufi_send_wifi_conn_report(mode, ESP_BLUFI_STA_CONN_FAIL, 0, NULL);
+            }
+        } else {
+            BLUFI_INFO("BLUFI BLE is not connected yet\n");
+        }
+        break;
+    case WIFI_EVENT_SCAN_DONE: {
+        uint16_t apCount = 0;
+        esp_wifi_scan_get_ap_num(&amp;apCount);
+        if (apCount == 0) {
+            BLUFI_INFO("Nothing AP found");
+            break;
+        }
+        wifi_ap_record_t *ap_list = (wifi_ap_record_t *)malloc(sizeof(wifi_ap_record_t) * apCount);
+        if (!ap_list) {
+            BLUFI_ERROR("malloc error, ap_list is NULL");
+            break;
+        }
+        ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&amp;apCount, ap_list));
+        esp_blufi_ap_record_t * blufi_ap_list = (esp_blufi_ap_record_t *)malloc(apCount * sizeof(esp_blufi_ap_record_t));
+        if (!blufi_ap_list) {
+            if (ap_list) {
+                free(ap_list);
+            }
+            BLUFI_ERROR("malloc error, blufi_ap_list is NULL");
+            break;
+        }
+        for (int i = 0; i &lt; apCount; ++i)
+        {
+            blufi_ap_list[i].rssi = ap_list[i].rssi;
+            memcpy(blufi_ap_list[i].ssid, ap_list[i].ssid, sizeof(ap_list[i].ssid));
+        }
+
+        if (ble_is_connected == true) {
+            esp_blufi_send_wifi_list(apCount, blufi_ap_list);
+        } else {
+            BLUFI_INFO("BLUFI BLE is not connected yet\n");
+        }
+
+        esp_wifi_scan_stop();
+        free(ap_list);
+        free(blufi_ap_list);
+        break;
+    }
+    default:
+        break;
+    }
+    return;
+}
+
+
+
+static void initialise_wifi(void)
+{
+    read_wifi_config();
+    ESP_ERROR_CHECK(esp_netif_init());
+    wifi_event_group = xEventGroupCreate();
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    esp_netif_t *sta_netif = esp_netif_create_default_wifi_sta();
+    assert(sta_netif);
+    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &amp;wifi_event_handler, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &amp;ip_event_handler, NULL));
+
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK( esp_wifi_init(&amp;cfg) );
+    if(wifi_flag != 1)
+    {        
+        ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
+    }
+    else
+    {
+        BLUFI_INFO("start wifi\n");
+        BLUFI_INFO("%s, %s", wifi_config_stored.sta.ssid, wifi_config_stored.sta.password);
+        ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &amp;wifi_config_stored) );
+    }
+    ESP_ERROR_CHECK( esp_wifi_start() );
+}
+
+static esp_blufi_callbacks_t example_callbacks = {
+    .event_cb = example_event_callback,
+    .negotiate_data_handler = blufi_dh_negotiate_data_handler,
+    .encrypt_func = blufi_aes_encrypt,
+    .decrypt_func = blufi_aes_decrypt,
+    .checksum_func = blufi_crc_checksum,
+};
+
+static void example_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_param_t *param)
+{
+    /* actually, should post to blufi_task handle the procedure,
+     * now, as a example, we do it more simply */
+    switch (event) {
+    case ESP_BLUFI_EVENT_INIT_FINISH:
+        BLUFI_INFO("BLUFI init finish\n");
+
+        esp_blufi_adv_start();
+        break;
+    case ESP_BLUFI_EVENT_DEINIT_FINISH:
+        BLUFI_INFO("BLUFI deinit finish\n");
+        break;
+    case ESP_BLUFI_EVENT_BLE_CONNECT:
+        BLUFI_INFO("BLUFI ble connect\n");
+        ble_is_connected = true;
+        esp_blufi_adv_stop();
+        blufi_security_init();
+        break;
+    case ESP_BLUFI_EVENT_BLE_DISCONNECT:
+        BLUFI_INFO("BLUFI ble disconnect\n");
+        ble_is_connected = false;
+        blufi_security_deinit();
+        esp_blufi_adv_start();
+        break;
+    case ESP_BLUFI_EVENT_SET_WIFI_OPMODE:
+        BLUFI_INFO("BLUFI Set WIFI opmode %d\n", param-&gt;wifi_mode.op_mode);
+        ESP_ERROR_CHECK( esp_wifi_set_mode(param-&gt;wifi_mode.op_mode) );
+        break;
+    case ESP_BLUFI_EVENT_REQ_CONNECT_TO_AP:
+        BLUFI_INFO("BLUFI requset wifi connect to AP\n");
+        /* there is no wifi callback when the device has already connected to this wifi
+        so disconnect wifi before connection.
+        */
+        esp_wifi_disconnect();
+        esp_wifi_connect();
+        break;
+    case ESP_BLUFI_EVENT_REQ_DISCONNECT_FROM_AP:
+        BLUFI_INFO("BLUFI requset wifi disconnect from AP\n");
+        esp_wifi_disconnect();
+        break;
+    case ESP_BLUFI_EVENT_REPORT_ERROR:
+        BLUFI_ERROR("BLUFI report error, error code %d\n", param-&gt;report_error.state);
+        esp_blufi_send_error_info(param-&gt;report_error.state);
+        break;
+    case ESP_BLUFI_EVENT_GET_WIFI_STATUS: {
+        wifi_mode_t mode;
+        esp_blufi_extra_info_t info;
+
+        esp_wifi_get_mode(&amp;mode);
+
+        if (gl_sta_connected) {
+            memset(&amp;info, 0, sizeof(esp_blufi_extra_info_t));
+            memcpy(info.sta_bssid, gl_sta_bssid, 6);
+            info.sta_bssid_set = true;
+            info.sta_ssid = gl_sta_ssid;
+            info.sta_ssid_len = gl_sta_ssid_len;
+            esp_blufi_send_wifi_conn_report(mode, ESP_BLUFI_STA_CONN_SUCCESS, 0, &amp;info);
+        } else {
+            esp_blufi_send_wifi_conn_report(mode, ESP_BLUFI_STA_CONN_FAIL, 0, NULL);
+        }
+        BLUFI_INFO("BLUFI get wifi status from AP\n");
+
+        break;
+    }
+    case ESP_BLUFI_EVENT_RECV_SLAVE_DISCONNECT_BLE:
+        BLUFI_INFO("blufi close a gatt connection");
+        esp_blufi_disconnect();
+        break;
+    case ESP_BLUFI_EVENT_DEAUTHENTICATE_STA:
+        /* TODO */
+        break;
+	case ESP_BLUFI_EVENT_RECV_STA_BSSID:
+        memcpy(sta_config.sta.bssid, param-&gt;sta_bssid.bssid, 6);
+        sta_config.sta.bssid_set = 1;
+        esp_wifi_set_config(WIFI_IF_STA, &amp;sta_config);
+        BLUFI_INFO("Recv STA BSSID %s\n", sta_config.sta.ssid);
+        break;
+	case ESP_BLUFI_EVENT_RECV_STA_SSID:
+        strncpy((char *)sta_config.sta.ssid, (char *)param-&gt;sta_ssid.ssid, param-&gt;sta_ssid.ssid_len);
+        sta_config.sta.ssid[param-&gt;sta_ssid.ssid_len] = '\0';
+        esp_wifi_set_config(WIFI_IF_STA, &amp;sta_config);
+        BLUFI_INFO("Recv STA SSID %s\n", sta_config.sta.ssid);
+        break;
+	case ESP_BLUFI_EVENT_RECV_STA_PASSWD:
+        strncpy((char *)sta_config.sta.password, (char *)param-&gt;sta_passwd.passwd, param-&gt;sta_passwd.passwd_len);
+        sta_config.sta.password[param-&gt;sta_passwd.passwd_len] = '\0';
+        esp_wifi_set_config(WIFI_IF_STA, &amp;sta_config);
+        write_wifi_config(&amp;sta_config);
+        BLUFI_INFO("Recv STA PASSWORD %s\n", sta_config.sta.password);
+        break;
+	case ESP_BLUFI_EVENT_RECV_SOFTAP_SSID:
+        strncpy((char *)ap_config.ap.ssid, (char *)param-&gt;softap_ssid.ssid, param-&gt;softap_ssid.ssid_len);
+        ap_config.ap.ssid[param-&gt;softap_ssid.ssid_len] = '\0';
+        ap_config.ap.ssid_len = param-&gt;softap_ssid.ssid_len;
+        esp_wifi_set_config(WIFI_IF_AP, &amp;ap_config);
+        BLUFI_INFO("Recv SOFTAP SSID %s, ssid len %d\n", ap_config.ap.ssid, ap_config.ap.ssid_len);
+        break;
+	case ESP_BLUFI_EVENT_RECV_SOFTAP_PASSWD:
+        strncpy((char *)ap_config.ap.password, (char *)param-&gt;softap_passwd.passwd, param-&gt;softap_passwd.passwd_len);
+        ap_config.ap.password[param-&gt;softap_passwd.passwd_len] = '\0';
+        esp_wifi_set_config(WIFI_IF_AP, &amp;ap_config);
+        BLUFI_INFO("Recv SOFTAP PASSWORD %s len = %d\n", ap_config.ap.password, param-&gt;softap_passwd.passwd_len);
+        break;
+	case ESP_BLUFI_EVENT_RECV_SOFTAP_MAX_CONN_NUM:
+        if (param-&gt;softap_max_conn_num.max_conn_num &gt; 4) {
+            return;
+        }
+        ap_config.ap.max_connection = param-&gt;softap_max_conn_num.max_conn_num;
+        esp_wifi_set_config(WIFI_IF_AP, &amp;ap_config);
+        BLUFI_INFO("Recv SOFTAP MAX CONN NUM %d\n", ap_config.ap.max_connection);
+        break;
+	case ESP_BLUFI_EVENT_RECV_SOFTAP_AUTH_MODE:
+        if (param-&gt;softap_auth_mode.auth_mode &gt;= WIFI_AUTH_MAX) {
+            return;
+        }
+        ap_config.ap.authmode = param-&gt;softap_auth_mode.auth_mode;
+        esp_wifi_set_config(WIFI_IF_AP, &amp;ap_config);
+        BLUFI_INFO("Recv SOFTAP AUTH MODE %d\n", ap_config.ap.authmode);
+        break;
+	case ESP_BLUFI_EVENT_RECV_SOFTAP_CHANNEL:
+        if (param-&gt;softap_channel.channel &gt; 13) {
+            return;
+        }
+        ap_config.ap.channel = param-&gt;softap_channel.channel;
+        esp_wifi_set_config(WIFI_IF_AP, &amp;ap_config);
+        BLUFI_INFO("Recv SOFTAP CHANNEL %d\n", ap_config.ap.channel);
+        break;
+    case ESP_BLUFI_EVENT_GET_WIFI_LIST:{
+        wifi_scan_config_t scanConf = {
+            .ssid = NULL,
+            .bssid = NULL,
+            .channel = 0,
+            .show_hidden = false
+        };
+        esp_wifi_scan_start(&amp;scanConf, true);
+        break;
+    }
+    case ESP_BLUFI_EVENT_RECV_CUSTOM_DATA:
+        BLUFI_INFO("Recv Custom Data %d\n", param-&gt;custom_data.data_len);
+        esp_log_buffer_hex("Custom Data", param-&gt;custom_data.data, param-&gt;custom_data.data_len);
+        break;
+	case ESP_BLUFI_EVENT_RECV_USERNAME:
+        /* Not handle currently */
+        break;
+	case ESP_BLUFI_EVENT_RECV_CA_CERT:
+        /* Not handle currently */
+        break;
+	case ESP_BLUFI_EVENT_RECV_CLIENT_CERT:
+        /* Not handle currently */
+        break;
+	case ESP_BLUFI_EVENT_RECV_SERVER_CERT:
+        /* Not handle currently */
+        break;
+	case ESP_BLUFI_EVENT_RECV_CLIENT_PRIV_KEY:
+        /* Not handle currently */
+        break;;
+	case ESP_BLUFI_EVENT_RECV_SERVER_PRIV_KEY:
+        /* Not handle currently */
+        break;
+    default:
+        break;
+    }
+}
+
+
+static void IRAM_ATTR gpio_isr_handler(void *arg)
+{
+    uint32_t gpio_num = (uint32_t) arg;
+    xQueueSendFromISR(gpio_evt_queue, &amp;gpio_num, NULL);
+}
+
+void app_main(void)
+{
+    esp_err_t ret;
+
+    // Initialize NVS
+    ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK( ret );
+
+    //init gpio
+    gpio_config_t io_conf = {};    
+    //interrupt of rising edge
+    io_conf.intr_type = GPIO_INTR_POSEDGE;
+    io_conf.pin_bit_mask = GPIO_INPUT_PIN_SEL;
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = 1;
+    gpio_config(&amp;io_conf);
+
+    //create a queue, only 1 item
+    gpio_evt_queue = xQueueCreate(1, sizeof(uint32_t));
+
+    //install isr gpio service
+    gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
+    //hook isr handler 
+    gpio_isr_handler_add(GPIO_INPUT_IFTTT_BUTTON, gpio_isr_handler, (void*) GPIO_INPUT_IFTTT_BUTTON);
+
+
+
+    initialise_wifi();
+    if(wifi_flag != 1)
+    {
+        ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
+
+        esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
+        ret = esp_bt_controller_init(&amp;bt_cfg);
+        if (ret) {
+            BLUFI_ERROR("%s initialize bt controller failed: %s\n", __func__, esp_err_to_name(ret));
+        }
+
+        ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
+        if (ret) {
+            BLUFI_ERROR("%s enable bt controller failed: %s\n", __func__, esp_err_to_name(ret));
+            return;
+        }
+
+        ret = esp_blufi_host_init();
+        if (ret) {
+            BLUFI_ERROR("%s initialise host failed: %s\n", __func__, esp_err_to_name(ret));
+            return;
+        }
+
+        BLUFI_INFO("BLUFI VERSION %04x\n", esp_blufi_get_version());
+
+        ret = esp_blufi_register_callbacks(&amp;example_callbacks);
+        if(ret){
+            BLUFI_ERROR("%s blufi register failed, error code = %x\n", __func__, ret);
+            return;
+        }
+
+        ret = esp_blufi_gap_register_callback();
+        if(ret){
+            BLUFI_ERROR("%s gap register failed, error code = %x\n", __func__, ret);
+            return;
+        }
+
+    }
+    else
+    {
+
+    }
+   
+}
+
+
+static void https_get_request(esp_tls_cfg_t cfg)
+{
+    char buf[512];
+    char sendbuf[512];
+    char content[128];
+    int ret, len;
+
+    sprintf(content,"{\"value1\":\"hi\",\"value2\":\"greeting\",\"value3\":\"%d\"}",counter_pressed++);
+
+    sprintf(sendbuf,"POST " WEB_URL " HTTP/1.1\r\n" \
+                             "Host: "WEB_SERVER"\r\n" \
+                             "Content-Type: application/json\r\n" \
+                             "Content-Length: %d\r\n" \
+                             "User-Agent: esp-idf/1.0 esp32\r\n" \
+                             "\r\n" \
+                             "%s\r\n", strlen(content), content);
+
+    ESP_LOGI(TAG, "%s", sendbuf);
+
+    struct esp_tls *tls = esp_tls_conn_http_new(WEB_URL, &amp;cfg);
+
+    if (tls != NULL) {
+        ESP_LOGI(TAG, "Connection established...");
+    } else {
+        ESP_LOGE(TAG, "Connection failed...");
+        goto exit;
+    }
+
+    size_t written_bytes = 0;
+    do {
+        ret = esp_tls_conn_write(tls,
+                                 sendbuf + written_bytes,
+                                 strlen(sendbuf) - written_bytes);
+        if (ret &gt;= 0) {
+            ESP_LOGI(TAG, "%d bytes written", ret);
+            written_bytes += ret;
+        } else if (ret != ESP_TLS_ERR_SSL_WANT_READ  &amp;&amp; ret != ESP_TLS_ERR_SSL_WANT_WRITE) {
+            ESP_LOGE(TAG, "esp_tls_conn_write  returned: [0x%02X](%s)", ret, esp_err_to_name(ret));
+            goto exit;
+        }
+    } while (written_bytes &lt; strlen(sendbuf));
+
+    ESP_LOGI(TAG, "Reading HTTP response...");
+
+    do {
+        len = sizeof(buf) - 1;
+        bzero(buf, sizeof(buf));
+        ESP_LOGI(TAG, "reading");
+        ret = esp_tls_conn_read(tls, (char *)buf, len);
+        ESP_LOGI(TAG, "read complete");
+        // ESP_LOGI(TAG, "%d bytes readed", len);
+        // if (ret == ESP_TLS_ERR_SSL_WANT_WRITE  || ret == ESP_TLS_ERR_SSL_WANT_READ) {
+        //     continue;
+        // }
+
+        if (ret &lt; 0) {
+            ESP_LOGE(TAG, "esp_tls_conn_read  returned [-0x%02X](%s)", -ret, esp_err_to_name(ret));
+            break;
+        }
+
+        if (ret == 0) {
+            ESP_LOGI(TAG, "connection closed");
+            break;
+        }
+
+        len = ret;
+        
+        ESP_LOGI(TAG, "%d bytes read", len);
+        /* Print response directly to stdout as it is read */
+        for (int i = 0; i &lt; len; i++) {
+            putchar(buf[i]);
+        }
+        putchar('\n'); // JSON output doesn't have a newline at end
+        
+    } while (1);
+
+exit:
+    esp_tls_conn_delete(tls);
+    // for (int countdown = 10; countdown &gt;= 0; countdown--) {
+    //     ESP_LOGI(TAG, "%d...", countdown);
+    //     vTaskDelay(1000 / portTICK_PERIOD_MS);
+    // }
+}
+
+static void https_get_request_using_crt_bundle(void)
+{
+    ESP_LOGI(TAG, "https_request using crt bundle");
+    esp_tls_cfg_t cfg = {
+        .crt_bundle_attach = esp_crt_bundle_attach,
+        .timeout_ms = 10000,
+    };
+    https_get_request(cfg);
+}
+
+// static void https_get_request_using_cacert_buf(void)
+// {
+//     ESP_LOGI(TAG, "https_request using cacert_buf");
+//     esp_tls_cfg_t cfg = {
+//         .cacert_buf = (const unsigned char *) server_root_cert_pem_start,
+//         .cacert_bytes = server_root_cert_pem_end - server_root_cert_pem_start,
+//     };
+//     https_get_request(cfg);
+// }
+
+// static void https_get_request_using_global_ca_store(void)
+// {
+//     esp_err_t esp_ret = ESP_FAIL;
+//     ESP_LOGI(TAG, "https_request using global ca_store");
+//     esp_ret = esp_tls_set_global_ca_store(server_root_cert_pem_start, server_root_cert_pem_end - server_root_cert_pem_start);
+//     if (esp_ret != ESP_OK) {
+//         ESP_LOGE(TAG, "Error in setting the global ca store: [%02X] (%s),could not complete the https_request using global_ca_store", esp_ret, esp_err_to_name(esp_ret));
+//         return;
+//     }
+//     esp_tls_cfg_t cfg = {
+//         .use_global_ca_store = true,
+//     };
+//     https_get_request(cfg);
+//     esp_tls_free_global_ca_store();
+// }
+
+static void https_request_task(void *pvparameters)
+{
+//     ESP_LOGI(TAG, "Start https_request example");
+
+//     https_get_request_using_crt_bundle();
+// //    https_get_request_using_cacert_buf();
+// //    https_get_request_using_global_ca_store();
+
+//     ESP_LOGI(TAG, "Finish https_request example");
+//     vTaskDelete(NULL);
+    uint32_t io_num;
+    for(;;)
+    {
+        //on GPIO release, trigger send
+        if(xQueueReceive(gpio_evt_queue, &amp;io_num, portMAX_DELAY))
+        {
+            ESP_LOGI(TAG, "Start ifttt https_request example");
+            https_get_request_using_crt_bundle();
+            ESP_LOGI(TAG, "Finish ifttt https_request example");
+        }
+    }
+}
+
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Please leave a reply if you have any questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/11/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

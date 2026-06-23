@@ -1,0 +1,166 @@
+---
+layout: post
+title: Measure GPU Energy Consumption
+date: 2024-06-04 01:55:33.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Devops
+- Technology
+tags: []
+meta:
+  _oembed_fc2bba572eb748b0e8c6b664f80281c8: "{{unknown}}"
+  _oembed_e01e779997f778612900293edc9f90dc: "{{unknown}}"
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Measuring GPU energy consumption can be important for several reasons, including optimizing performance, reducing energy costs, and minimizing environmental impact. Here's how you can measure GPU energy consumption and why it might be important:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3,"fontSize":"medium"} --></p>
+<h3 class="wp-block-heading has-medium-font-size">Why Measure GPU Energy Consumption?</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<!-- wp:list-item --></p>
+<li>
+<strong>Performance Optimization:</strong><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>Monitoring energy consumption helps in understanding the trade-offs between performance and power usage. This is particularly important for tasks that require intensive GPU usage, such as deep learning and gaming.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Cost Reduction:</strong><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>Reducing energy consumption can lead to significant cost savings, especially in data centers where many GPUs are used simultaneously.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Environmental Impact:</strong><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>Lowering energy usage helps reduce the carbon footprint of computing operations, contributing to more sustainable and eco-friendly practices.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Thermal Management:</strong><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>High power consumption often leads to increased heat generation. By monitoring and optimizing energy usage, you can better manage the thermal characteristics of your system, potentially extending the lifespan of your hardware.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Battery Life:</strong><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>For laptops and mobile devices, managing GPU energy consumption is crucial for extending battery life.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Regulatory Compliance:</strong><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>Some industries and regions have regulations regarding energy consumption and efficiency. Monitoring GPU power usage can help ensure compliance with these regulations.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>How to measure GPU power consumption</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><code>pynvml</code> is a Python binding for the NVIDIA Management Library (NVML), which provides programmatic access to various hardware metrics and management capabilities of NVIDIA GPUs. It allows you to monitor and manage GPU devices, retrieve power usage statistics, and perform other management tasks.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading">Installation</h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can install <code>pynvml</code> using <code>pip</code>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>pip install pynvml</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>below is the sample to monitor a piece of code which directly consumes or idirectly calling API to service that uses the GPU</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import pynvml
+import time
+import torch
+pynvml.nvmlInit()
+handle = pynvml.nvmlDeviceGetHandleByIndex(0)  # First GPU
+start_time = time.time()
+start_energy = pynvml.nvmlDeviceGetTotalEnergyConsumption(handle)
+time.sleep(6) # train_one_step() # or call API
+torch.cuda.synchronize()  # Synchronizes CPU and GPU time.
+elapsed_time = time.time() - start_time
+consumed_energy = \
+    pynvml.nvmlDeviceGetTotalEnergyConsumption(handle) - start_energy
+MJ2WH = 2.7777777777778E-7
+comsumed_wh = consumed_energy*MJ2WH</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Retrieves total energy consumption for this GPU in millijoules (mJ) since the driver was last reloaded</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table>
+<tbody>
+<tr>
+<td>1 mJ</td>
+<td>2.7777777777778E-7 W*h</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>WIth upper, we can easily calculate how much enery is consumed by AI for a task.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>reference:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://ml.energy/blog/energy/measurement/measuring-gpu-energy-best-practices">https://ml.energy/blog/energy/measurement/measuring-gpu-energy-best-practices</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://docs.rs/nvml-binding/latest/nvml_binding/bindings/fn.nvmlDeviceGetTotalEnergyConsumption.html">https://docs.rs/nvml-binding/latest/nvml_binding/bindings/fn.nvmlDeviceGetTotalEnergyConsumption.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/06/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

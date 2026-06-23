@@ -1,0 +1,109 @@
+---
+layout: post
+title: Counter in Python
+date: 2025-04-21 09:13:06.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Counter is a Python import statement that brings in the Counter class from the collections module.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>What is Counter?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Counter is a specialized dictionary subclass used for counting hashable objects. It counts the occurrences of each element in an iterable and stores them as dictionary key-value pairs, where the keys are the elements and the values are their counts.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example Usage:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Counting Elements in a List</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from collections import Counter
+data = ['apple', 'banana', 'apple', 'orange', 'banana', 'apple']
+counter = Counter(data)
+print(counter)
+Output: Counter({'apple': 3, 'banana': 2, 'orange': 1})</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":2} --></p>
+<ol start="2" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Counting Characters in a String</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>text = "hello world"
+char_count = Counter(text)
+print(char_count)
+Output: Counter({'l': 3, 'o': 2, 'h': 1, 'e': 1, ' ': 1, 'w': 1, 'r': 1, 'd': 1})</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":3} --></p>
+<ol start="3" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Finding the Most Common Elements</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>most_common = counter.most_common(2)  # Get top 2 most common elements
+print(most_common)
+Output: [('apple', 3), ('banana', 2)]</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":4} --></p>
+<ol start="4" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Using Counter for Arithmetic Operations</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>
+counter1 = Counter({'a': 3, 'b': 2, 'c': 1})
+counter2 = Counter({'a': 1, 'b': 2, 'c': 3})
+print(counter1 + counter2)  # Adds counts together
+Output: Counter({'a': 4, 'b': 4, 'c': 4})
+print(counter1 - counter2)  # Subtracts counts, removes zero or negative counts
+Output: Counter({'a': 2})
+print(counter1 &amp; counter2)  # Intersection: min of corresponding counts
+Output: Counter({'a': 1, 'b': 2, 'c': 1})
+print(counter1 | counter2)  # Union: max of corresponding counts
+Output: Counter({'a': 3, 'b': 2, 'c': 3})</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Summary</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Counter is useful for counting occurrences of elements in a list, string, or any iterable.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• It provides quick ways to get the most common elements.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Supports arithmetic operations like addition, subtraction, intersection, and union.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/04/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

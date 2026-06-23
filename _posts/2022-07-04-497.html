@@ -1,0 +1,178 @@
+---
+layout: post
+title: Docker Multi-arch build and images, the simple way - buildx
+date: 2022-07-04 06:43:01.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta:
+  _oembed_7c548631be4e6968f75a709dbcd83dfb: "{{unknown}}"
+  _oembed_d5d6bda444df9de4e2eeced6c837fa06: "{{unknown}}"
+  _oembed_dc8a90f8630bf2915efe9a3af4ba07c3: "{{unknown}}"
+  _oembed_58e5e4b1e1bc749095a38b10c9c49a82: "{{unknown}}"
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Recently, I has one requirement that one app container shall be abled to run on cloud server (which is x64 arch /amd64), and also on box like raspberry pi (arm64 arch).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This is called multiple platform or multi-arch support.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p> Following is the technology history roadmap from developer.ibm.com:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>"Projects that <strong>do</strong> support multiple platforms have resorted to using image names to indicate which platform an image was built for. For example, my-cool-app-ppc64le:latest; or creating a Docker hub namespace for each architecture, such as ppc64le/my-cool-app.</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>To alleviate these issues, the Docker community has come up with what is currently called a manifest list, also nicknamed a multi-arch image, or fat manifest. An individual manifest <strong>describes</strong> the contents of one image, and a manifest list enables you to <strong>group</strong> multiple images together. After the creation of a manifest list, anyone (from the project owners to their user-base) can use the manifest list name where they once used an individual image name. When a user runs a docker pull or a docker run command, the Docker engine does the work of selecting which image to pull based on the operating system and architecture on which it is running. As a result, a project's users no longer have to worry about finding the name of the image that will work for their platform. The project can have a single name, <strong>my-cool-app:latest</strong>"</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So the popular way is to using manifest to group images together, and docker engine will based on its architecture to pull right image.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We do not need to build the tool from scrath, docker has a tool called <a href="https://github.com/docker/buildx">buildx</a> can help us.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>First, make sure following preequisites are met:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, docker version must be larger than 19.03</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, turn on docker's experiment feature.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># edit ~/.docker/config.json, add one line
+experimental": "enabled
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Then we need to install buildx on the build machine</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Download the lastest version and right arch bin file from <a href="https://github.com/docker/buildx/releases">https://github.com/docker/buildx/releases</a>
+</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#rename the file
+$ mv buildx-v0.8.2.linux-amd64 docker-buildx
+
+#grant execution right to the file
+$ chmod +x docker-buildx
+
+#on my machine, this cli-plugins folder is not present, create the folder
+$ mkdir -p ~/.docker/cli-plugins 
+
+#move the file
+mv docker-buildx ~/.docker/cli-plugins</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Verify that buildx is running properly</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ docker buildx ls</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Create a driver that support different arch</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ docker buildx create --driver docker-container --platform linux/amd64,linux/arm64 --name remote-builder
+#and use this builder
+Docker buildx use remote-builder</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Check again</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>The builder shall with star symbol, and platforms already includes the ones we intend to support.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":499,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2022/07/image.png" alt="" class="wp-image-499"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Finally, try to build your first image that support multi-arch with buildx</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Single line command, this command can help us build images, prepare manifests and push to registry:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ docker buildx build -o type=registry -f "Dockerfile path" --build-arg version=${version} --platform linux/arm64/v8,linux/amd64 --tag "registry.cn-shanghai.aliyuncs.com/mycoolapp:${tag}" . </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, we can use --push as  short hand of -o type=registry</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>--platform specifies the platform we want to support, add more if you need.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The dockerfile is the same, however, better to check whether your base image in it support your desired paltforms.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>buildx has many more option that you can explore, find them <a href="https://docs.docker.com/engine/reference/commandline/buildx_build/">here</a>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Check the manifest of builded images.</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So we can pull the image of different arch with single tag.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":501,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/07/image-1-1024x397.png" alt="" class="wp-image-501"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>That's pretty cool!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Reference:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/">https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://developer.ibm.com/tutorials/createmulti-architecture-docker-images/">https://developer.ibm.com/tutorials/createmulti-architecture-docker-images/</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://docs.docker.com/engine/reference/commandline/buildx_build/">https://docs.docker.com/engine/reference/commandline/buildx_build/</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have any comments.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/07/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

@@ -1,0 +1,60 @@
+---
+layout: post
+title: tcpdump to monitor traffic
+date: 2023-07-13 09:18:17.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>The command <strong>sudo tcpdump -i docker0 -vvvs 1024 -l -A dst port 18080</strong> is used to capture network traffic on the <strong>docker0</strong> interface and filter packets that are destined for port 18080. Here is what each option does:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>
+<strong>-i docker0</strong>: specifies the interface to capture packets on.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>-vvvs 1024</strong>: sets the verbosity level of tcpdump to 2 (very verbose), and sets the snaplen (the maximum number of bytes to capture) to 1024.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>-l</strong>: tells tcpdump to print each packet as soon as it is captured, rather than buffering them.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>-A</strong>: tells tcpdump to print the packet contents in ASCII.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>dst port 18080</strong>: filters packets that are destined for port 18080.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Typical usage of this command is when you want to monitor network traffic on a specific port. For example, if you want to see all HTTP traffic on port 80, you can use the command <strong>sudo tcpdump -i eth0 -A dst port 80</strong>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Some results:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":756,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2023/07/image-1024x85.png" alt="" class="wp-image-756"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/07/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

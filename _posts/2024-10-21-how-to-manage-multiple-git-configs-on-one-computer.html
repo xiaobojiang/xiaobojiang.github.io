@@ -1,0 +1,137 @@
+---
+layout: post
+title: How to Manage Multiple Git Configs on One Computer
+date: 2024-10-21 03:44:21.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Handling different Git profiles for various projects doesn’t have to be difficult. With a little setup, you can easily switch between profiles for work and personal projects. Here’s how you can do it usinggitfor work projects andmygitfor personal ones.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Step 1 → Organize Repos by Profile</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>First, separate the repositories into directories based on their profiles. For example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>•<strong>WORK</strong>→ for your work-related projects (managed bygit)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>•<strong>PERSONAL</strong>→ for open source or personal projects (managed bymygit)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Step 2 → Set Up Global Git Configuration</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Create or edit the global.gitconfigfile in your home directory. This file will tell Git which configuration to use based on the directory path where the repository is located. Add an entry for each profile, as shown below:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>[includeIf "gitdir:~/personal/"]
+ path= ~/.mygitconfig-personal
+[includeIf "gitdir:~/work/"]
+ path= ~/.gitconfig-work</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This tells Git to use.mygitconfig-personalfor repos in the~/personal/directory and.gitconfig-workfor repos in the~/work/directory.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Step 3 → Create Profile-Specific Configurations</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Next, create the individual Git config files for work (~/.gitconfig-work) and personal (~/.mygitconfig-personal) profiles. Customize them with your specific details, like user name and email:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Work Profile (</strong>~/.gitconfig-work<strong>)</strong>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>[user]
+  name = work_user
+  email = work_email@company.com</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Personal Profile (</strong>~/.mygitconfig-personal<strong>)</strong>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>[user]
+ name= personal_user
+ email=personal_email@domain.com</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Step 4 → Verify the Setup</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now, you have two Git config files (~/.gitconfig-workand~/.mygitconfig-personal). Let’s test that they are applied correctly.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1.<strong>For Work</strong>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>•Create a new repo in your~/work/directory:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ cd ~/work
+$ mkdir work-test-repo
+$ cd work-test-repo
+$ git init</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>•Check the active Git configuration:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ git config --local --list</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>You should see your work-specific user details like:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>user.name=work_user
+user.email=work_email@company.com</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>2.<strong>For Personal</strong>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Create a new repo in your~/personal/directory:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ cd ~/personal
+$ mkdir personal-test-repo
+$ cd personal-test-repo
+$ git init</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Check the configuration:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ git config --local --list</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This time, your personal profile will be active:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>user.name=personal_user
+user.email=personal_email@domain.com</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>And that’s it! By organizing your repositories and usingincludeIfin your global.gitconfig, Git will automatically use the correct configuration file based on the project directory you’re working in.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let me know if you need any further modifications or explanations! </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/10/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

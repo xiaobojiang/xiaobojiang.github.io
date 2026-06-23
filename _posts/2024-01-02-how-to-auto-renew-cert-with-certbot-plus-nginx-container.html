@@ -1,0 +1,117 @@
+---
+layout: post
+title: How to auto renew cert with certbot plus nginx container
+date: 2024-01-02 03:19:43.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Here, nginx mounted a folder of certs inside.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And externally, we use a certbot container to create certs.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And then cp files, of course, they can share the same mounting folder if applicable.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Ansible script</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>- name: provision letencrypt working data folder
+file:
+path: '{{ ansible_env.HOME }}/letsencryptdir'
+state: directory
+mode: '0755'
+
+- name: provision app cfg folder if not yet
+file:
+path: '{{ ansible_env.HOME }}/s_cfg/cert'
+state: directory
+mode: '0755'
+
+- name: install certbot via pip
+pip:
+name: certbot
+state: present
+
+- name: install crontab and crond via cronie on aws ec2
+package:
+name: cronie
+state: present
+become: yes
+
+- name: start crond and enable
+ansible.builtin.systemd:
+state: started
+enabled: yes
+name: crond
+become: yes
+
+- name: provision shell file to server
+template:
+src: ./templates/renewcert.sh
+dest: '{{ ansible_env.HOME }}/renewcert.sh'
+mode: 'u+x'
+
+- name: create crontab to run on hour 3 on every sunday
+cron:
+name: "renew cert"
+minute: "0"
+hour: "3"
+weekday: "0"
+job: "{{ ansible_env.HOME }}/renewcert.sh &gt;&gt; {{ ansible_env.HOME }}/cronlog.log 2&gt;&amp;1"
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Intall certbot</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>$ pip install certbot</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Prepare a script.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#!/bin/sh
+cert_dir="{{ ansible_env.HOME }}/letsencryptdir"
+dest_dir="{{ ansible_env.HOME }}/s_cfg/{{ cert_dir }}"
+
+if [ $( docker ps -a | grep nginx | wc -l ) -gt 0 ]; then
+docker stop nginx;
+fi
+
+
+if [ -z "$(ls -A $cert_dir/live 2&gt;/dev/null)" ]; then
+echo "Certificate directory is empty or not present. Generating new certificate..."
+docker run --rm -p 80:80 -v $cert_dir:/etc/letsencrypt certbot/certbot certonly --standalone --rsa-key-size 4096 -d {{ app_host }} --cert-name certs --register-unsafely-without-email --agree-tos
+else
+echo "Certificate renewal found. Running Certbot renew..."
+docker run --rm -p 80:80 -v $cert_dir:/etc/letsencrypt certbot/certbot renew --non-interactive --quiet
+fi
+
+sudo cp $cert_dir/live/certs/cert.pem $dest_dir/{{ site_cert_name }}
+sudo cp $cert_dir/live/certs/privkey.pem $dest_dir/{{ site_key_name }}
+
+docker start nginx</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>And it will run with cron job, on 3am everyday.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/01/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

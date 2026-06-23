@@ -1,0 +1,191 @@
+---
+layout: post
+title: Enable mdns discovery on host network
+date: 2025-05-30 02:18:02.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Recent days, I am playing APIs with my Hue bridge and lights.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I've setup a jupyter notebook container runtime to write notebook and debug and explore the APIs.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then I found that my code cannot mdns discover hue bridge, while after a while, trying the same on the host it works..</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I recalled that my notebook is running in docker network, which is a vlan from the host, while the mdnd request cannot pass through.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Did few research with AI, find two solutions:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>using --network=host</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>creating a macvlan</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<tbody>
+<tr>
+<th><strong>Strategy</strong></th>
+<th><strong>mDNS Support</strong></th>
+<th><strong>Security Level</strong></th>
+<th><strong>Notes</strong></th>
+</tr>
+<tr>
+<td>--network=host</td>
+<td>✅</td>
+<td>⚠️ Low</td>
+<td>Full mDNS support; exposes all container ports.</td>
+</tr>
+<tr>
+<td>Macvlan Networking</td>
+<td>✅</td>
+<td>✅ High</td>
+<td>Isolates containers; requires network setup.</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let me explain more on macvlan</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>🔍 Understanding macvlan Networking</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Direct Network Access</strong>: Containers on a macvlan network have their own IP addresses and can communicate directly with other devices on the same network segment.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>No Port Publishing</strong>: The standard -p or --publish flags used in Docker to map container ports to host ports are ineffective with macvlan networks. This is because containers are already accessible via their own IP addresses, making port publishing unnecessary.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Host-Container Communication</strong>: By default, the host cannot directly communicate with containers on a macvlan network due to network isolation.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>🔄 Accessing macvlan Containers from the Host</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>To enable the host to communicate with containers on a macvlan network, you can create a macvlan interface on the host itself. Here’s how:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":1} --></p>
+<ol start="1" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Create a macvlan Network</strong>:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>docker network create -d macvlan \
+
+  --subnet=192.168.1.0/24 \
+
+  --gateway=192.168.1.1 \
+
+  -o parent=&lt;network_interface_name&gt; macvlan_net</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":2} --></p>
+<ol start="2" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Create a macvlan Interface on the Host</strong>:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>ip link add macvlan_host link &lt;network_interface_name&gt; type macvlan mode bridge
+
+ip addr add 192.168.1.100/24 dev macvlan_host
+
+ip link set macvlan_host up</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This assigns the IP 192.168.1.100 to the host’s macvlan interface, allowing it to communicate with containers on the macvlan_net network.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":3} --></p>
+<ol start="3" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Run a Container on the macvlan Network</strong>:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>docker run -it -d --name jupyter  --network=macvlan_net -p 8888:8888 <a href="http://quay.io/jupyter/minimal-notebook">quay.io/jupyter/minimal-notebook</a></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":3} --></p>
+<ol start="3" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>The container is now accessible at a separate ip in lan, such as 192.168.1.100, and the host can communicate with it via the macvlan_host interface.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now, it works, my bridge is found with mdns discovery!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[{'internalipaddress': '192.168.1.8', 'id': 'ecb5faa4...', 'name': 'Hue Bridge - A4...'}]</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>🔐 Security Considerations</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Isolation</strong>: macvlan networks provide isolation between the host and containers, which can enhance security but may complicate communication.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Access Control</strong>: Ensure that appropriate firewall rules and access controls are in place to prevent unauthorized access to containers on the macvlan network.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Monitoring</strong>: Regularly monitor network traffic and container activity to detect any unusual behavior.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:paragraph --></p>
+<p>By configuring a macvlan interface on the host, you can facilitate communication between the host and containers on a macvlan network, enabling functionalities like mDNS discovery while maintaining network isolation.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

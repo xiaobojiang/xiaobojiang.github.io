@@ -1,0 +1,143 @@
+---
+layout: post
+title: Verify website certificate with openssl s_client command
+date: 2022-05-30 06:29:21.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Technology
+- Web
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>It is important to know whether the site is trustable via checking its certificates.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>We can view one website’s certificates chain in the browser, eg, I take the screenshot example of bing.com in the Chrome.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":462,"width":600,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image aligncenter size-full is-resized"><img src="{{site.baseurl}}/assets/2022/05/BD654987-6AB2-4AF9-90D9-09EE29BECAFC.png" alt="" class="wp-image-462" width="600"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 1. certificate chain of bing.com</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This gives the information about the chain, who is the signer, and certificate validity.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the upper picture, Baltimore CyberTrust is the root, the intermediate cert signer is Microsoft, and it signs certificate of bing.com</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And the server certificate is valid till September 6, 2022.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>There is another way to do it, with openssl s_client command, and it can download the whole server certificate chain.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">1, Verify the certificate chain:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>$ echo -n | openssl s_client -showcerts -connect &lt;HOST&gt;:&lt;PORT&gt;</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>echo -n gives a response to the server, so that the connection is released</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Try it on bing.com</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This gives the same chain as in the Chrome browser.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The depth 2 is the root certificate, depth 1 is the Microsoft intermediate certificate, and depth 0 is the website’s certificate.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And those abbreviations are:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>C: country code (IE: Ireland, US: United States)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>O: organization</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>OU: organization unit</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>CN: common name (for depth 0, it is the website’s full domain name, this helps browser verify that the certificate is assigned to the correct website you are visiting.)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":459,"width":600,"height":254,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image aligncenter size-large is-resized"><img src="{{site.baseurl}}/assets/2022/05/image-1-1024x434.png" alt="" class="wp-image-459" width="600" height="254"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 2. output of openssl s_client command</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">2, Download the server cert (depth 0) only:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$echo -n | openssl s_client -connect $HOST:$PORTNUMBER -servername $SERVERNAME | openssl x509 &gt; /tmp/$SERVERNAME.cert</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>That will save the certificate to /tmp/$SERVERNAME.cert.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>openssl x509 removes information about the certificate chain and connection details. This is the preferred format to import the certificate into other keystores.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The -servername is used to select the correct certificate when multiple are presented, in the case of SNI.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The x509 at the end will strip out the intermediate certs, you will need to use sed command instead of the x509 at the end.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">3, Download the full chain:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ echo -n | openssl s_client -showcerts -connect &lt;a href="http://home.iotspacex.com:443/"&gt;bing.com:443&lt;/a&gt; | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' &gt; ~/Downloads/bing.pem</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here we use -showcerts when we want to download all the certificates in the chain. But if we just want to download the server certificate, there is no need to specify -showcerts.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>-showcerts</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Displays the server certificate list as sent by the server: <strong>it only consists of certificates the server has sent</strong> (in the order the server has sent them). <strong>It is not a verified chain</strong>. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The openssl or the operating system stored all root certificate locally, so root certificate is not included in the output. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now, the certificate of depth 0 and 1 of bing are download into the file.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note: if the depth is larger than 3, it will recursively download all the chain, except root.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":460,"width":600,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image aligncenter size-large is-resized"><img src="{{site.baseurl}}/assets/2022/05/1FE84A3B-DFAC-46CB-8A1D-2B4E1AD0A767-1024x546.png" alt="" class="wp-image-460" width="600"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 3. Downloaded example certificate chain of bing.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>That's the end of this post.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you like.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

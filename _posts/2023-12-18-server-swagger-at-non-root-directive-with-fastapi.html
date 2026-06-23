@@ -1,0 +1,122 @@
+---
+layout: post
+title: Server Swagger at non root directive with fastapi
+date: 2023-12-18 07:45:00.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p><strong>I want to fetch swagger from /dev/docs, and with that, openapi.json is also fetch from /dev/openapi.json</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://fastapi.tiangolo.com/tutorial/metadata/">To set the root URL for Swagger UI in FastAPI, you can use the </a><a href="https://fastapi.tiangolo.com/tutorial/metadata/">openapi_url</a><a href="https://fastapi.tiangolo.com/tutorial/metadata/"> parameter in the </a><a href="https://fastapi.tiangolo.com/tutorial/metadata/">FastAPI</a><a href="https://fastapi.tiangolo.com/tutorial/metadata/"> constructor</a><a href="https://fastapi.tiangolo.com/tutorial/metadata/">1</a>. Here’s an example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Python</strong>AI-generated code. Review and use carefully. <a href="https://www.bing.com/new#faq">More info on FAQ</a>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>fromfastapiimportFastAPI</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>app = FastAPI(</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>    openapi_url="/dev/openapi.json",</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>    docs_url="/dev/docs",</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>    redoc_url=None,</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://fastapi.tiangolo.com/reference/openapi/docs/">In FastAPI, the </a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/">openapi_url</a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/">, </a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/">docs_url</a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/">, and </a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/">redoc_url</a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/"> parameters are used to configure the URLs for the OpenAPI schema, Swagger UI, and ReDoc UI, respectively </a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/">1</a>. Here’s what each parameter does:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>
+<strong>openapi_url</strong>: This parameter specifies the URL for the OpenAPI schema. By default, it is set to <strong>/openapi.json</strong>. <a href="https://fastapi.tiangolo.com/reference/openapi/docs/">You can customize it by setting this parameter to a different URL </a><a href="https://fastapi.tiangolo.com/tutorial/metadata/">2</a>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>docs_url</strong>: This parameter specifies the URL for the Swagger UI. By default, it is set to <strong>/docs</strong>. <a href="https://fastapi.tiangolo.com/pt/tutorial/metadata/">You can customize it by setting this parameter to a different URL </a><a href="https://fastapi.tiangolo.com/pt/tutorial/metadata/">3</a>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>redoc_url</strong>: This parameter specifies the URL for the ReDoc UI. By default, it is set to <strong>/redoc</strong>. <a href="https://fastapi.tiangolo.com/reference/openapi/docs/">You can customize it by setting this parameter to a different URL </a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/">1</a>.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>ReDoc is an alternative UI for OpenAPI documentation. It provides a clean and modern interface for exploring and testing APIs. <a href="https://fastapi.tiangolo.com/reference/openapi/docs/">ReDoc is included in FastAPI by default, and you can enable it by setting the </a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/">redoc_url</a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/"> parameter in the </a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/">FastAPI</a><a href="https://fastapi.tiangolo.com/reference/openapi/docs/"> constructor</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this example, the root URL for the app is still <strong>/</strong>. The <strong>openapi_url</strong> parameter specifies the URL for the OpenAPI schema, and the <strong>docs_url</strong> parameter specifies the URL for the Swagger UI. The <strong>redoc_url</strong> parameter is set to <strong>None</strong> to disable ReDoc.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>fromfastapiimportFastAPI</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>importuvicorn</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>app = FastAPI(</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>openapi_url="/dev/openapi.json",</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>docs_url="/dev/docs",</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>redoc_url=None,</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>@app.get("/users/{username}")</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>asyncdefread_user(username: str):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>return{"message":f"Hello{username}"}</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>if__name__ =="__main__":</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>uvicorn.run(app, host="0.0.0.0", port=8080)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>API is still at root but doc moves to somewhere else:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":849,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2023/12/image-5.png" alt="" class="wp-image-849"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:image {"id":850,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2023/12/image-6-1024x376.png" alt="" class="wp-image-850"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>I hope this helps!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/12/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

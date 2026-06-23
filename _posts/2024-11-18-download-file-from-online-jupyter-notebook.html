@@ -1,0 +1,64 @@
+---
+layout: post
+title: Download file from online jupyter notebook
+date: 2024-11-18 05:41:29.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>During recent time, I spend a lot of time taking AI short courses on deeplearning.ai (thanks! Andrew). There are a lot of good courses, and the best part if you can play with it on its online jupyter playground. From time to time, I played these code with more modification with other AI model locally. One of the thing it that there are some "invisible" sample data files, which shares the same folder with py file, I wish I could download. If you have similar need, try this:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>To download a file from an online Jupyter Notebook to your local machine, you have a few options depending on where your notebook is running. Here are the common methods:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Method : Use Jupyter Notebook’s File Download Option</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1. Navigate to the Jupyter Notebook file browser.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2. Find the file you want to download.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3. Right-click on the file and select Download. This will download the file to your local system.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Method 2: Use IPython’s FileLink for Direct Download</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you are working within a cell, you can create a clickable download link for a file using IPython.display’s FileLink.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from IPython.display import FileLink
+
+#Replace 'filename.ext' with your file's name
+
+FileLink('filename.ext')</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Running this cell will generate a download link directly in the notebook output, which you can click to download the file.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1031,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2024/11/image-1-1024x282.png" alt="" class="wp-image-1031"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/11/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

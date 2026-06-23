@@ -1,0 +1,156 @@
+---
+layout: post
+title: Build a Serial Debugger with Kivy + Python – part 3 packaging
+date: 2021-10-28 01:31:38.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p><br>This is the final post for writing an Kivy Serial Debugger program, you can find other two posts talking about UI design with kv lang (<a href="https://www.iotcolon.com/?p=181">https://www.iotcolon.com/?p=181</a>) and python script for interaction (<a href="https://www.iotcolon.com/?p=194">https://www.iotcolon.com/?p=194</a>)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>If you finished writing your code, and want to package the code and distribute in different os platform, like android, macOS or on Windows. Kivy offers how-to on different platforms. You can find packaging for Windows, OS X, Android and IOS in the link: <a href="https://kivy.org/doc/stable/gettingstarted/packaging.html">https://kivy.org/doc/stable/gettingstarted/packaging.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>In this post, I will show how to pack Serial Debugger code into an app and install on the macOS.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>Here, assume that Kivy and its dependencies are already installed.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><br>PyInstaller is required for this packaging purpose, you can install it via Homebrew, or get the runnable via git.<br>Follow the steps: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, create a folder “packaging” and go inside </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, get the pyinstaller: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$git clone http://github.com/pyinstaller/pyinstaller </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, create a file named “serialdebugger.spec” in this directory. You can find spec file definition here: <a href="https://pyinstaller.readthedocs.io/en/stable/spec-files.html">https://pyinstaller.readthedocs.io/en/stable/spec-files.html</a>     </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here, add following code into it: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># -*- mode: python ; coding: utf-8 -*-
+
+
+block_cipher = None
+
+
+a = Analysis(['/Users/xiaobo/Git/kivy_playground/app/serial_debugger/serialdebugger.py'],
+             pathex=['/Users/xiaobo/Git/packaging'],
+             binaries=[],
+             datas=[],
+             hiddenimports=[],
+             hookspath=[],
+             runtime_hooks=[],
+             excludes=['_tkinter', 'Tkinter', 'enchant', 'twisted'],
+             win_no_prefer_redirects=False,
+             win_private_assemblies=False,
+             cipher=block_cipher,
+             noarchive=False)
+pyz = PYZ(a.pure, a.zipped_data,
+             cipher=block_cipher)
+exe = EXE(pyz,
+          a.scripts,
+          [],
+          exclude_binaries=True,
+          name='serialdebugger',
+          debug=False,
+          bootloader_ignore_signals=False,
+          strip=False,
+          upx=True,
+          console=False )
+coll = COLLECT(exe, Tree('/Users/xiaobo/Git/kivy_playground/app/serial_debugger/'),
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               strip=False,
+               upx=True,
+               upx_exclude=[],
+               name='serialdebugger')
+app = BUNDLE(coll,
+             name='serialdebugger.app',
+             icon='/Users/xiaobo/Git/kivy_playground/app/serial_debugger/icon.png',
+             bundle_identifier=None)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the file,：</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>A new instance of class Analysis takes the script name with full path (…/serialdebugger.py) as input. It analyze all imports and dependencies in class members named.<br>
+</li>
+<li>An instance of class PYZ is a .pyz archive (described under Inspecting Archives below), which contains all the Python modules from a.pure.<br>
+</li>
+<li>An instance of APP is built from the analyzed scripts and the PYZ archive, here an icon can also be specifiied. This object creates the executable file for mac. For windows, you shall define in EXE instance.<br>
+</li>
+<li>An instance of COLLECT creates the output folder from all the other parts.<br>
+</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p> You can specify the whole path your codes are not inside the packaging directory.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>4, Then run the following command:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ pyinstaller/pyinstaller.py serialdebugger.spec     </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Replace the <em>serialdebugger</em> with your file name where appropriate, this shall give you a &lt;yourapp&gt;.app in the dist/ folder.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":206,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/10/image-13.png" alt="" class="wp-image-206"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>5, put the .app file into the Application folder. Then you have it, try it out.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":207,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/10/image-15-1024x358.png" alt="" class="wp-image-207"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can find your serial debugger application in your search bar:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":204,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/10/image-12.png" alt="" class="wp-image-204"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Click and run it, in below it is the serial deubugger UI created in all three posts.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":205,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2021/10/image-14-1024x595.png" alt="" class="wp-image-205"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>As a summary, in all three posts, Kivy’s UI, script and packaging are introduced, an example of serial debugger are implemented.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can find this project's source code in my github: <a href="https://github.com/xiaobojiang/kivy_playground">https://github.com/xiaobojiang/kivy_playground</a>, in the path /app/serial_debbuger.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have any questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/10/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

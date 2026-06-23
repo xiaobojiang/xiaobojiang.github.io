@@ -1,0 +1,87 @@
+---
+layout: post
+title: "[one line tip] Split long shell command into multiple lines"
+date: 2022-09-21 06:07:14.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- One Line Tip
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>This is the new series, which I will make one line tip for some small and detailed problems.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>One line tip, one minute Fix!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This tip is about split long shell command into lines, thus to enhance readability.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>One line tip:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>split the command by add backslash (\) and enter new line without space on each line end</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Example:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ cat test.sh                                                                                                                      [14:02:55]
+echo "The File Name is: $0"
+echo "The First argument is: $1"
+echo "The Second argument is: $2"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Original line:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>mvn sonar:sonar -Dsonar.projectKey=${sonarname} -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${sonarkey}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>splited with tip</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ sh test.sh "1"\
+ "2"
+The File Name is: test.sh
+The First argument is: 1
+The Second argument is: 2</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note: do not insert any space after backslash, it will be taken as new command</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code {"backgroundColor":"white"} --></p>
+<pre class="wp-block-code has-white-background-color has-background"><code>$ <mark class="has-inline-color has-yellow-color">sh test.sh "1"\ </mark>#there is a space
+ "2"
+The File Name is: test.sh
+The First argument is: 1 
+The Second argument is: 
+zsh: command not found: 2</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Why it will work:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If a \&lt;newline&gt; pair appears, and the backslash is not itself quoted, the \&lt;newline&gt; is treated as a line continuation (that is, it is removed from the input stream and effectively ignored).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/09/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

@@ -1,0 +1,183 @@
+---
+layout: post
+title: Rules for path in Nginx configuration
+date: 2024-07-15 02:28:22.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>In NGINX, path rules are used to determine how to handle incoming requests based on the URI (Uniform Resource Identifier). The <code>~</code> and <code>~*</code> operators are used to define regular expression (regex) matching rules, while <code>=</code> and <code>^~</code> are used for literal string matching and prefix matching respectively. Here's an explanation of each:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">1. <code>=</code><br />
+</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The <code>=</code> operator is used for exact string matching. If the URI exactly matches the specified string, NGINX will use this rule.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>location = /exact-match </code>
+<code>{</code>
+<code> # Configuration for exact match </code>
+<code>}</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this case, only requests to <code>/exact-match</code> will match this location block.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">2. <code>^~</code><br />
+</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The <code>^~</code> operator is used for prefix matching. If a URI starts with the specified prefix, NGINX will use this rule and stop searching for other matches.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>location ^~ /images/ </code><code>{<span style="background-color: initial;font-family: inherit;font-size: inherit">  </span></code><code>  # Configuration for URIs starting with /images/ </code><code>}</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this case, any request starting with <code>/images/</code> will match this location block.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">3. <code>~</code><br />
+</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The <code>~</code> operator is used for case-sensitive regular expression matching.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>location ~ \.jpg$ </code>
+<code>{</code>
+<code> # Configuration for URIs ending with .jpg </code>
+<code>}</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this case, any URI ending with <code>.jpg</code> will match this location block, and the match is case-sensitive (e.g., <code>/picture.JPG</code> would not match).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">4. <code>~*</code><br />
+</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The <code>~*</code> operator is used for case-insensitive regular expression matching.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>location ~* \.jpg$ </code>
+<code>{</code>
+<code> # Configuration for URIs ending with .jpg </code>
+<code>}</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this case, any URI ending with <code>.jpg</code> will match this location block, and the match is case-insensitive (e.g., <code>/picture.JPG</code> would match).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Matching Order</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>NGINX processes the location blocks in a specific order:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<!-- wp:list-item --></p>
+<li>Exact matches (<code>=</code>).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Prefix matches (<code>^~</code>).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Case-sensitive regex matches (<code>~</code>).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Case-insensitive regex matches (<code>~*</code>).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Prefix matches (default).</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">Example Configuration</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here's an example configuration combining these different rules:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code><code>server </code>
+<code>{ </code>
+<code>listen 80; </code>
+<code>location = /{</code>
+<code> # Configuration for the exact match of "/" </code>
+<code>} </code>
+<code>location ^~ /static/<span style="background-color: initial;font-family: inherit;font-size: inherit"> {</span></code>
+<code><span style="background-color: initial;font-family: inherit;font-size: inherit"> # Configuration for any URI starting with "/static/" </span></code>
+<code><span style="background-color: initial;font-family: inherit;font-size: inherit">}</span></code>
+<code><span style="background-color: initial;font-family: inherit;font-size: inherit"> location ~ \.php$ {</span></code>
+<code><span style="background-color: initial;font-family: inherit;font-size: inherit"> # Configuration for case-sensitive regex match of ".php" </span></code>
+<code><span style="background-color: initial;font-family: inherit;font-size: inherit">}</span></code>
+<code><span style="background-color: initial;font-family: inherit;font-size: inherit"> location ~* \.jpg$ {</span></code>
+<code><span style="background-color: initial;font-family: inherit;font-size: inherit"> # Configuration for case-insensitive regex match of ".jpg" </span></code>
+<code><span style="background-color: initial;font-family: inherit;font-size: inherit">}</span></code>
+<code><span style="background-color: initial;font-family: inherit;font-size: inherit"> location / {</span></code>
+<code><span style="background-color: initial;font-family: inherit;font-size: inherit"> # Default configuration for any other URI</span></code>
+<code><span style="background-color: initial;font-family: inherit;font-size: inherit"> } </span></code>
+<code>}</code></code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this configuration:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>The exact match for <code>/</code> will be processed first.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>URIs starting with <code>/static/</code> will be processed next.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>URIs matching the case-sensitive regex <code>\.php$</code> will be processed after.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>URIs matching the case-insensitive regex <code>\.jpg$</code> will be processed next.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Any other URIs will be processed by the default location block.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Hope this helps.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/07/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

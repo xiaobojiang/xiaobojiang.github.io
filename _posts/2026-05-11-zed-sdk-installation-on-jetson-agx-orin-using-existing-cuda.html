@@ -1,0 +1,144 @@
+---
+layout: post
+title: ZED SDK Installation on Jetson AGX Orin (Using Existing CUDA)
+date: 2026-05-11 07:37:14.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Robotics
+- Technology
+tags: []
+meta:
+  _oembed_6a637cffd770af9b7d9fa863e0f657e1: "{{unknown}}"
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Adding another tech note on using ZED depth camera on Jetson Orin AGX.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Overview</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>This guide explains how to install the ZED SDK on Jetson AGX Orin using<br>the existing CUDA from JetPack.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Key Principle</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>JetPack (L4T) → CUDA → ZED SDK</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Do NOT install CUDA manually</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Match ZED SDK with JetPack (L4T)</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Steps</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">1. Check system info</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>cat /etc/nv_tegra_release</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># R36 (release), REVISION: 4.7, GCID: 42132812, BOARD: generic, EABI: aarch64, DATE: Thu Sep 18 22:54:44 UTC 2025
+# KERNEL_VARIANT: oot
+TARGET_USERSPACE_LIB_DIR=nvidia
+TARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia
+
+---
+How to interpret:
+    •   R35.x → JetPack 5.x
+    •   R36.x → JetPack 6.x
+Final Version:
+    •   L4T: 36.4.7</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>nvcc --version<br>lsb_release -a<br>uname -m</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">2. Verify CUDA</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>nvidia-smi<br>dpkg -l | grep cuda</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">3. Install dependencies if needed</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>sudo apt update sudo apt install nvidia-jetpack-dev #nvidia-jetpack</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">4. Download ZED SDK</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:embed {"url":"https://www.stereolabs.com/developers/release"} --></p>
+<figure class="wp-block-embed">
+<div class="wp-block-embed__wrapper">
+https://www.stereolabs.com/developers/release
+</div>
+</figure>
+<p><!-- /wp:embed --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">5. Install</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading">5.1 install download file</h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>cd ~/Downloads chmod +x ZED_SDK_Tegra_L4TXX.X_vX.X.X.run<br>./ZED_SDK_Tegra_L4TXX.X_vX.X.X.run</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading">5.2 run diagnostic</h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then run ZED_Diagnotic<br>if you notice that "GMSL driver is missing or not installed"<br>do not worry, check your zed camera model:<br>If you are using:<br>• ZED 2 / ZED 2i / ZED Mini (USB)<br>👉 ✅ You can IGNORE this warning</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you are using:<br>• ZED X / ZED X Mini (GMSL)<br>👉 ❌ Then this is a real issue</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":4} --></p>
+<h4 class="wp-block-heading">5.3 optimize models</h4>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>in the same diagnostic window, click AI model tab.<br>And select necessary models (eg, depth related) and optimize<br>it will download models and do necessary optimization.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">6. Test</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>ZED_Explorer zed_depth_viewer</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Notes</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Always match L4T version</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Use built-in CUDA from JetPack</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2026/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

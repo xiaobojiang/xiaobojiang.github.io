@@ -1,0 +1,228 @@
+---
+layout: post
+title: Enforcing Structured Outputs from LLMs with Instructor
+date: 2025-09-09 03:16:30.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:heading --><html><body></p>
+<h2 class="wp-block-heading"><strong>Introduction</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>When working with LLMs, free-form text is often good enough. But in production applications, structured data is king.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Imagine building a travel planner: instead of prose like “You should go to Zermatt, Switzerland, for 7 days and try skiing, snowboarding, and après-ski”, you need a validated object like:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>{
+
+  "destination": "Zermatt, Switzerland",
+
+  "days": 7,
+
+  "activities": ["skiing", "snowboarding", "après-ski"]
+
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This ensures your downstream system — whether it’s a database, API, or UI — gets predictable output.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The challenge? Not all LLMs support structured outputs natively.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>✅ <strong>OpenAI GPT-4.1 / GPT-4o</strong> → support structured outputs with response_format=YourPydanticModel</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>❌ <strong>Qwen3, Llama via Ollama, Mistral</strong> → return only raw text, with no schema enforcement</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>This is where <a href="https://python.useinstructor.com"><strong>Instructor</strong></a> comes in.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>Step 1. The Problem: Qwen3 without Instructor</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here’s what happens if you call Qwen3 directly:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>response = client.chat.completions.create(
+
+    model="qwen3-7b-chat",
+
+    messages=[{"role": "user", "content": "Plan a 7-day ski trip in Switzerland."}]
+
+)
+
+print(response.choices[0].message.content)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Output might look like:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>"You should go to Zermatt in Switzerland. Spend 7 days skiing, snowboarding, and enjoying Swiss cheese fondue."</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Great text, but…</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>No JSON</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>No type safety</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>You’d need brittle regex/parsers to extract fields</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>Step 2. The OpenAI Way (native structured outputs)</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>OpenAI models solve this elegantly.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from pydantic import BaseModel
+
+from typing import List
+
+class VacationPlan(BaseModel):
+
+    destination: str
+
+    days: int
+
+    activities: List[str]
+
+response = client.beta.chat.completions.parse(
+
+    model="gpt-4.1",
+
+    messages=[{"role": "user", "content": "Plan a 7-day ski trip in Switzerland."}],
+
+    response_format=VacationPlan,  # native support for schema
+
+)
+
+print(response.choices[0].message.parsed)  # -&gt; VacationPlan(destination='Zermatt', days=7, activities=['skiing', 'snowboarding'])</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This works beautifully on GPT-4.1, but not on Qwen3, Llama, or Mistral.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>Step 3. Enter Instructor</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Instructor is a compatibility layer that makes all LLMs behave like OpenAI in terms of structured output.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Install it:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>pip install instructor</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Patch your client:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import os
+
+import instructor
+
+from pydantic import BaseModel
+
+from typing import List
+
+#Step 1: Define schema
+
+class VacationPlan(BaseModel):
+
+    destination: str
+
+    days: int
+
+    activities: List[str]
+
+#Step 2: Wrap the client
+
+instructor_client = instructor.from_openai(
+
+    client,
+
+    mode=instructor.Mode.JSON  # enforce JSON mode for models like Qwen3
+
+)
+
+#Step 3: Call the model with schema
+
+def test_qwen3_vacation_plan():
+
+    response = instructor_client.chat.completions.create(
+
+        model=os.getenv("QWEN3_MODEL_NAME"),
+
+        messages=[{
+
+            "role": "user",
+
+            "content": "Plan a 7-day ski trip in Switzerland."
+
+        }],
+
+        response_model=VacationPlan,  # schema enforcement
+
+        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+
+    )
+
+    print(response)
+
+    print(type(response))  # -&gt; &lt;class 'main.VacationPlan'&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now, even with Qwen3, you get a validated Python object:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>VacationPlan(destination="Zermatt", days=7, activities=["skiing", "snowboarding"])</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for reading, please leave a comment if you have better ideas or thoughts.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/09/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

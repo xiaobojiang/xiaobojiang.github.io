@@ -1,0 +1,174 @@
+---
+layout: post
+title: 'Fixing scp on Newer OpenSSH: Use Legacy SCP Mode with -O'
+date: 2026-06-22 08:29:37.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- One Line Tip
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Sometimes a command that worked for years suddenly starts failing after a laptop upgrade.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>That happened to me recently while copying files to an embedded Linux device. The target was reachable, SSH login worked, and the path was correct:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>ssh root@192.168.1.10</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>No problem.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>But when I tried to copy a file with <code>scp</code>, the transfer failed. The confusing part was that nothing had changed on the device side. The device still had the same SSH server, the same <code>/data/</code> directory, and the same root login.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The real change was on my host machine.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Starting with OpenSSH 9.0, <code>scp</code> uses <strong>SFTP by default</strong> instead of the older SCP/RCP-style protocol. That is usually a good thing because SFTP has safer and more predictable filename handling. But on some older devices, minimal Linux systems, recovery images, vendor firmware, or embedded targets, SFTP may not be available or may not behave the way modern <code>scp</code> expects.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The fix is simple: force legacy SCP mode with <code>-O</code>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>scp -O localfile root@192.168.1.10:/data/</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Copy from Local Machine to Target</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Use this when you want to send a file from your computer to the device:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>scp -O localfile root@192.168.1.10:/data/</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>scp -O zeroclaw root@C42996CA26ED:/data/</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This copies the local file <code>zeroclaw</code> into <code>/data/</code> on the target device.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Copy from Target Back to Local Machine</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Use this when you want to pull a file from the device:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>scp -O root@192.168.1.10:/data/file.txt .</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>The final <code>.</code> means “copy it into the current local directory.”</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Copy a Directory Recursively</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>For folders, add <code>-r</code>:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>scp -O -r mydir root@C42996CA26ED:/data/</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This copies the entire local directory <code>mydir</code> to <code>/data/</code> on the target.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Use a Specific SSH Port</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Remember that <code>scp</code> uses uppercase <code>-P</code> for the port:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>scp -O -P 2222 file.txt root@192.168.1.10:/data/</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>That is different from <code>ssh</code>, where the port option is lowercase <code>-p</code>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Why <code>-O</code> Works</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The <code>-O</code> option tells OpenSSH <code>scp</code> to use the old SCP protocol instead of the newer default SFTP mode. This is useful when the remote target only supports the legacy behavior, which is common on older firmware, stripped-down embedded systems, or devices with limited SSH/SFTP support.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In other words:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>scp file root@target:/path/</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>may now mean “copy using SFTP-style behavior,” while:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>scp -O file root@target:/path/</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>means “copy using the old SCP/RCP-style protocol.”</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Quick Cheat Sheet</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># Copy one file to target
+scp -O file.txt root@192.168.1.10:/data/
+
+# Copy one file from target
+scp -O root@192.168.1.10:/data/file.txt .
+
+# Copy a directory to target
+scp -O -r mydir root@192.168.1.10:/data/
+
+# Copy using a custom SSH port
+scp -O -P 2222 file.txt root@192.168.1.10:/data/</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">Takeaway</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>When <code>ssh</code> works but <code>scp</code> suddenly fails after an OpenSSH upgrade, do not immediately blame the network, the password, or the target path.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Try this first:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>scp -O ...</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>For modern servers, SFTP mode is the better default. For older embedded devices, <code>-O</code> can be the small compatibility flag that saves a lot of debugging time.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">References</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>OpenSSH 9.0 changed <code>scp</code> to use SFTP by default instead of the legacy SCP/RCP protocol: <a href="https://undeadly.org/cgi?action=article;sid=20220409132310">https://undeadly.org/cgi?action=article;sid=20220409132310</a>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Red Hat notes that SCP is deprecated in RHEL 9 and replaced by SFTP by default in the <code>scp</code> utility: <a href="https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/9.1_release_notes/deprecated_functionality">https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/9.1_release_notes/deprecated_functionality</a>
+</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Hope this helps.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2026/06/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

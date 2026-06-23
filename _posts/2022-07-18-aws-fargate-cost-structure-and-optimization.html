@@ -1,0 +1,146 @@
+---
+layout: post
+title: AWS Fargate cost structure and optimization
+date: 2022-07-18 06:02:34.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Kubernetes
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p><strong><em>Explore the fargate cost structure.</em></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>AWS Fargate pricing is calculated based on the vCPU and memory resources used from the time you start to download your container image until the Amazon EKS Pod terminates, rounded up to the nearest second.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It is claimed that the cost is calculated based on the actual cpu and memory usage[1].</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":510,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image aligncenter size-full"><img src="{{site.baseurl}}/assets/2022/07/image-3.png" alt="" class="wp-image-510"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Alright, we can use kubectl top command to verify the utilization done by each resource(pod, daemonsets) on the node.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Eg:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":511,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image aligncenter size-full"><img src="{{site.baseurl}}/assets/2022/07/image-4.png" alt="" class="wp-image-511"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Take the first pod as example, now it consumes 0.002 core cpu and 305Mi.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong><em>Now the question:</em></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In every hour, how much you need to pay for the first pod?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>My early thought is, rounded up the resource, so CPU is 0.25 core, and memory is 512Mi. Then, the cost is 0.04656*0.25 + 0.00511*0.5 = 0.014195 per hour.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Well, if you think that is the case, then you will get very surprised at the monthly bill.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong><em>What’s the actual story?</em></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>First, in kubernetes, user will specify the resources, in requests and limits.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Eg:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>        resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "250m"
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Second, the AWS fargate cost is based on the fargate node that assigned to this pod.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The fargate node has certain support configurations [1]:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>CPU                Memory Values</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>0.25 vCPU      0.5 GB, 1 GB, and 2 GB</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>0.5 vCPU        Min. 1 GB and Max. 4 GB, in 1 GB increments</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1 vCPU           Min. 2 GB and Max. 8 GB, in 1 GB increments</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2 vCPU           Min. 4 GB and Max. 16 GB, in 1 GB increments</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>4 vCPU           Min. 8 GB and Max. 30 GB, in 1 GB increments</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can check out the pod actual configuration in the AWS console.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":512,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image aligncenter size-full"><img src="{{site.baseurl}}/assets/2022/07/image-5.png" alt="" class="wp-image-512"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>According to my experiment, the initial assigned configuration is based on the resource requested. And memory wise, it always assigns a level up than you request.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Eg, it assign 0.25Core+1G ram, which is 512Mi more than I requested, even the actual consumption is 325Mi. I guess ram configuration is what I requested plus some overhead (logging), so rouned up to next level.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And further more, if you request 2 core 2G ram, and you will get at least 2core 4G ram fargate node. Although you really consumes little on the node, the cost will be so high. So it works like virtual managed EC2, with certain type to choose from. (similar to t3 small/medium)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong><em>Once you know how it works, there are few tipcs to save cost for our EKS fargate cluster:</em></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, do not claim luxury resource which beyonds our actual consumption</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, use tools, eg kubectl top to monitor the resources. Note, monitoring service is not default available on AWS EKS, we can install it easily.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, we can also use Vertical pod autoscaler or Horizontal pod autoscaler to scale up resource when required [2,3].</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have any questions or comments, thank you.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[1] https://aws.amazon.com/fargate/pricing/</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[2] <a href="https://docs.aws.amazon.com/eks/latest/userguide/vertical-pod-autoscaler.html">https://docs.aws.amazon.com/eks/latest/userguide/vertical-pod-autoscaler.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>[3] <a href="https://docs.aws.amazon.com/eks/latest/userguide/horizontal-pod-autoscaler.html">https://docs.aws.amazon.com/eks/latest/userguide/horizontal-pod-autoscaler.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

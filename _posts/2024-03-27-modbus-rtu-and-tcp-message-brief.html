@@ -1,0 +1,214 @@
+---
+layout: post
+title: Modbus RTU and TCP message brief
+date: 2024-03-27 08:28:30.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- IoT
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p><strong>Modbus RTU message</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Modbus RTU is a widely used serial communication protocol in industrial automation. It uses a master-slave architecture, binary packet structure, and error detection to facilitate communication between devices like PLCs over RS-232 or RS-485.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>RTU Request</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":896,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2024/03/image-1-1024x520.png" alt="" class="wp-image-896"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>RTU Response</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":897,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2024/03/image-2-1024x629.png" alt="" class="wp-image-897"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Modbus TCP</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The Modbus TCP command consists of a portion of the Modbus RTU message and a special header.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>From the Modbus RTU message, the SlaveID address at the beginning and the CRC checksum at the end are removed, which forms the PDU, the Protocol Data Unit.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The following is an example of a Modbus RTU request for obtaining the AI value of the holding registers from registers # 40108 to 40110 with the address of the device 17.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":895,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2024/03/image.webp" alt="" class="wp-image-895"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Transaction Identifier</strong>: 2 bytes are set by the Master to uniquely identify each request. Can be any. These bytes are repeated by the Slave device in the response, since the responses of the Slave device may not always be received in the same order as the requests.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Protocol Identifier</strong>: 2 bytes are set by the Master, will always be 00 00, which corresponds to the Modbus protocol.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Length</strong>: 2 bytes are set by the Master, identifying the number of bytes in the message that follow. It is counted from Unit Identifier to the end of the message.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Unit Identifier</strong>: 1 byte is set to Master. It is repeated by the Slave device to uniquely identify the Slave device.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The following is an example of a Modbus RTU request for obtaining the AI value of the holding registers from registers # 40108 to 40110 with the address of the device 17.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>11 03 006B 0003 7687</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table>
+<tbody>
+<tr>
+<td><strong>11</strong></td>
+<td>Device address SlaveID (17 = <strong>11</strong> hex)</td>
+</tr>
+<tr>
+<td><strong>03</strong></td>
+<td>Function Code (read Analog Output Holding Registers)</td>
+</tr>
+<tr>
+<td><strong>006B</strong></td>
+<td>Address of the first register (40108-40001 = 107 = <strong>6B</strong> hex)</td>
+</tr>
+<tr>
+<td><strong>0003</strong></td>
+<td>The number of required registers (reading 3 registers from 40108 to 40110)</td>
+</tr>
+<tr>
+<td><strong>7687</strong></td>
+<td>Checksum CRC</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the response from the Modbus TCP Slave device we get:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>0001 0000 0009 11 <strong>03 06 022B 0064 007F</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Where:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table>
+<tbody>
+<tr>
+<td><strong>0001</strong></td>
+<td><strong>Transaction identifier</strong></td>
+<td>Transaction Identifier</td>
+</tr>
+<tr>
+<td><strong>0000</strong></td>
+<td><strong>Protocol identifier</strong></td>
+<td>Protocol Identifier</td>
+</tr>
+<tr>
+<td><strong>0009</strong></td>
+<td>
+<strong>The length</strong> (9 bytes are followed)</td>
+<td>Message Length</td>
+</tr>
+<tr>
+<td><strong>11</strong></td>
+<td>
+<strong>The device address</strong> (17 = 11 hex)</td>
+<td>Unit Identifier</td>
+</tr>
+<tr>
+<td><strong>03</strong></td>
+<td>
+<strong>Function code</strong> (read Analog Output Holding Registers)</td>
+<td>Function Code</td>
+</tr>
+<tr>
+<td><strong>06</strong></td>
+<td>
+<strong>The number of bytes later</strong> (6 bytes are followed)</td>
+<td>Byte Count</td>
+</tr>
+<tr>
+<td><strong>02</strong></td>
+<td>
+<strong>Value of the high register bit</strong> (02 hex)</td>
+<td>Register value Hi (AO0)</td>
+</tr>
+<tr>
+<td><strong>2B</strong></td>
+<td>
+<strong>Early discharge value register</strong> (2B hex)</td>
+<td>Register value Lo (AO0)</td>
+</tr>
+<tr>
+<td><strong>00</strong></td>
+<td>
+<strong>Value of the high register bit</strong> (00 hex)</td>
+<td>Register value Hi (AO1)</td>
+</tr>
+<tr>
+<td><strong>64</strong></td>
+<td>
+<strong>Value of the low register bit</strong> (64 hex)</td>
+<td>Register value Lo (AO1)</td>
+</tr>
+<tr>
+<td><strong>00</strong></td>
+<td>
+<strong>Value of the high register bit</strong> (00 hex)</td>
+<td>Register value Hi (AO2)</td>
+</tr>
+<tr>
+<td><strong>7F</strong></td>
+<td>
+<strong>Early discharge value register</strong> (7F hex)</td>
+<td>Register value Lo (AO2)</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>The analog output register AO0 has the value 02 2B HEX or 555 in the decimal system.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The analog output register AO1 has the value 00 64 HEX or 100 in the decimal system.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The analog output register AO2 has the value 00 7F HEX or 127 in the decimal system.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Other useful information:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, default port for modbus TCP is 502</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, there is a online free tooling to debug modbus RTU and TCP, link:  <a href="https://github.com/ClassicDIY/ModbusTool/releases">https://github.com/ClassicDIY/ModbusTool/releases</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/03/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

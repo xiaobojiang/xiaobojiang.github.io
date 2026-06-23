@@ -1,0 +1,218 @@
+---
+layout: post
+title: Claude Skills and MCP
+date: 2025-12-23 08:05:31.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:heading --><html><body></p>
+<h2 class="wp-block-heading">
+<strong>📌 What </strong>Claude Skills Are</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Claude Skills</strong> are <strong>task-specific modules</strong> that extend Claude’s capabilities by teaching it <em>how</em> to perform particular workflows reliably.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>They package reusable instructions, templates, code, and rules that Claude can automatically load when relevant, so users don’t have to repeatedly explain a process. For example: formatting corporate docs, enforcing a style guide, or generating standard reports. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Key characteristics:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Procedural knowledge</strong> — they encode <em>how</em> to do things. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Modular and reusable</strong> — defined in structured folders/files (e.g., SKILL.md with metadata). </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Efficient</strong> — they load on demand (progressive disclosure) so Claude operates with fewer tokens and more consistent results. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Integrated into Claude platforms</strong> — usable in Claude.ai, Claude Code, the API, and the Agent SDK. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>📌 What MCP (Model Context Protocol)</strong> Is</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Model Context Protocol (MCP)</strong> is an <strong>open standard</strong> introduced by Anthropic (later widely adopted across the AI ecosystem) that defines <strong>how LLMs like Claude connect to external tools, services, data sources, and APIs</strong> in a standardized, secure way. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Key aspects of MCP:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Connectivity layer</strong> — enables Claude (and other models) to <em>access real-world systems</em> such as databases, SaaS tools, file stores, CRMs, etc. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Standard, open protocol</strong> — designed to work across models and platforms, not just Claude. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Client–server architecture</strong> — the model (client) uses JSON-RPC over stdio/HTTP/SSE to interact with MCP servers exposing tool capabilities. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Foundation for tool integrations</strong> — makes AI assistants capable of <em>real-time, contextual access</em> to external systems. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">
+<strong>🔄 How </strong>Claude Skills and MCP Relate</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>They serve <strong>complementary but distinct roles</strong> in extending Claude’s abilities: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<thead>
+<tr>
+<th><strong>Aspect</strong></th>
+<th><strong>Claude Skills</strong></th>
+<th><strong>MCP (Model Context Protocol)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Purpose</strong></td>
+<td>Teach Claude <em>how</em> to perform tasks</td>
+<td>Give Claude <em>access</em> to external tools/data</td>
+</tr>
+<tr>
+<td><strong>Focus</strong></td>
+<td>Workflow logic, procedural knowledge</td>
+<td>Connectivity, tool/data access</td>
+</tr>
+<tr>
+<td><strong>Scope</strong></td>
+<td>Internal to Claude workflows</td>
+<td>External integrations (APIs, services)</td>
+</tr>
+<tr>
+<td><strong>Token Efficiency</strong></td>
+<td>High — loads only relevant instructions</td>
+<td>Moderate — tool descriptions add context</td>
+</tr>
+<tr>
+<td><strong>Typical Use</strong></td>
+<td>Formatting workflows, templates, company playbooks</td>
+<td>Pulling live data from Notion, Slack, databases</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧠 Working Together</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>In practice, you often <strong>combine both</strong> features to build powerful AI agents:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>MCP</strong> connects Claude to the systems you use (e.g., GitHub, Notion, Slack, CRM).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Claude Skills</strong> teach Claude <em>how</em> your specific team or organization uses those systems. 👉 Together, Claude can <em>retrieve data</em> via MCP and <em>act on it with structured logic</em> defined in Skills. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Connect Claude to Notion using <strong>MCP</strong> so it can access your project pages — then add a <strong>Skill</strong> that tells Claude how to prepare meeting summaries according to your internal standards (format, sections, tone). </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧩 Simple Analogy</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>MCP</strong> = <em>access to the tools in the hardware store</em> (database, Slack, Notion). </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Claude Skills</strong> = <em>the expert showing you exactly which tools to pick and how to use them</em> for your task. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>In Summary</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Claude Skills</strong> are about <em>instructional expertise</em> — teaching the model how to execute specific workflows reliably and efficiently. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>MCP</strong> is about <em>connectivity</em> — enabling Claude to reach and interact with external systems in a standardized way. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Used together</strong>, they make Claude both <em>aware of external data/tools</em> and <em>capable of acting on them in structured, repeatable ways</em>. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Hope this helps.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>ref:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://agentskills.io/what-are-skills">https://agentskills.io/what-are-skills</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://www.anthropic.com/news/model-context-protocol">https://www.anthropic.com/news/model-context-protocol</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/12/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

@@ -1,0 +1,138 @@
+---
+layout: post
+title: Comparison between ClaudeCode and OpenClaw
+date: 2026-03-17 01:38:23.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Both ClaudeCode and OpenClaw get a lot of buz recently, they are really efficiency tool for daily work and life.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Claude Code is Anthropic’s coding-focused agent for software development. It works in the terminal and now also has a VS Code extension, with features aimed at longer, more autonomous coding tasks such as checkpoints and sandboxing for safer file/network access. Anthropic positions it as a tool for building, editing, reviewing, and iterating on code with more autonomy than a normal chat assistant.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>OpenClaw is an open-source, self-hosted AI assistant/gateway that connects chat apps like WhatsApp, Telegram, Discord, Slack, iMessage, and others to AI agents. Its docs describe it as something you run on your own devices so you can message an agent from the tools you already use, and its GitHub emphasizes that it can act as a personal assistant across many communication channels.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<tbody>
+<tr>
+<th><strong>Topic</strong></th>
+<th><strong>Claude Code (CC) — simple</strong></th>
+<th><strong>OpenClaw — simple</strong></th>
+<th><strong>Same / Different (corrected)</strong></th>
+</tr>
+<tr>
+<td>What it is</td>
+<td>Coding agent focused on working in a repo</td>
+<td>Self-hosted agent gateway/orchestrator (often chat-app front end)</td>
+<td>
+<strong>Different</strong> </td>
+</tr>
+<tr>
+<td>Default “agent”</td>
+<td>CC itself is the agent</td>
+<td>OpenClaw runs its own agent; can add others via skills</td>
+<td>
+<strong>Different</strong> </td>
+</tr>
+<tr>
+<td>Skills mechanism</td>
+<td>Not “skills-first” in CC memory model</td>
+<td>Skills are first-class: <a href="http://SKILL.md">SKILL.md</a> skill folders teach tools</td>
+<td>
+<strong>Different</strong> </td>
+</tr>
+<tr>
+<td>Can OpenClaw use CC?</td>
+<td>N/A</td>
+<td>Yes, <strong>optionally</strong> via a Claude Code Skill (MCP/CLI integration)</td>
+<td>
+<strong>Same (optional integration)</strong> </td>
+</tr>
+<tr>
+<td>CLI usage</td>
+<td>Primary interface is a developer CLI workflow</td>
+<td>You run/manage a gateway/service + configure skills/plugins</td>
+<td>
+<strong>Same (both use CLI), but Different purpose</strong> </td>
+</tr>
+<tr>
+<td>Memory concept</td>
+<td>Persistent instructions + auto-memory; sessions start with fresh context window</td>
+<td>Memory is Markdown files in workspace; files are the source of truth</td>
+<td>
+<strong>Same concept, Different implementation</strong> </td>
+</tr>
+<tr>
+<td>Memory structure</td>
+<td>
+<a href="http://CLAUDE.md">CLAUDE.md</a> for persistent instructions; auto memory can add learnings</td>
+<td>Two layers: daily log memory/YYYY-MM-DD.md + optional curated <a href="http://MEMORY.md">MEMORY.md</a>
+</td>
+<td>
+<strong>Different</strong> </td>
+</tr>
+<tr>
+<td>Memory retrieval</td>
+<td>Not described as “memory_get/memory_search tools” in CC memory doc</td>
+<td>Has explicit tools: memory_search and memory_get via memory plugin</td>
+<td>
+<strong>Different</strong> </td>
+</tr>
+<tr>
+<td>Group-chat memory boundary</td>
+<td>Not called out this way in CC memory doc</td>
+<td>
+<a href="http://MEMORY.md">MEMORY.md</a> only loads in main private session (not group contexts)</td>
+<td>
+<strong>Different</strong> </td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>Short Summary:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>For coding, project work, and software development</strong> → <strong>Claude Code</strong>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>For office tasks, organization, automation, and time-saving</strong> → <strong>OpenClaw</strong>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>If you’re a professional developer</strong> → <strong>Pick Claude Code</strong>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>If you’re a typical knowledge worker</strong> → <strong>Pick OpenClaw</strong>
+</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2026/03/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

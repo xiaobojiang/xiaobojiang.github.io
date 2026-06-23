@@ -1,0 +1,616 @@
+---
+layout: post
+title: ROS 2 Custom Interface Guide
+date: 2026-04-15 03:25:56.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Robotics
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:heading --><html><body></p>
+<h2 class="wp-block-heading">1. Overview</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>This guide walks through creating a <strong>separate ROS 2 interface package</strong>, managing it as a Git submodule, and consuming custom message and service definitions in a <strong>Python node</strong>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>whole workpackage</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>ros_ws/
+└── src/
+    ├── navigation_interfaces/   # your custom interface package, this will use git submoduel add
+    └── navigation_nodes/        # Python node package
+---</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">2. Create an Interface Package as a standalone git</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Create a ROS 2 package with <code>ament_cmake</code>:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>   ros2 pkg create --build-type ament_cmake --license Apache-2.0 navigation_interfaces</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":2} --></p>
+<ol start="2" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Create a new Git repository:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>   cd navigation_interfaces
+   git init </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":3} --></p>
+<ol start="3" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Create directories for your interface files:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>   mkdir msg
+   mkdir srv</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:list {"ordered":true,"start":4} --></p>
+<ol start="4" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Add your <code>.msg</code> and <code>.srv</code> files:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li><code>msg/NavigationStatus.msg</code></li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li><code>srv/StartNavigation.srv</code></li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>sample content for NavigationStatus.msg</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># NavigationStatus.msg
+# A summary of the robot's current navigation state
+
+# Standard ROS2 timestamp and frame info
+std_msgs/Header header
+
+# Current goal (pose in map frame)
+geometry_msgs/PoseStamped goal
+
+# Current robot pose in map frame
+geometry_msgs/PoseStamped current_pose
+
+# Navigation path progress [0.0 -&gt; 1.0]
+float32 progress
+
+# Is navigation currently active?
+bool active
+
+# Current state as a string (e.g., "IDLE", "MOVING", "ARRIVED", "FAILED")
+string state
+
+# Estimated time remaining in seconds (if available)
+builtin_interfaces/Duration estimated_time_remaining
+
+# Error code or diagnostic flags
+int32 error_code
+string error_message</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>sample content for StartNavigation.srv</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":1} --></p>
+<h1 class="wp-block-heading">StartNavigation.srv</h1>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code># Request
+geometry_msgs/PoseStamped goal
+bool reset_odometry
+---
+# Response
+bool success
+string message</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">3. Edit Build Files</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">CMakeLists.txt</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Add:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>find_package(rosidl_default_generators REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/NavigationStatus.msg"
+  "srv/StartNavigation.srv"
+  DEPENDENCIES std_msgs geometry_msgs builtin_interfaces
+)
+
+ament_package()</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>final txt</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>cmake_minimum_required(VERSION 3.8)
+project(navigation_interfaces)
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# --------------------------------------------------
+# Find required packages for interface generation
+# --------------------------------------------------
+find_package(ament_cmake REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
+# If your messages/services use other ROS message types,
+# make sure to find these too:
+find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+
+# --------------------------------------------------
+# Generate interfaces from your .msg / .srv files
+# --------------------------------------------------
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/NavigationStatus.msg"
+  "srv/StartNavigation.srv"
+
+  # If your messages reference other message types,
+  # list those packages here so the generator knows about them:
+  DEPENDENCIES
+    std_msgs
+    geometry_msgs
+    builtin_interfaces
+)
+
+# --------------------------------------------------
+# Export runtime dependency for other packages
+# --------------------------------------------------
+ament_export_dependencies(rosidl_default_runtime)
+
+# --------------------------------------------------
+# Standard ament package macro
+# --------------------------------------------------
+ament_package()</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">package.xml</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Add:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>&lt;!-- Build tool for generating code --&gt;
+&lt;buildtool_depend&gt;rosidl_default_generators&lt;/buildtool_depend&gt;
+
+&lt;!-- Runtime support for the generated interfaces --&gt;
+&lt;exec_depend&gt;rosidl_default_runtime&lt;/exec_depend&gt;
+
+&lt;!-- Dependencies for message types you reference --&gt;
+&lt;depend&gt;std_msgs&lt;/depend&gt;
+&lt;depend&gt;geometry_msgs&lt;/depend&gt;
+&lt;depend&gt;builtin_interfaces&lt;/depend&gt;
+
+&lt;!-- Mark this package as an interface group --&gt;
+&lt;member_of_group&gt;rosidl_interface_packages&lt;/member_of_group&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>final xml</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>&lt;?xml version="1.0"?&gt;
+&lt;?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?&gt;
+&lt;package format="3"&gt;
+  &lt;name&gt;navigation_interfaces&lt;/name&gt;
+  &lt;version&gt;0.0.0&lt;/version&gt;
+  &lt;description&gt;TODO: Package description&lt;/description&gt;
+  &lt;maintainer email="ubuntu@todo.todo"&gt;ubuntu&lt;/maintainer&gt;
+  &lt;license&gt;Apache-2.0&lt;/license&gt;
+
+  &lt;!-- Existing build tool --&gt;
+  &lt;buildtool_depend&gt;ament_cmake&lt;/buildtool_depend&gt;
+
+  &lt;!-- Required to generate language bindings for your custom interfaces --&gt;
+  &lt;buildtool_depend&gt;rosidl_default_generators&lt;/buildtool_depend&gt;
+
+  &lt;!-- Runtime support for generated code --&gt;
+  &lt;exec_depend&gt;rosidl_default_runtime&lt;/exec_depend&gt;
+
+  &lt;!-- Dependencies for message/service types you reference --&gt;
+  &lt;depend&gt;std_msgs&lt;/depend&gt;
+  &lt;depend&gt;geometry_msgs&lt;/depend&gt;
+  &lt;depend&gt;builtin_interfaces&lt;/depend&gt;
+
+  &lt;!-- Mark this as an interface package --&gt;
+  &lt;member_of_group&gt;rosidl_interface_packages&lt;/member_of_group&gt;
+
+  &lt;!-- Test dependencies (optional) --&gt;
+  &lt;test_depend&gt;ament_lint_auto&lt;/test_depend&gt;
+  &lt;test_depend&gt;ament_lint_common&lt;/test_depend&gt;
+
+  &lt;export&gt;
+    &lt;build_type&gt;ament_cmake&lt;/build_type&gt;
+  &lt;/export&gt;
+&lt;/package&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading {"level":1} --></p>
+<h1 class="wp-block-heading">create workspace</h1>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:heading {"level":1} --></p>
+<h1 class="wp-block-heading">mkdir or git pull workspace</h1>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>mkdir ros_ws
+cd ros_ws
+mkdir src
+git init</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">4. Add Submodule in Your Workspace</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>In your main ROS 2 workspace (e.g., <code>ros_ws</code>):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>cd ros_ws
+git submodule add https://github.com/your-org/navigation_interfaces.git src/navigation_interfaces
+
+git submodule update --init --recursive</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">5. Creating whole workspace and navigation node</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>still follow the workspace structure</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>ros_ws/
+└── src/
+    ├── navigation_interfaces/   # your custom interface package
+    └── navigation_nodes/        # Python node package</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>and create node:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>ros2 pkg create navigation_nodes --build-type ament_python --license Apache-2.0 --dependencies rclpy navigation_interfaces</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then you have:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>ros_ws/
+└── src/
+    ├── navigation_interfaces/     # your custom message/service package
+    └── navigation_nodes/          # new Python node package
+        ├── navigation_nodes/      # Python module (code lives here)
+        │   ├── __init__.py
+        │   ├── start_navigation_server.py
+        │   └── start_navigation_client.py
+        ├── resource/
+        │   └── navigation_nodes   # marker file
+        ├── setup.cfg
+        ├── setup.py
+        └── package.xml</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading">1. Python Node Using the Interfaces</h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>1) Create a file start_navigation_server.py in a Python package<br>Create a file start_navigation_server.py in a Python package (like navigation_nodes or py_navigation):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#!/usr/bin/env python3
+
+import rclpy
+from rclpy.node import Node
+
+from navigation_interfaces.srv import StartNavigation
+from navigation_interfaces.msg import NavigationStatus
+
+class StartNavigationServer(Node):
+    def __init__(self):
+        super().__init__('start_navigation_server')
+        # Create a service with type StartNavigation and callback
+        self.srv = self.create_service(
+            StartNavigation,
+            '/navigation/start',
+            self.start_navigation_callback
+        )
+
+        # Simulate a status publisher so graph is complete
+        self.status_pub = self.create_publisher(NavigationStatus, '/navigation/status', 10)
+
+    def start_navigation_callback(self, request, response):
+        self.get_logger().info(f"Received request to start navigation with pose: {request.goal}")
+        # Always return success (fill fields in your response)
+        response.success = True
+        response.message = 'Navigation accepted!'
+
+        # Optionally publish one status
+        status = NavigationStatus()
+        status.header.frame_id = 'map'
+        status.active = True
+        status.state = 'STARTED'
+        self.status_pub.publish(status)
+
+        return response
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = StartNavigationServer()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then make it executable:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>chmod +x start_navigation_server.py</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Build and source your workspace before running.<br>2) start_navigation_client.py:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code> #!/usr/bin/env python3
+
+import rclpy
+from rclpy.node import Node
+
+from navigation_interfaces.srv import StartNavigation
+from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import Header
+
+class StartNavigationClient(Node):
+    def __init__(self):
+        super().__init__('start_navigation_client')
+        self.client = self.create_client(StartNavigation, '/navigation/start')
+
+        while not self.client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Service not available, waiting...')
+
+    def send_request(self):
+        # Create request and fill fields
+        req = StartNavigation.Request()
+        req.goal = PoseStamped()
+        req.goal.header.frame_id = 'map'
+        req.goal.header.stamp = self.get_clock().now().to_msg()
+        req.goal.pose.position.x = 1.0
+        req.goal.pose.position.y = 2.0
+        req.goal.pose.position.z = 0.0
+
+        future = self.client.call_async(req)
+        rclpy.spin_until_future_complete(self, future)
+
+        response = future.result()
+        self.get_logger().info(f"Response: success={response.success}, message='{response.message}'")
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = StartNavigationClient()
+    node.send_request()
+    node.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>3) Optional NavigationStatus Publisher Example (Standalone) navigation_status_publisher.py</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code> #!/usr/bin/env python3
+
+import rclpy
+from rclpy.node import Node
+from navigation_interfaces.msg import NavigationStatus
+from std_msgs.msg import Header
+
+class NavStatusPublisher(Node):
+    def __init__(self):
+        super().__init__('nav_status_publisher')
+        self.pub = self.create_publisher(NavigationStatus, '/navigation/status', 10)
+        self.timer = self.create_timer(1.0, self.publish_status)
+
+    def publish_status(self):
+        msg = NavigationStatus()
+        msg.header.frame_id = 'map'
+        msg.active = True
+        msg.state = 'RUNNING'
+        self.pub.publish(msg)
+        self.get_logger().info('Published status update')
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = NavStatusPublisher()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>run the nodes<br>minimal content for each file<br>package.xml</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>&lt;?xml version="1.0"?&gt;
+&lt;package format="3"&gt;
+  &lt;name&gt;navigation_nodes&lt;/name&gt;
+  &lt;version&gt;0.0.1&lt;/version&gt;
+  &lt;description&gt;Nodes for navigation examples&lt;/description&gt;
+  &lt;maintainer email="you@example.com"&gt;Your Name&lt;/maintainer&gt;
+  &lt;license&gt;Apache-2.0&lt;/license&gt;
+
+  &lt;exec_depend&gt;rclpy&lt;/exec_depend&gt;
+  &lt;exec_depend&gt;navigation_interfaces&lt;/exec_depend&gt;
+
+&lt;/package&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>setup.py</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from setuptools import setup
+
+package_name = 'navigation_nodes'
+
+setup(
+    name=package_name,
+    version='0.0.1',
+    packages=[package_name],
+    install_requires=['setuptools'],
+    zip_safe=True,
+    author='Your Name',
+    author_email='you@example.com',
+    description='Python navigation example nodes',
+    classifiers=[
+        'Programming Language :: Python :: 3',
+    ],
+    entry_points={
+        'console_scripts': [
+            'start_navigation_server = navigation_nodes.start_navigation_server:main',
+            'start_navigation_client = navigation_nodes.start_navigation_client:main',
+            'navigation_status_publisher = navigation_nodes.navigation_status_publisher:main',
+        ],
+    },
+)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>setuop.cfg</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>[develop]
+script_dir=$base/lib/navigation_nodes</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>install_scripts=$base/lib/navigation_nodes</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, build</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>cd ~/playground/ros_ws
+colcon build --symlink-install
+source install/setup.bash</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, run server in one terminal</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>#ros2 run &lt;your_python_package&gt; start_navigation_server
+ros2 run navigation_nodes start_navigation_server</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>output like：<br>ubuntu@ubuntu-Precision-5820-Tower:~/playground/ros_ws$ ros2 run navigation_nodes start_navigation_server<br>[INFO] [1767064293.253063707] [start_navigation_server]: Received request to start navigation with pose: geometry_msgs.msg.PoseStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1767064293, nanosec=240373751), frame_id='map'), pose=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=1.0, y=2.0, z=0.0), orientation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0)))</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, run client in another</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>ros2 run &lt;your_python_package&gt; start_navigation_client
+ros2 run navigation_nodes start_navigation_client</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>output like:<br>[INFO] [1767064293.267758431] [start_navigation_client]: Response: success=True, message='Navigation accepted!'</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>4, (optional) Monitor messages:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>ros2 run navigation_nodes navigation_status_publisher
+ros2 topic echo /navigation/status</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">6. Tips</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Always source the install space before running</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Use submodule tagging to manage versions</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Your custom interfaces package can be reused across nodes</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>You don’t parse <code>.msg</code> files manually — Python generated classes handle all fields</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading">7. Summary</h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>You now have a modular ROS 2 interface package with:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Managed message/service definitions</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Git submodule integration</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Python consumption via generated classes</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2026/04/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

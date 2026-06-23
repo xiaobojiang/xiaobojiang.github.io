@@ -1,0 +1,129 @@
+---
+layout: post
+title: Temperature in LLM
+date: 2025-12-02 07:11:29.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>The “temperature” parameter in a large language model (LLM) controls how the logits (raw scores) are converted into probabilities and thus influences how randomly the model picks its next token. Here’s a breakdown:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>🧮 How temperature works</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>A model produces <strong>logits</strong> z_i for each possible next‐token i.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The usual softmax turns logits into probabilities: $$P(i) = \frac{\exp(z_i)}{\sum_j \exp(z_j)}$$</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>With temperature T, you scale the logits before softmax: $$P(i) = \frac{\exp(z_i / T)}{\sum_j \exp(z_j / T)} $$</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Interpretation of T:<!-- wp:list -->
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>If T = 1: it’s the standard softmax. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>If T &gt; 1: the distribution becomes <em>flatter</em>. Less difference between high and low logits → more randomness → more variety. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>If T &lt; 1: the distribution becomes <em>sharper</em>. The highest logit dominates more → the model is more “confident” / deterministic. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>In the limit as T \to 0: the distribution tends toward a one‐hot: basically always pick the token with the highest logit. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list -->
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>✅ So, when you set temperature = 0…</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>In theory: yes — when T \to 0, the model’s probability distribution collapses to the arg max (i.e., the token with the highest logit gets probability → 1, others → 0). For example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>“T → 0: Distribution becomes one‐hot (argmax)” </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>“T = 0: Deterministic, always selects the highest probability token” </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In practice: however, many LLM APIs do not allow exactly 0, or treat extremely small values (~0.01) as “greedy” sampling mode. Using “temperature = 0” often means “greedy decoding” (always pick the highest‐probability token) rather than “strictly mathematically dividing by zero”.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>⚠️ Things to watch</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Even if you set a very low temperature, whether you <strong>always</strong> pick the highest‐probability token depends also on <em>decoding strategy</em> (greedy vs sampling) and whether there are additional constraints (like top-k, top-p filters, repetition penalties). For example, even at low temperature you might still have top-k sampling which might add randomness. </li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Setting temperature too low can make the output <em>boring</em>, repetitive, and stuck in safe responses. Setting it too high can make it <em>nonsensical</em>. It’s a trade‐off between <strong>coherence</strong> and <strong>creativity</strong>. </li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>📋 Summary</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Temperature controls randomness in token selection by scaling logits before softmax.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Lower T → more deterministic (sharper distribution). Higher T → more random, exploratory (flatter distribution).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Setting T=0 (or very close) → effectively greedy decoding → pick the single token with highest score (in ideal math).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>But in real‐world LLM systems: Check how the “temperature=0” mode is implemented (often means greedy decoding + no randomness).</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Use temperature as a knob: if you want very reliable, factual output → use low T; if you want creative generation → use higher T.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/12/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

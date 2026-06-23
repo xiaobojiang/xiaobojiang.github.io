@@ -1,0 +1,146 @@
+---
+layout: post
+title: 'A question: LLM quantization to int8. during inference, will it convert back
+  to float32?'
+date: 2025-08-05 01:35:04.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>TL'DR Answer is: No, during inference, a quantized LLM (Large Language Model) running in int8 precision will not convert the data back to float32. Instead, the computations will be performed directly in the int8 domain or, in some cases, in mixed precision (int8 and float16/float32), depending on the framework and hardware support. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here’s a breakdown:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li><strong>What Happens During Quantization?</strong></li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Quantization reduces the precision of weights and, optionally, activations from high precision (e.g., float32) to low precision (e.g., int8).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• This process involves:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Mapping the high-precision values into a discrete set of low-precision values.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Using a scale factor to approximate the original range of values in the lower precision format.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>$$x_{int8} = \text{round}\left(\frac{x_{float32}}{\text{scale}}\right)$$</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>During inference, computations can be performed in int8 with the scale factor applied later.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":2} --></p>
+<ol start="2" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li><strong>During Inference</strong></li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Weights: Stored as int8. They stay in int8 format throughout inference.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Activations: Depending on the model:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Activations can also be in int8, allowing fully int8 computation.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• In some cases, activations may be converted to float16 or float32 temporarily for certain operations (e.g., non-linear functions like GELU or softmax).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Scale Factors: Used to rescale int8 operations back into a usable range for subsequent layers, without requiring full conversion back to float32.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example of int8 MatMul</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For a matrix multiplication:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>$$C = \text{MatMul}(A_{int8}, B_{int8}) \times \text{scale}_A \times \text{scale}_B$$</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The computation stays in int8, with the scale factors applied to adjust the final output range.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":3} --></p>
+<ol start="3" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li><strong>Why Doesn’t It Convert Back to Float32?</strong></li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Efficiency: The goal of quantization is to reduce memory usage and computation costs. Converting back to float32 negates these benefits.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Hardware Optimization: Modern hardware (e.g., GPUs, TPUs, and specialized accelerators like NVIDIA TensorRT or Intel’s DLBoost) supports int8 computations natively, avoiding the need to return to float32.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Precision Trade-off: While int8 has lower precision, careful scaling and calibration during quantization ensure that the accuracy drop is minimal.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":4} --></p>
+<ol start="4" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li><strong>Mixed-Precision Exceptions</strong></li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>In some cases, specific operations may revert temporarily to higher precision:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Layer-Norm, Softmax, or Non-linear Functions: These are often computed in float16 or float32 to preserve numerical stability.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Final Output Conversion: If the final result is needed in float32 for compatibility, only the output is upcast, not intermediate computations.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":5} --></p>
+<ol start="5" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li><strong>Summary</strong></li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>• Int8 inference primarily operates in int8 or mixed precision (int8 + float16/float32), depending on the hardware and model implementation.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>• The model does not convert all operations back to float32 during inference, as that would undermine the benefits of quantization.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This approach enables faster and more memory-efficient inference while maintaining acceptable accuracy levels.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for reading! Leave a post or comment for more dicussions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/08/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

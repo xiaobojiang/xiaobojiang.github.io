@@ -1,0 +1,141 @@
+---
+layout: post
+title: Programatic accessing MS sharepoint - permission
+date: 2025-07-21 08:00:10.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta:
+  _oembed_8d9747162e34e3f36d0ba2c08d86b6ec: "{{unknown}}"
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Microsoft sharepoint is an Enterprise software, experts users using this to store documents and share with others.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the new AI era, one of the topic is to build AI agent that can make best use of these documents and assist people in daily work, for example, an RAG based knowledge assistant.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>One of the task to connect our AI framework with this sharepoint, thus it can get latest document update. It has many advantages:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>SharePoint is part of Microsoft 365 and integrates with <strong>Azure AD</strong>, providing <strong>fine-grained access control</strong>.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>You can define <strong>permissions</strong> per file, folder, or user group.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Supports audit logs and compliance (e.g., for ISO, HIPAA).</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>How to enable this? follow this tutorial</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, create an Azure managed application, and take client id/secret, applicaiton name, and tenent id from it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>make sure some API permission are properly set here</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1204,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/07/97C1DF80-48D0-4324-AA6E-FBE19625CCE2-1024x255.png" alt="" class="wp-image-1204"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, go to <a href="https://developer.microsoft.com/en-us/graph/graph-explorer">https://developer.microsoft.com/en-us/graph/graph-explorer</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2.1 login yourself</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>3, find the site id, one way is to follow the site, and call this api</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>GET <a href="https://graph.microsoft.com/v1.0/me/followedSites">https://graph.microsoft.com/v1.0/me/followedSites</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1203,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/07/41F6EFA2-24A3-41F9-B4C8-D9A72FCD1BAE-1024x289.png" alt="" class="wp-image-1203"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Site id is the string of key "id"</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>4, call API to grant access (you must be sharepoint admin)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>POST</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://graph.microsoft.com/v1.0/sites/{siteid}/permissions">https://graph.microsoft.com/v1.0/sites/{siteid}/permissions</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>body:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>{
+
+  "roles": ["read"],
+
+  "grantedToIdentities": [{
+
+  "application": {
+
+  "id": "7c...",
+
+  "displayName": "XXX"
+
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>You shall get something like:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>code 201</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1202,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/07/6655C865-2103-4EDA-96CE-64F14827B53F-1024x398.png" alt="" class="wp-image-1202"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Done</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>For step 4, there is also GUI way of working, check this document's step 2</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>5, Useful libraries</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Lib:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://github.com/microsoftgraph/msgraph-sdk-python">https://github.com/microsoftgraph/msgraph-sdk-python</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Doc:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://learn.microsoft.com/en-us/graph/sdks/sdks-overview">https://learn.microsoft.com/en-us/graph/sdks/sdks-overview</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In next post I will bring some code pieces on how to read files from folders in sharepoint.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/07/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

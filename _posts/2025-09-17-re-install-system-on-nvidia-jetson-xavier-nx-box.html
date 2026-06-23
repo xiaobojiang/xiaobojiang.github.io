@@ -1,0 +1,120 @@
+---
+layout: post
+title: Re-Install System on Nvidia Jetson Xavier NX box
+date: 2025-09-17 01:47:47.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>I have a Nvidia Jetson Xavier NX from twowint <a href="https://twowinit.com">https://twowinit.com/,</a> model is T505, purchased around 2022.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It has a 21 TOPS GPU inside, we have a small team want to reuse this for GenAI edge cases.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1236,"sizeSlug":"thumbnail","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-thumbnail"><img src="{{site.baseurl}}/assets/2025/09/tuweiT505-150x150.jpg" alt="" class="wp-image-1236"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>However, as it has been longer time, the system OS version is old (ubuntu 18.04), we want to upgrade the OS into 22, via. we are successful to 20, but failed at 22, this box totally not-responsive..</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Consulting with Twowint Smart AI chatbot: <a href="https://maxkb.twowinit.com/ui/chat">https://maxkb.twowinit.com/ui/chat/</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It tells me two major steps:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>download and install SDK manager to do this task, from Nvidia website: <a href="https://developer.nvidia.com/sdk-manager">https://developer.nvidia.com/sdk-manager</a>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>put the jetson box into recovery mode (press REC, then press RES together for 2+ seconds, then release)</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>During step 1, I fell into the pitfall of host OS requirement.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>My Jetson only can ugprade to 5.1.X version, which requires the Host OS must be Ubuntu 18 or 20.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1241,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/09/F90D4CEF-E467-4235-961D-0C2DDADB77B0-1024x269.png" alt="" class="wp-image-1241"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Weird request, I only have the ubuntu 24, apparently it does not work.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then I have two options:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>1, user sdk manager docker image with CLI, tried, too difficult to use..</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>2, run up a virtual machine with Ubuntu.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Then I used the <a href="https://www.virtualbox.org">https://www.virtualbox.org/</a> to fire up the Ubuntu.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Mount the USB of T505 into the virtual machine.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally, follow the guide line: <a href="https://docs.nvidia.com/sdk-manager/install-with-sdkm-jetson/index.html">https://docs.nvidia.com/sdk-manager/install-with-sdkm-jetson/index.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Remind to fire up the M2 SSD as root disk, thus have enough space to install cuda. Handy tool here: <a href="https://github.com/jetsonhacks/rootOnNVMe">https://github.com/jetsonhacks/rootOnNVMe</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>and one good post here: <a href="https://blog.csdn.net/m0_53717069/article/details/128536837">https://blog.csdn.net/m0_53717069/article/details/128536837</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1237,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/09/2-1024x640.png" alt="" class="wp-image-1237"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Figure 1: Connected with Jetson, and starting to download and install</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1238,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/09/1-1024x660.png" alt="" class="wp-image-1238"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Figure 2: flash os as step 1</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1240,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2025/09/3-1024x638.png" alt="" class="wp-image-1240"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Figure 3: start Jetson, configure M2 disk as root (github tool), then connect via ssh from sdk manager to install CUDA.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Wow, it works now, my T505 survives and upgraded.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally pip install "jetson-stats" to get command "jtop" (similiar to nvidia-smi)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>With 5.15 Jetpack, cuda version is 11.4. Good enough for next step.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Keep in Tune.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/09/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

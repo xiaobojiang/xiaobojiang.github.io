@@ -1,0 +1,269 @@
+---
+layout: post
+title: Getting Started with Nvidia NIM + LLM Locally
+date: 2026-03-05 03:46:11.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>NVIDIA NIM (NeMo Inference Microservices) is NVIDIA’s containerized solution for running foundation models anywhere — from the cloud to your own GPU server. Each NIM is a pre-built Docker image that bundles a model and an optimized inference stack so you can start generating responses within minutes.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧠 Why NIM?</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>✨ Highlights:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Plug-and-play</strong> deployment — one container = one model endpoint.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Optimized performance</strong> using TensorRT-LLM / vLLM for low-latency inference.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Standard APIs</strong> (OpenAI-compatible) for easy integration.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Flexible deployment</strong> — run in data centers, clouds, or at the edge.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Enterprise-grade scaling &amp; observability</strong> with NVIDIA AI Enterprise and Kubernetes support.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>In short: production-ready AI models, your infrastructure.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Install Nvidia container toolkit:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>follow this guide  if this is not available on the machine: <a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html">https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🔐 Setup — Access &amp; Keys</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list {"ordered":true,"start":1} --></p>
+<ol start="1" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Create / log in to your</strong> <a href="https://ngc.nvidia.com"><strong>NVIDIA NGC</strong></a> <strong>account.</strong>
+</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Accept the model license</strong> (e.g., <em>Meta Llama 3 8B Instruct NIM</em>) on its NGC page.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Generate an API key</strong> under <strong>Setup → API Keys</strong> in your NGC account.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Authenticate Docker</strong> to NVIDIA’s registry:</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>docker login nvcr.io
+
+#username: $oauthtoken
+
+#password: &lt;your NGC API key&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>(or use)</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>echo &lt;YOUR_NGC_API_KEY&gt; | docker login nvcr.io --username '$oauthtoken' --password-stdin</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>💻 Run Llama 3 NIM Locally</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Create a volume</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>docker volume create nim-cache</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Once logged in, simply pull and start the container:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>export NGC_API_KEY=&lt;YOUR_NGC_API_KEY&gt;
+
+Then if you are facing code 451, add a proxy to bypass
+
+  -e HTTP_PROXY=http://&lt;proxy_ip:port&gt; \
+
+  -e HTTPS_PROXY=http://&lt;proxy_ip:port&gt; \
+
+  -e NO_PROXY=localhost,127.0.0.1,&lt;proxy_ip&gt; \</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Full command:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>docker run --gpus all \
+
+  -p 18000:8000 \
+
+  -e NGC_API_KEY \
+
+  -e TRANSFORMERS_CACHE=/opt/nim/.cache \
+
+  -v nim-cache:/opt/nim/.cache \
+
+  -e HTTP_PROXY=http://&lt;proxy_ip:port&gt; \
+
+  -e HTTPS_PROXY=http://&lt;proxy_ip:port&gt; \
+
+  -e NO_PROXY=localhost,127.0.0.1,&lt;proxy_ip&gt; \
+
+  nvcr.io/nim/google/gemma-3-1b-it:latest</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>✅ Tip:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If your machine has multiple GPUs, you can limit usage to one by adding:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>--gpus '"device=0"'</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The NIM container launches a REST API server on port 8000 — ready to receive inference requests.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you are facing issues on GPU &amp; cuda version capability and compatiblity "You can use float16 instead by explicitly setting the<code>dtype</code> flag in CLI, for example: --dtype=half."</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Try below command:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>docker run --gpus all \
+
+  -p 18000:8000 \
+
+  -e NGC_API_KEY \
+
+  -e TRANSFORMERS_CACHE=/opt/nim/.cache \
+
+  -v nim-cache:/opt/nim/.cache \
+
+  -e HTTP_PROXY=http://&lt;proxy_ip:port&gt; \
+
+  -e HTTPS_PROXY=http://&lt;proxy_ip:port&gt; \
+
+  -e NO_PROXY=localhost,127.0.0.1,&lt;proxy_ip&gt; \
+
+  nvcr.io/nim/google/gemma-3-1b-it:latest \
+
+python3 -m vllm_nvext.entrypoints.openai.api_server --dtype half</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧪 Quick Test — Call the Model API</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Use openai lib to talk to your local endpoint:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from openai import OpenAI
+#Point the OpenAI client to your local Ollama endpoint
+client = OpenAI(base_url="http://localhost:18000/v1", api_key="not-needed")
+#Send a chat completion request
+response = client.chat.completions.create(
+model="google/gemma-3-1b-it",
+messages=[
+{"role": "system", "content": "You are a helpful assistant."},
+{"role": "user", "content": "Explain quantum computing in simple terms."}
+],
+)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>response:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>"""Okay, let’s break down quantum computing in a way that’s hopefully easy to understand! It’s a really weird and fascinating field, but here’s the gist:
+
+1. Regular Computers vs. Quantum Computers:
+
+Regular Computers (like your laptop): They store information as bits…."""</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading {"level":1} --></p>
+<h1 class="wp-block-heading">Print the result</h1>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>print(response.choices[0].message.content)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You’ll get a neat JSON response containing the model’s reply — just like using OpenAI’s API, but fully local and GPU-accelerated. ⚡</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧭 Wrap-Up</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>That’s it — you’ve deployed Llama 3 8B Instruct via NVIDIA NIM on your own GPU!</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>From here, you can:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Integrate the endpoint into your own applications</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Scale with Kubernetes &amp; NIM Operator</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Explore other NIMs (for speech, vision, or embedding models)</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>For more, visit the official docs:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>👉 <a href="https://developer.nvidia.com/nim">https://developer.nvidia.com/nim</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>and find more models her:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>👉 https://docs.nvidia.com/nim/large-language-models/latest/supported-models.html</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2026/03/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

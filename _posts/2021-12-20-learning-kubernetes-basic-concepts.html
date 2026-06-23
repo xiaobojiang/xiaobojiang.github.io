@@ -1,0 +1,181 @@
+---
+layout: post
+title: Learning Kubernetes - basic concepts
+date: 2021-12-20 03:23:27.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Kubernetes
+- Technology
+tags: []
+meta:
+  _oembed_de32f64fcc23893da019621f09928c1f: "{{unknown}}"
+  _oembed_1d5ca64e196de28d47965e546b13de99: "{{unknown}}"
+  _oembed_3eda6d0f4dbdb544e413b35a3415cfe8: "{{unknown}}"
+  _oembed_97796acddf1923dc03104732fcaebe8f: '<blockquote class="wp-embedded-content"
+    data-secret="nMcqrjSuKW"><a href="https://www.learnsteps.com/what-is-etcd-and-where-is-it-used-in-k8s-basics-on-kubernetes/">What
+    is etcd and where is it used in k8s: Basics on Kubernetes.</a></blockquote><iframe
+    class="wp-embedded-content" sandbox="allow-scripts" security="restricted" style="position:
+    absolute; clip: rect(1px, 1px, 1px, 1px);" title="&#8220;What is etcd and where
+    is it used in k8s: Basics on Kubernetes.&#8221; &#8212; Learn Steps" src="https://www.learnsteps.com/what-is-etcd-and-where-is-it-used-in-k8s-basics-on-kubernetes/embed/#?secret=nMcqrjSuKW"
+    data-secret="nMcqrjSuKW" width="600" height="338" frameborder="0" marginwidth="0"
+    marginheight="0" scrolling="no"></iframe>'
+  _oembed_time_97796acddf1923dc03104732fcaebe8f: '1639969446'
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>I used Kubernetes a lot in daily work, I want to make a summary post of K8S concepts. As for the learning, I make some abstraction on key concepts of K8S.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>What is “Kubernetes”?</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Kubernetes is an open source container orchestration engine for automating deployment, scaling, and management of containerized applications. The open source project is hosted by the Cloud Native Computing Foundation (<a href="https://www.cncf.io/about">CNCF</a>).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The name Kubernetes originates from Greek, meaning helmsman or pilot. K8s as an abbreviation results from counting the eight letters between the "K" and the "s". </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>Why K8S is created?</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Look back the deployment history, there are serveral eras:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":293,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/12/image-5.png" alt="" class="wp-image-293"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Traditional deployment era: orgnization runs application on physical servers, and at that time, there is micro service concept, normally one big application was created and deployed on a very powerful server. This has serveral issues: 1, resource estimation, the server’s resource is hard to estimate, and normally it goes to either underperform or overperform 2, resource allocation, if user deploy multiple applications on the server, if one takes up most of reosurces, other will underporform, 3, resource migration and scaling, moving a service from one to other takes time and time consuming.</li>
+<li>Vitualized deployment era: As a solution, virtualization was introduced. It allows you to run multiple Virtual Machines (VMs) on a single physical server's CPU. Virtualization allows applications to be isolated between VMs and provides a level of security as the information of one application cannot be freely accessed by another application. Virtualization allows better utilization of resources in a physical server and allows better scalability because an application can be added or updated easily, reduces hardware costs, and much more. Each VM is a full machine running all the components, including its own operating system, on top of the virtualized hardware.</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Container deployment era: Containers are similar to VMs, but they have relaxed isolation properties to share the Operating System (OS) among the applications. Therefore, containers are considered lightweight. Similar to a VM, a container has its own filesystem, share of CPU, memory, process space, and more. As they are decoupled from the underlying infrastructure, they are portable across clouds and OS distributions. A popular container technology is docker.</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>What K8S can do?</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Containers are a good way to bundle and run your applications. In a production environment, you need to manage the containers that run the applications and ensure that there is no downtime. For example, if a container goes down, another container needs to start.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>That's how Kubernetes comes to the rescue! Kubernetes provides you with a framework to run distributed systems resiliently. It takes care of scaling and failover for your application, provides deployment patterns, and more.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Kubernetes provides you with:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>
+<strong>Service discovery and load balancing</strong> Kubernetes can expose a container using the DNS name or using their own IP address. If traffic to a container is high, Kubernetes is able to load balance and distribute the network traffic so that the deployment is stable.</li>
+<li>
+<strong>Storage orchestration</strong> Kubernetes allows you to automatically mount a storage system of your choice, such as local storages, public cloud providers, and more.</li>
+<li>
+<strong>Automated rollouts and rollbacks</strong> You can describe the desired state for your deployed containers using Kubernetes, and it can change the actual state to the desired state at a controlled rate.</li>
+<li>
+<strong>Automatic bin packing</strong> You provide Kubernetes with a cluster of nodes that it can use to run containerized tasks. You tell Kubernetes how much CPU and memory (RAM) each container needs. Kubernetes can fit containers onto your nodes to make the best use of your resources.</li>
+<li>
+<strong>Self-healing</strong> Kubernetes restarts containers that fail, replaces containers, kills containers that don't respond to your user-defined health check, and doesn't advertise them to clients until they are ready to serve.</li>
+<li>
+<strong>Secret and configuration management</strong> Kubernetes lets you store and manage sensitive information, such as passwords, OAuth tokens, and SSH keys. You can deploy and update secrets and application configuration without rebuilding your container images, and without exposing secrets in your stack configuration.</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size"><strong>What components are of K8S?</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Normally, Kubernetes comes with a cluster. If you would like to use such service in AWS, it is called EKS (elastic Kubernetes cluster).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The cluster consists of multiple machines, called nodes, which runs containerized applications, the minimum unit in k8s is pod.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Part of the applications are called control plane. The control plane manages the nodes and the pods in the cluster. In production, the control plane usually runs across multiple computers, providing fault tolerance and high availability. In cloud managed services like EKS in AWS, control plane is managed and deployed by AWS, so user does not need to worry about this.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Below is a diagram of K8S cluster.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":292,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2021/12/image-4.png" alt="" class="wp-image-292"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the picture, we can observe that control plane has several components:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Control Plane Components:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Kube-apiserver: The API server is a component of the Kubernetes control plane that exposes the Kubernetes API. The API server is the front end for the Kubernetes control plane. That is where user interact with k8s cluster.</li>
+<li>Etcd: Consistent and highly-available key value store used as Kubernetes' backing store for all cluster data. Everything you create or make changes to is stored as a key-value in etcd. It is like a database of all the states of Kubernetes. And only api-server can access etcd.</li>
+<li>Kube-controller-manager Control plane component that runs controller processes. Some types of these controllers are:
+<ul>
+<li>Node controller: Responsible for noticing and responding when nodes go down.</li>
+</ul>
+<ul>
+<li>Job controller: Watches for Job objects that represent one-off tasks, then creates Pods to run those tasks to completion.</li>
+</ul>
+<ul>
+<li>Endpoints controller: Populates the Endpoints object (that is, joins Services &amp; Pods).</li>
+</ul>
+<ul>
+<li>Service Account &amp; Token controllers: Create default accounts and API access tokens for new namespaces.</li>
+</ul>
+</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>DNS: While the other addons are not strictly required, all Kubernetes clusters should have cluster DNS, as many examples rely on it. Cluster DNS is a DNS server, in addition to the other DNS server(s) in your environment, which serves DNS records for Kubernetes services. Which enables inter pods can access other services via domains like: default.mysql</li>
+<li>cloud-controller-manager</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>A Kubernetes control plane component that embeds cloud-specific control logic. The cloud controller manager lets you link your cluster into your cloud provider's API, and separates out the components that interact with that cloud platform from components that only interact with your cluster. The cloud-controller-manager only runs controllers that are specific to your cloud provider.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>N<strong>ode Components</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Node components run on every node, maintaining running pods and providing the Kubernetes runtime environment.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>
+<strong>Kubelet</strong><strong>, </strong>An agent that runs on each <a href="https://kubernetes.io/docs/concepts/architecture/nodes/" target="_blank" rel="noreferrer noopener">node</a> in the cluster. It makes sure that <a href="https://kubernetes.io/docs/concepts/containers/" target="_blank" rel="noreferrer noopener">containers</a> are running in a <a href="https://kubernetes.io/docs/concepts/workloads/pods/" target="_blank" rel="noreferrer noopener">Pod</a>.</li>
+<li>
+<strong>kube-proxy</strong><strong>, </strong><a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy/">kube-proxy</a> maintains network rules on nodes. These network rules allow network communication to your Pods from network sessions inside or outside of your cluster.</li>
+<li>
+<strong>Container runtime</strong><strong>, </strong>The container runtime is the software that is responsible for running containers. Kubernetes supports several container runtimes: <a href="https://docs.docker.com/engine/" target="_blank" rel="noreferrer noopener">Docker</a>, <a href="https://containerd.io/docs/" target="_blank" rel="noreferrer noopener">containerd</a>, <a href="https://cri-o.io/#what-is-cri-o" target="_blank" rel="noreferrer noopener">CRI-O</a>, and any implementation of the <a href="https://github.com/kubernetes/community/blob/master/contributors/devel/sig-node/container-runtime-interface.md">Kubernetes CRI </a>
+</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3> </h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>*Reference:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/">https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://kubernetes.io/docs/concepts/overview/components/">https://kubernetes.io/docs/concepts/overview/components/</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://medium.com/devops-mojo/kubernetes-architecture-overview-introduction-to-k8s-architecture-and-understanding-k8s-cluster-components-90e11eb34ccd">https://medium.com/devops-mojo/kubernetes-architecture-overview-introduction-to-k8s-architecture-and-understanding-k8s-cluster-components-90e11eb34ccd</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://www.learnsteps.com/what-is-etcd-and-where-is-it-used-in-k8s-basics-on-kubernetes/">https://www.learnsteps.com/what-is-etcd-and-where-is-it-used-in-k8s-basics-on-kubernetes/</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

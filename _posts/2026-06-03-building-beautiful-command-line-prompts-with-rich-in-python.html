@@ -1,0 +1,289 @@
+---
+layout: post
+title: Building Beautiful Command-Line Prompts with rich in Python
+date: 2026-06-03 07:51:33.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Python
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>When working with Python in the command line, it’s easy to overlook presentation.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>But a well-structured and visually appealing output can dramatically improve how you read, debug, and communicate information — especially when working with prompts, structured text, or configuration data.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The <a href="https://github.com/Textualize/rich">rich</a> library makes this easier than ever.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this post, we’ll walk through a neat snippet that turns dull terminal output into a color-coded, panelized display, and explore some practical use cases.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧩 The Problem: Plain Text Fatigue</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>When you’re iterating on AI prompts, debugging XML templates, or viewing nested structures, standard print() statements don’t cut it.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>A raw output might look like this:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>&lt;prompt&gt;
+
+##User Input
+
+Hello, world!
+
+###[Context]
+
+This is a test.
+
+&lt;/prompt&gt;</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Readable? Kind of.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Visually engaging or structured? Not at all.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Let’s fix that.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>💻 The Solution: rich Formatting</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here’s a simple function that brings color, structure, and polish to your terminal output:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from rich.console import Console
+
+from rich.panel import Panel
+
+from rich.text import Text
+
+console = Console()
+
+def show_prompt(prompt_text: str, title: str = "Prompt", border_style: str = "blue"):
+
+    """Display a prompt with rich formatting and XML tag highlighting.
+
+    Args:
+
+        prompt_text: The prompt string to display
+
+        title: Title for the panel (default: "Prompt")
+
+        border_style: Border color style (default: "blue")
+
+    """
+
+    # create a formatted diaplay of the prompt
+
+    formatted_text = Text(prompt_text)
+
+    formatted_text.highlight_regex(r"&lt;[^&gt;]+&gt;", style="bold blue")  # Highlight XML tags
+
+    formatted_text.highlight_regex(
+
+        r"##[^#\n]+", style="bold magenta"
+
+    )  # Highlight headers
+
+    formatted_text.highlight_regex(
+
+        r"###[^#\n]+", style="bold cyan"
+
+    )  # Highlight sub-headers
+
+    #Display in a panel for better presentation
+
+    console.print(
+
+        Panel(
+
+            formatted_text,
+
+    title=f"[bold green]{title}[/bold green]",
+
+            border_style=border_style,
+
+            padding=(1, 2),
+
+      )
+
+)</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🔍 Breaking It Down</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>1. Highlighting Key Elements</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The function uses regular expressions with highlight_regex() to colorize specific text patterns:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>r"&lt;[^&gt;]+&gt;" → highlights XML-style tags in bold blue
+
+r"##[^#\n]+" → marks section headers (##Header) in magenta
+
+r"###[^#\n]+" → colors subheaders (###Subheader) in cyan</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This instantly makes structured text pop visually.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>2. Wrapping in a Panel</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The Panel component from rich.panel adds:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>A <strong>border</strong> (color-customizable)</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>A <strong>title</strong> (styled in green)</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Padding around the content for clean spacing</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>This simple container elevates the presentation, making it feel like an output block in a UI rather than raw text.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>3. Console Output</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally, the function uses console.print() to render the styled panel.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can easily adjust the border_style (e.g., "yellow", "red", "cyan") or change fonts and highlights depending on your data.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧠 Example in Action</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here’s how it looks in use:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>prompt = """
+
+&lt;prompt&gt;
+
+##User Input
+
+What is the capital of France?
+
+###[Context]
+
+You are a helpful assistant.
+
+&lt;/prompt&gt;
+
+"""</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>show_prompt(prompt, title="LLM Prompt Example", border_style="cyan")</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Output (rendered in the terminal):</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":1370,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2026/06/image-1024x261.png" alt="" class="wp-image-1370"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Your eyes can instantly distinguish structure, hierarchy, and boundaries.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧰 Real-World Applications</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>This approach can add value across multiple scenarios:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>1. Prompt Engineering</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>When developing large language model (LLM) prompts that include structured sections or metadata, use this to visualize templates clearly during debugging or demonstration.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>2. Configuration Display</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Display configuration files, JSON snippets, or YAML content with colored keys and values.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It makes it much easier to spot errors or version differences at a glance.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>3. CLI Utilities</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you’re building a command-line interface (CLI) tool using frameworks like typer or click, this adds polish and clarity to your outputs — turning logs or summaries into visually guided sections.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>4. Log Review and Report Formatting</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>In data pipelines or automation scripts, highlight important events or summaries in color-coded panels (e.g., “✅ SUCCESS”, “⚠️ WARNING”, “❌ ERROR”).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🧾 Final Thoughts</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>The rich library proves that terminal output doesn’t have to be boring.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>With a few lines of code, you can add structure, emphasis, and style — making your CLI tools more readable and professional.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Whether you’re displaying LLM prompts, configs, or debugging complex strings, rich helps you and your users see the data in a whole new light.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:paragraph --></p>
+<p>Further Reading:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li><a href="https://rich.readthedocs.io/">Rich Documentation</a></li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li><a href="https://github.com/Textualize/textual">Textual Framework (GUI for the terminal)</a></li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li><a href="https://typer.tiangolo.com/">Typer: Modern CLI apps with Python</a></li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2026/06/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

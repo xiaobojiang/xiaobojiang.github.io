@@ -1,0 +1,81 @@
+---
+layout: post
+title: Service Compose and trigger curl request with docker-compose
+date: 2024-02-26 05:12:09.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Devops
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>To ensure that a service is running and its port is serving requests before other services start in Docker Compose, you can combine the use of depends_on for service startup order and a health check to verify that the service is ready. Here's an example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>version: '3'
+
+services:
+
+  web:
+
+    image: nginx
+
+    ports:
+
+      - "8080:80"
+
+    healthcheck:
+
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+
+      interval: 5s
+
+      timeout: 2s
+
+      retries: 5
+
+ 
+
+  app:
+
+    image: your_app_image
+
+    depends_on:
+
+      web:
+
+        condition: service_healthy</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>In this example:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<!-- wp:list-item --></p>
+<li>The web service is configured with a health check. The health check uses curl to verify that the service is responding on port 80. The interval, timeout, and retries options define the health check parameters.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>The app service depends on web, and the depends_on option is set with the condition: service_healthy. This ensures that the app service will only start when the web service is not just running but also healthy according to its health check.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>When you run docker-compose up -d, Docker Compose will start the services in the specified order. The app service will only start after the web service is running, and its health check succeeds, indicating that the service is ready to serve requests on port 80.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Adjust the configuration according to your specific service requirements and health check criteria. Keep in mind that health checks are specific to the application and its readiness indicators, so you may need to customize the health check command based on your service's behavior.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2024/02/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

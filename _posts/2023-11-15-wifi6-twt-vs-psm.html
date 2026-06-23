@@ -1,0 +1,89 @@
+---
+layout: post
+title: WiFi6 TWT vs PSM
+date: 2023-11-15 03:30:06.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Internet of Things
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>TWT (target wait time) is a negotiated agreement, based on expected traffic activity between the access point (AP) and clients, to specify a scheduled target wake-up time for Wi-Fi 6 clients in power save (PS) mode. TWT enables devices to negotiate when and how frequently they will wake up to send or receive data. TWT increases device sleep time and greatly improves battery life; this is critical in the Internet of Things (IoT). PSM (power save mode) is another power-saving mechanism that allows devices to sleep for longer periods of time between data transmissions. However, older, existing Wi-Fi client power-saving methods were putting the device in sleep mode between Access Point (AP) beacons and would wake up just when they had data to transmit. <a href="https://www.renesas.com/us/en/blogs/low-power-advantage-wi-fi-66e-twt-explained">TWT meets the power-saving objectives of 802.11ax by using the spectrum more efficiently by saving time and power and enabling less contention between clients with transmissions in the shared medium</a><a href="https://www.renesas.com/us/en/blogs/low-power-advantage-wi-fi-66e-twt-explained">1</a>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"id":818,"sizeSlug":"full","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-full"><img src="{{site.baseurl}}/assets/2023/11/image.png" alt="" class="wp-image-818"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>What is Target Wake Time?</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the simplest terms, Target Wake Time (TWT) is a new feature that allows an Access Point (AP) and stations to “wake up” at negotiated times. The stations and AP reach a TWT agreement that defines when a station is awake to receive and send data.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Still sounds complicated?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Well, to simplify things, let’s try to get rid of all the technical jargon and use an analogy.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Assume a family of four live in a house, sleeping in different rooms. Every day they wake up to an alarm all at the same time. The father has to get up early to drive 30 minutes to work, but his two kids feel annoyed waking up at the same time since they can sleep in a little bit longer due to their school being only a 5-minute walk.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Obviously, setting the alarm at different times would be a better idea. The kids’ sleep won't be disturbed when their dad leaves home earlier. Alarms ringing at different times resembles TWT agreements which wakes stations up periodically.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Why do stations and APs need TWT to schedule their wake times?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Without TWT, the AP will broadcast a beacon frame to alert some stations to possible data transmissions. This beacon frame informs some stations of the information that their data has been stored in the AP’s cache. Since the AP can only communicate with one station at a time, they have to “stay awake” to receive data packets from the AP one after another regardless of how long that process takes. When station 1 is exchanging data with AP, station 2 is in an idle state and waits until the AP finishes its communication with station 1. This causes extra power consumption and shorter battery lives for network devices.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>So how can TWT help devices save power and extend battery life?</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This mechanism allows each station to negotiate their periods with the AP to transmit and receive data packets before the beacon period. Stations only wake up at TWT sessions and remain in sleep mode for the rest of the time.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p> In theory, they could sleep for 23 hours and 59 minutes and just wake up and do a transmission, then go back to sleep for another day. These efforts greatly improve battery life.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>TWT modes of operation</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>There are three modes of operation for TWT:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<!-- wp:list-item --></p>
+<li>Individual: The client chooses when to wake up and when to sleep. The client will negotiate agreement with the AP so all other clients will know when other clients will wake up and send data.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Broadcast: The AP is in charge here and will provide the schedule to all clients that support broadcast TWT.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Opportunistic power savings: This mode allows a peer-to-peer (P2P) Group Owner to opportunistically save power when all its associated clients are sleeping.</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>在802.11ax之前，Wi-Fi协议采用的节能机制有“legacy PS”和“WMM-PS”技术，前者终端可以在一个或多个beacon的间隔之间睡眠，当唤醒时可以发送上行的报文，也可以通过监听beacon的DTIM字段获知是否有需要接收的下行报文，如果有需要接收的报文，终端可以发出trigger获取相关的报文。这个机制被验证有效单节电效果有限，通常终端需要在一秒内唤醒多次来读取DTIM。后者在802.11e中提出，主要针对voice-over-Wi-Fi设备对于节电的需求。语音设备往往需要以固定的短间隔传输报文（如20ms）。该节能机制允许设备在一个beacon周期内多次休眠和传输报文。同时，考虑到语音通信的对等特性，U-APSD设计了通过上行报文触发下行发送的机制。</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>但是上述低功耗机制也存在效率低，延时大等问题，对于采用legacy PS机制的客户端，每次要获到缓存于接入点（AP）中的数据，必须通过发送PS-Poll帧，完成一次完整PS-Poll-&gt;ACK握手，效率很低；并且客户端（STA）每次根据DTIM间隔定时醒来接收接入点（AP）的广播帧，而DTIM一般Beacon（100ms）时间的整数倍，所以客户端（STA）与接入点（AP）进行数据交互的时延比较很大，不能应用于延时敏感的场景，并且通常客户端每秒必须唤醒几次来读取 DTIM。虽然在实时性业务方面WMM-PS做了很大的改进，减小实时性要求高的业务在电源管理过程中的延迟，但是其灵活度依然限于接入点与客户端单点“沟通”，休眠时间上依然受限于Beacon周期。</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>802.11ax新引入的节电机制TWT（Target Wake Time），拥有更大的弹性，允许更长的节电周期，以及多设备的休眠调度。借助TWT，接入点与客户端之间不再与Beacon周期绑定。TWT允许接入点和客户端之间单独协商休眠和通信的周期，接入点可以在任何约定的请求时间表来唤醒客户端（几分钟，几小时甚至天级别），这就为电池供电的设备（尤其是物联网领域中的设备）节省了大量电能。TWT的一个相关但重要的好处是借助新OFDMA调度功能，它还可以使用似于UL-OFDMA的上行链路调度方法。利用OFDMA同时唤醒以便它们可以同时通信并共享信道，从而增加网络容量，减少竞争降低延时。由于接入点与每个客户端单独协商，因此它可以分组或分别按计划发送，以实现最佳流量效率或适应来自其他客户端的流量要求。同时每个客户端都可以与接入点针对几种不同类型的应用程序协商多个单独的唤醒协议。</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2023/11/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --><br />
+</body></html></p>

@@ -1,0 +1,121 @@
+---
+layout: post
+title: Shell - file test operators
+date: 2021-11-29 03:39:55.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Recently I am using shell to write some automation scripts, I would like to write few posts about frequent shell functions for myself.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>One of the topic test file and do following file operation (delete, create)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p> One sample to test if the file exists, delete it if exists.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>if [ -f ${current_dir}/test.txt ] ;then
+  rm ${current_dir}/test.txt
+  echo "remove the existing file"
+else
+  echo "..."
+fi</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>here, '-f' means check if the provides path is a file and exists. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Similarly, I can use '-d' to check is the path is a existed folder.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>There are more file operators in shell, the following operators returns true if file exists:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Take and use it if you are in the same scenario.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>-b FILE
+FILE exists and is block special
+
+-c FILE
+FILE exists and is character special
+
+-d FILE
+FILE exists and is a directory
+
+-e FILE
+FILE exists
+
+-f FILE
+FILE exists and is a regular file
+
+-g FILE
+FILE exists and is set-group-ID
+
+-G FILE
+FILE exists and is owned by the effective group ID
+
+-h FILE
+FILE exists and is a symbolic link (same as -L)
+
+-k FILE
+FILE exists and has its sticky bit set
+
+-L FILE
+FILE exists and is a symbolic link (same as -h)
+
+-O FILE
+FILE exists and is owned by the effective user ID
+
+-p FILE
+FILE exists and is a named pipe
+
+-r FILE
+FILE exists and read permission is granted
+
+-s FILE
+FILE exists and has a size greater than zero
+
+-S FILE
+FILE exists and is a socket
+
+-t FD file descriptor FD is opened on a terminal
+
+-u FILE
+FILE exists and its set-user-ID bit is set
+
+-w FILE
+FILE exists and write permission is granted
+
+-x FILE
+FILE exists and execute (or search) permission is granted</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/11/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

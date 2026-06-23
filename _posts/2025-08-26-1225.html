@@ -1,0 +1,241 @@
+---
+layout: post
+title: 'Real-World Example: Structured Output+Database Storage'
+date: 2025-08-26 06:03:33.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>Continue to previous post on structure output <a href="https://www.iotcolon.com/?p=1219">https://www.iotcolon.com/?p=1219</a>.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>let’s extend the previous blog with a real-world API integration example that uses Structured Outputs to pull data from an LLM, validate it, and store it in a database.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>📖 Use Case</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Imagine you’re building a support ticket triage system.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You want the LLM to:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true,"start":1} --></p>
+<ol start="1" class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>Extract key fields from incoming ticket text</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Classify urgency level</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>Save results directly to your database</li>
+<p><!-- /wp:list-item -->
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Without Structured Outputs, you’d risk inconsistent formatting breaking your pipeline. With .parse() and Pydantic, you guarantee valid, structured data every time.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>📐 Step 1 — Define the Schema</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from pydantic import BaseModel, Field
+
+from typing import Literal
+
+class TicketData(BaseModel):
+
+    customer_name: str = Field(..., description="Full name of the customer")
+
+    issue_summary: str = Field(..., description="Brief summary of the issue")
+
+    urgency: Literal["low", "medium", "high"] = Field(..., description="Urgency level")
+
+    contact_email: str = Field(..., description="Customer's contact email")</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🤖 Step 2 — Extract Structured Data from LLM</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>from openai import OpenAI
+
+client = OpenAI()
+
+ticket_text = """
+
+Hi, I'm Jane Doe. My server has been down for 3 hours and I can't access my client files.
+
+Please help ASAP. Email: jane@example.com
+
+"""
+response = client.beta.chat.completions.parse(
+
+    model="gpt-4o-mini",
+
+    messages=[
+
+        {"role": "system", "content": "Extract ticket details from the user message."},
+
+        {"role": "user", "content": ticket_text}
+
+    ],
+
+    response_format=TicketData
+
+)
+
+ticket_info = response.choices[0].message.parsed
+
+print(ticket_info.dict())</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>✅ The .dict() output will always look like:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>{
+
+  "customer_name": "Jane Doe",
+
+  "issue_summary": "Server down for 3 hours, cannot access client files",
+
+  "urgency": "high",
+
+  "contact_email": "jane@example.com"
+
+}</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>💾 Step 3 — Save to the Database</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here’s an example using SQLite for simplicity:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>import sqlite3
+
+#Connect to DB (or create if it doesn't exist)
+
+conn = sqlite3.connect("tickets.db")
+
+cursor = conn.cursor()
+
+#Create table
+
+cursor.execute("""
+
+CREATE TABLE IF NOT EXISTS tickets (
+
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    customer_name TEXT,
+
+    issue_summary TEXT,
+
+    urgency TEXT,
+
+    contact_email TEXT
+
+)
+
+""")
+
+#Insert the parsed ticket
+
+cursor.execute("""
+
+INSERT INTO tickets (customer_name, issue_summary, urgency, contact_email)
+
+VALUES (?, ?, ?, ?)
+
+""", (
+
+    ticket_info.customer_name,
+
+    ticket_info.issue_summary,
+
+    ticket_info.urgency,
+
+    ticket_info.contact_email
+
+))
+
+conn.commit()
+
+conn.close()</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>📊 Step 4 — Querying Tickets by Urgency</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>conn = sqlite3.connect("tickets.db")
+
+cursor = conn.cursor()
+
+cursor.execute("SELECT * FROM tickets WHERE urgency = 'high'")
+
+high_priority_tickets = cursor.fetchall()
+
+print(high_priority_tickets)
+
+conn.close()</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Now you have a full pipeline:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>LLM → Structured Outputs → Validated Pydantic model → Database storage.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:separator --></p>
+<hr class="wp-block-separator has-alpha-channel-opacity">
+<!-- /wp:separator --></p>
+<p><!-- wp:heading --></p>
+<h2 class="wp-block-heading"><strong>🔹 Why This Works Well in Production</strong></h2>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Predictable:</strong> The database always gets valid fields</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Type-Safe:</strong> Wrong types are caught before insert</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Maintainable:</strong> Easy to update schema as your needs change</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Low Overhead:</strong> No regex, no fragile string parsing</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time reading. Hope you find this useful.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2025/08/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

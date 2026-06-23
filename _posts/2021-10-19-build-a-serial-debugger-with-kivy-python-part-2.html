@@ -1,0 +1,136 @@
+---
+layout: post
+title: Build a Serial Debugger with Kivy + Python – part 2
+date: 2021-10-19 03:33:05.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Python
+- Technology
+tags: []
+meta:
+  _edit_last: '2'
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>This is the second post about building an app with Kivy: serial debugger.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In linked post (https://www.iotcolon.com/?p=181) , the serial debugger’s UI design was discussed.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":195,"sizeSlug":"large","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img src="{{site.baseurl}}/assets/2021/10/image-7-1024x595.png" alt="" class="wp-image-195"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 1. Serial Debugger UI </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This post talks the python script, which will work together with the kv file, to make the app really interact with user and device.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>You can name the python script with whatever you like, just put the py file in the same folder with kv file.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Few classes need to be defined in the file:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>Indicator: this class links to the Indicator widget in kv file, script can control its color via updating the color property in the class</li>
+<li>SaveDialog: this class links to the pop up dialog of saving log, script can get the file path from its instance</li>
+<li>Root: this class links to the Root widget in the kv file, the main logic interacts with UI happens here</li>
+<li>SerialDebuggerApp: this class must be name with kv file name + “App”, by this, Kivy knows how to find the correct kv file. Here, the root widget will be created and run. This class will be called in the “__main__”.</li>
+<li>SerialPort: this is a abstract layer to deal with serials, it is not directly UI related.</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p>Everytime, a event happened on the UI, a hook defined in the kv file will be triggered. Take the log save button as example.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":196,"width":840,"height":702,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full is-resized"><img src="{{site.baseurl}}/assets/2021/10/image-8.png" alt="" class="wp-image-196" width="840" height="702"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 2. Button's action hook with python script</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the button’s kv language definition, the button click release will trigger its root parent widget’s show_save function. This function shall be defined in the Root widget class, and in the function, it creates a pop up save dialog, configure properties of the pop up, and open it in the front UI.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Other hook can be the text change in the drop-down selection, take one of the serial setting, “port” as example.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":197,"sizeSlug":"large","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-large"><img src="{{site.baseurl}}/assets/2021/10/image-9-1024x520.png" alt="" class="wp-image-197"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 3: Spinner's text change hook to and text update by python script</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The port can be chosen by user, once user make the selection, the on_text in the kv file will trigger the function on_commport_change in the Root class. In my implementation, it will update the value in the SerialPort class instance.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The ports shall be dynamically refreshed if any serial devices are connected or disconnected. Function of update_comm_ports and update port will do this refresh job. ‘update_comm_ports’ will list out all the active serial ports in the host computer, put them into a list, ‘update_port’ will use this list to update the values of “id_commport” drop-down.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the ‘SerialDebuggerApp’ class, with Clock’s schedule_interval feature, this function will be called every 1 second:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Clock.schedule_interval(root.update_port, 1.0)</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I will leave other callbacks and hooks to readers, you can also find some of helper functions I wrote for Serial communication, eg encoding switch between hex and ascii.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>And finally, you can find a function flow chart.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":198,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/10/image-10.png" alt="" class="wp-image-198"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 4. Flowchar of serial debugger APP</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the beginning, app start two fixed interval task, one is the 1 second frequency serial port refreshing, the other one is the 1/60 second serial receiving check function.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In order to break the line of serial input, 100ms idle period is implemented. If there is no input bytes detected in serial receiving more than this period, it takes this as a complete line, and append \n at this line in the receiving area.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The hex and acsii encoding switch is a handy function, it would be good to show the hex content if you see mess code in the receiving area, and also enable user to send arbitrary content to device.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>That’s almost all for the python script part, you can find the complete code in my git: <a href="https://github.com/xiaobojiang/kivy_playground">https://github.com/xiaobojiang/kivy_playground</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:image {"align":"center","id":199,"sizeSlug":"full","linkDestination":"none"} --></p>
+<div class="wp-block-image">
+<figure class="aligncenter size-full"><img src="{{site.baseurl}}/assets/2021/10/image-11.png" alt="" class="wp-image-199"></figure>
+</div>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph {"align":"center"} --></p>
+<p class="has-text-align-center">Figure 5. my kivy repo</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>In the next post, I will talk about packaging the Kivy code.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you have any questions, please leave a reply.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2021/10/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

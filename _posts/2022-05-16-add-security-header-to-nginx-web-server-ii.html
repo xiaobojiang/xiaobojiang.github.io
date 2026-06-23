@@ -1,0 +1,232 @@
+---
+layout: post
+title: Add Security Header to Nginx Web Server - II
+date: 2022-05-16 03:30:42.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Technology
+- Web
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>In <a href="https://www.iotcolon.com/?p=445">last post</a>, we talked about five commonly applied security headers:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"align":"left"} --></p>
+<p class="has-text-align-left"><em>Strict-Transport-Security<br>Content-Security-Policy<br>X-Content-Type-Options<br>X-Frame-Options<br>X-XSS-Protection</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>However, I found myself missed one security header: Referrer Policy.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This is a rather new header added in 2017 (https://www.w3.org/TR/referrer-policy/).</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>I found one really good post talking about this header, shared here:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>The <strong>Referrer Policy</strong> HTTP header sets the parameter for amount of information sent along with ReferrerHeader while making a request.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p> Referrer policy is used to maintain the security and privacy of source account while fetching resources or performing navigation. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>This is done by modifying the algorithm used to populate Referrer<em> Header</em>. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Referrer Policy</strong> can be delivered for a request through various methods. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>It can be done by simply using the HTTP header or the <em>meta</em> element in HTML which takes <em>referrer</em> keyword as value that in turn allows referrer policy setting through markup or using the <em>referrerpolicy</em> content attribute in <a href="https://www.geeksforgeeks.org/html-tutorials/"><strong>HTML</strong></a>. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://www.geeksforgeeks.org/css-tutorials/"><strong>CSS</strong></a> consults the referrer policy of owner document when <em>style</em> attribute is used and policy can be over-written for external <strong>stylesheets</strong> which have default value of <em>no-referrer-when-downgrade</em>. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Syntax :</strong> </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">Referrer-Policy : no-referrer
+Referrer-Policy : no-referrer-when-downgrade
+Referrer-Policy : origin
+Referrer-Policy : strict-origin
+Referrer-Policy : origin-when-cross-origin
+Referrer-Policy : strict-origin-when-cross-origin
+Referrer-Policy : same-origin
+Referrer-Policy : unsafe-url</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Directives : </strong>This header accepts eight directive as mentioned above and described below:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li>
+<strong>no-referrer :</strong> This sends no referrer information along with the request made.</li>
+<li>
+<strong>no-referrer-when-downgrade : </strong>This sends complete URL information to a potentially trustworthy URL from <em>modern</em> HTTPS State or from not modern <strong>HTTPS</strong> state to any origin . Information is sent for <strong>HTTPS -&gt; HTTPS</strong> and <strong>HTTP -&gt; HTTPS</strong> transition . This is the default Referrer-Policy.</li>
+<li>
+<strong>origin :</strong> It only sends the origin value of the request client when making either same-origin (same website) or cross-origin (different website) requests.</li>
+<li>
+<strong>strict-origin : </strong>This only sends origin information to potentially trustworthy URL from modern <strong>HTTPS</strong> State or from not modern <strong>HTTPS</strong> state to any origin.</li>
+<li>
+<strong>origin-when-cross-origin : </strong>It sends complete URL information when making requests on same origin but only origin information when making cross-origin requests.</li>
+<li>
+<strong>strict-origin-when-cross-origin :</strong> It sends complete URL information when working on request from same origin. It sends only origin information to potentially trustworthy URL from modern <strong>HTTPS</strong> State or from not modern <strong>HTTPS</strong> state to any origin. No referrer information is sent to a potentially non-trustworthy URL.</li>
+<li>
+<strong>same-origin : </strong>It sends referrer information when origin is on same website but no information is sent for cross origin.</li>
+<li>
+<strong>unsafe-url : </strong>It sends complete URL information irrespective of any criteria.</li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Examples: </strong>This is the standard example given by World Wide Web Consortium. The examples here list the website to which request is sent as the Navigation Website and the referrer information sent along with it. For ease , <strong>https://example.com/page.html </strong>will be considered origin site for each example. </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li><strong>no-referrer</strong></li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">Navigation website : https://notexample.com/page.html (or any other website)
+Referrer : no referrer sent</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li><strong>no-referrer-when-downgrade</strong></li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">Navigation website : https://not.example.com/ 
+Referrer : https://example.com/page.html
+-------------------------------------------
+Navigation Website : http://not.example.com/
+Referrer : no referrer sent</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li><strong>origin</strong></li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">Navigation Website : any trustworthy or non-trustworthy URL
+Referrer : https://example.com/</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li><strong>strict-origin</strong></li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">Navigation Website : https://not.example.com
+Referrer : https://example.com/.
+---------------------------------------------
+Navigation Website : http://not.example.com
+Referrer : no-referrer 
+---------------------------------------------
+Origin Website : <strong>http</strong>://example.com/page.html
+Navigation Website : any trustworthy or non-trustworthy URL
+Referrer : http://example.com/</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li><strong>origin-when-cross-origin</strong></li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">Navigation Website : https://example.com/not-page.html 
+Referrer : https://example.com/page.html
+-------------------------------------------------------
+Navigation Website : https://not.example.com/ (or a non-trustworthy URL)
+Referrer : https://example.com/</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li><strong>strict-origin-when-cross-origin</strong></li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">Navigation Website : https://example.com/not-page.html
+Referrer : https://example.com/page.html.
+-------------------------------------------------------
+Navigation Website : https://not.example.com/
+Referrer : https://example.com/
+--------------------------------------------------------
+Navigation Website : http://not.example.com/
+Referrer : no referrer</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li><strong>same-origin</strong></li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">Navigation Website : https://example.com/not-page.html 
+Referrer : https://example.com/page.html
+------------------------------------------------------
+Navigation Website : https://not.example.com/
+Referrer : no referrer</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:list --></p>
+<ul>
+<li><strong>unsafe-url</strong></li>
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:preformatted --></p>
+<pre class="wp-block-preformatted">Navigation Website : <em>Any trustworthy or non-trustworthy URL</em>
+Referrer : https://example.com/page.html</pre>
+<p><!-- /wp:preformatted --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Supported Browsers: </strong>The browsers supported by <strong>HTTP headers Referrer-Policy</strong> are listed below</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list {"ordered":true} --></p>
+<ol>
+<li>Google Chrome</li>
+<li>Safari</li>
+<li>Microsoft Edge</li>
+<li>Opera</li>
+<li>Mozilla Firefox</li>
+</ol>
+<p><!-- /wp:list --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>If you already know what it is, and think it is important to your website, follow the below recommendation to add.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>How to add in Nginx server:</strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>##
+# Referrer Policy
+##
+
+add_header Referrer-Policy "no-referrer";</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Please leave a reply if you have any questions.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Reference and based on:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://www.geeksforgeeks.org/http-headers-referrer-policy/#:~:text=The%20Referrer%20Policy%20HTTP%20header%20sets%20the%20parameter,the%20algorithm%20used%20to%20populate%20Referer%20Header%20.">https://www.geeksforgeeks.org/http-headers-referrer-policy/#:~:text=The%20Referrer%20Policy%20HTTP%20header%20sets%20the%20parameter,the%20algorithm%20used%20to%20populate%20Referer%20Header%20.</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/05/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

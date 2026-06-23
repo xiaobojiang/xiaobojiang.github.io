@@ -1,0 +1,336 @@
+---
+layout: post
+title: Add X509 v3 extension to ca and certs
+date: 2022-03-29 01:56:36.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- Linux
+- Technology
+tags: []
+meta:
+  _oembed_12e1266f9d430aa8c0862ae8640b483e: "{{unknown}}"
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>In normal case, openssl generates certs of x509 version 1. In some application scenario, due to security consideration, x509 version 3 certs are required, with v3 extension inside.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Following is a typical requirement for self-signed ca and devices.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Authority Root and Intermediate Certificate </strong><strong></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table>
+<tbody>
+<tr>
+<td><strong>Extension</strong></td>
+<td><strong>Acceptable Value</strong></td>
+<td><strong>Notes</strong></td>
+</tr>
+<tr>
+<td>Key Usage</td>
+<td>Digital Signature, Certificate Sign, CRL Sign</td>
+<td>should be marked critical, see <a href="https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.3">https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.3</a>
+</td>
+</tr>
+<tr>
+<td>Basic Constraints</td>
+<td>CA:TRUE, pathlen:1</td>
+<td>should be marked critical, see <a href="https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.9">https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.9</a>
+</td>
+</tr>
+<tr>
+<td>Subject Key Identifier</td>
+<td>Unique identifer for certificate</td>
+<td>see <a href="https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.2">https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.2</a>
+</td>
+</tr>
+<tr>
+<td>Authority Key Identifier</td>
+<td>Unique identifer for certificate's signer</td>
+<td>will be same as SKI for root certs, see <a href="https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.1">https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.1</a>
+</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example root certificate</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>X509v3 extensions:
+    X509v3 Key Usage: critical
+        Digital Signature, Certificate Sign, CRL Sign
+    X509v3 Basic Constraints: critical
+        CA:TRUE, pathlen:1
+    X509v3 Subject Key Identifier:
+        03:DE:50:35:56:D1:4C:BB:66:F0:A3:E2:1B:1B:C3:97:B2:3D:D1:55
+    X509v3 Authority Key Identifier:
+        03:DE:50:35:56:D1:4C:BB:66:F0:A3:E2:1B:1B:C3:97:B2:3D:D1:55
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>Device Certificate </strong><strong></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table>
+<tbody>
+<tr>
+<td><strong>Extension</strong></td>
+<td><strong>Acceptable Value</strong></td>
+<td><strong>Notes</strong></td>
+</tr>
+<tr>
+<td>Key Usage</td>
+<td>Digital Signature, Key Encipherment</td>
+<td>should be marked critical</td>
+</tr>
+<tr>
+<td>Basic Constraints</td>
+<td>CA:FALSE, pathlen:0</td>
+<td>should be marked critical</td>
+</tr>
+<tr>
+<td>Extended Key Usage</td>
+<td>TLS Web Client Authentication</td>
+<td>see <a href="https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.12">https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.12</a>
+</td>
+</tr>
+<tr>
+<td>Subject Key Identifier</td>
+<td>Unique identifer for certificate</td>
+<td></td>
+</tr>
+<tr>
+<td>Authority Key Identifier</td>
+<td>Unique identifer for certificate's signer</td>
+<td>must match signer's SKI</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>Example certificate for device with globally unique identifier </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>X509v3 extensions:
+           X509v3 Key Usage: critical
+               Digital Signature, Key Encipherment
+           X509v3 Basic Constraints: critical
+               CA:FALSE, pathlen:0
+           X509v3 Extended Key Usage:
+               TLS Web Client Authentication, TLS Web Server Authentication
+           X509v3 Subject Key Identifier:
+               89:A7:49:8A:6F:AB:E4:F1:83:40:4A:05:0F:9F:84:69:AE:FC:36:9D
+           X509v3 Authority Key Identifier:
+               C8:A6:D5:5B:D9:1B:26:3F:BE:2E:CB:E5:44:73:29:BA:23:71:F3:18
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>This requires certificates with x509 version 3 extension.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>How to generate such kind of certs? Do not worry, follow the steps in below, it is not very complex:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">CA</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Prepare one config file in folder ca/openssl.cnf</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>[ req ]
+distinguished_name = req_distinguished_name
+policy = policy_match
+x509_extensions = v3_ca
+# For the CA policy
+[ policy_match ]
+countryName = optional
+stateOrProvinceName = optional
+organizationName = optional
+organizationalUnitName = optional
+commonName = supplied
+emailAddress = optional
+[ req_distinguished_name ]
+countryName = Country Name (2 letter code)
+countryName_default = CN
+countryName_min = 2
+countryName_max = 2
+stateOrProvinceName = State or Province Name (full name) ## Print this me
+ssage
+stateOrProvinceName_default = Shanghai ## This is the default value
+localityName = Locality Name (eg, city) ## Print this message
+localityName_default = Shanghai ## This is the default value
+0.organizationName = Organization Name (eg, company) ## Print this messa
+ge
+0.organizationName_default = Iotcolon ## This is the default value
+organizationalUnitName = Organizational Unit Name (eg, section) ## Print thi
+s message
+organizationalUnitName_default = Iotcolon ## This is the default value
+commonName = Common Name (eg, your name or your server hostname)
+## Print this message
+commonName_max = 64
+emailAddress = Email Address ## Print this message
+emailAddress_max = 64
+[ v3_ca ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = critical,CA:true,pathlen:1
+keyUsage = critical,digitalSignature,keyCertSign,cRLSign
+nsComment = "OpenSSL Generated Certificate"
+</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Pay attention to following section in the file</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>x509_extensions=<em>v3_ca</em></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>specifies the section that defines extensions to add to a self-signed certificate, where v3_ca is the name of the section. See the following [v3_ca] description for information about the fields that the section can contain. This field is optional.</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Gen ca private key:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ openssl genrsa -out ca/cakey.pem 4096</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Generate ca cert</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ openssl req -new -x509 -days 3650 -config ca/openssl.cnf -key ca/cakey.pem -out ca/cacert.pem</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">client side</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Prepare config file at devices/openssl.cnf</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>[ req ]
+default_bits        = 4096
+distinguished_name  = req_distinguished_name
+policy              = policy_match
+x509_extensions     = user_crt
+req_extensions      = v3_req
+
+[ req_distinguished_name ]
+countryName                     = Country Name (2 letter code)
+countryName_default             = CN
+countryName_min                 = 2
+countryName_max                 = 2
+stateOrProvinceName             = State or Province Name (full name) ## Print this message
+stateOrProvinceName_default     = Shanghai ## This is the default value
+localityName                    = Locality Name (eg, city) ## Print this message
+localityName_default            = Shanghai ## This is the default value
+0.organizationName              = Organization Name (eg, company) ## Print this message
+0.organizationName_default      = Signify ## This is the default value
+organizationalUnitName          = Organizational Unit Name (eg, section) ## Print this message
+organizationalUnitName_default  = Brightsites ## This is the default value
+commonName                      = Common Name (eg, your name or your server hostname) ## Print this message
+commonName_default              = 1234
+commonName_max                  = 64
+emailAddress                    = Email Address ## Print this message
+emailAddress_default            = brightsites@singify.com
+emailAddress_max                = 64
+
+[ user_crt ]
+## nsCertType              = client, server, email
+nsComment               = "OpenSSL Generated Certificate"
+keyUsage                = critical,digitalSignature,keyEncipherment
+extendedKeyUsage        = clientAuth ##serverAuth for server certs
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid,issuer:always
+basicConstraints        = critical,CA:FALSE,pathlen:0
+
+
+[ v3_req ]
+basicConstraints        = critical,CA:FALSE,pathlen:0
+keyUsage                = critical,digitalSignature,keyEncipherment
+extendedKeyUsage        = clientAuth ##serverAuth for server certs</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Here,</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><strong>req_extensions=<em>v3_req</em></strong></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><em>specifies the section that defines extensions to add to a certificate request, where v3_req is the name of the section. See the following [v3_req] description for information about the fields that the section can contain. This field is optional.</em></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Gen private key and csr:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ openssl req -new -days 3650 -nodes -keyout devices/2.key -out devices/2.csr -config devices/openssl.cnf </code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Sign certificate: </p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ openssl x509 -req -days 3650 -in devices/2.csr -CA ca/cacert.pem -CAkey ca/cakey.pem -CAcreateserial -out devices/2.crt -extensions user_crt -extfile devices/openssl.cnf</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:paragraph --></p>
+<p>Note: server side is similar, just make the keyUsage as serverAuth</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph {"fontSize":"medium"} --></p>
+<p class="has-medium-font-size">Check the v3 extension</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Ca side</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ openssl x509 -text -noout -in ca/cacert.pem | grep -A15 "X509v3 extensions"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":398,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/03/image-2-1024x435.png" alt="" class="wp-image-398"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Client side</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:code --></p>
+<pre class="wp-block-code"><code>$ openssl x509 -text -noout -in devices/1.crt | grep -A15 "X509v3 extensions"</code></pre>
+<p><!-- /wp:code --></p>
+<p><!-- wp:image {"id":399,"sizeSlug":"large","linkDestination":"none"} --></p>
+<figure class="wp-block-image size-large"><img src="{{site.baseurl}}/assets/2022/03/image-3-1024x434.png" alt="" class="wp-image-399"></figure>
+<p><!-- /wp:image --></p>
+<p><!-- wp:paragraph --></p>
+<p>Done.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Leave a reply if you have comments or question.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Thanks for your time.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Ref link:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.9">https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.9</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><a href="https://www.openssl.org/docs/man3.0/man5/x509v3_config.html">https://www.openssl.org/docs/man3.0/man5/x509v3_config.html</a></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2022/03/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>

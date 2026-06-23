@@ -1,0 +1,179 @@
+---
+layout: post
+title: How to Select an Claw-wise Agent For Your Needs
+date: 2026-06-08 02:52:33.000000000 +08:00
+type: post
+parent_id: '0'
+published: true
+password: ''
+status: publish
+categories:
+- AI
+- Linux
+- Technology
+tags: []
+meta: {}
+author: "xiaobo Jiang"
+---
+<p><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd"><br />
+<!-- wp:paragraph --><html><body></p>
+<p>For resource limited device, running openclaw would require too many RAM and storage. So I need an alternative, with below few things in mind: small footprint with limit RAM and storage request, has good track of github stars and under active maintenance, support skills, support running in container way.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Below is a weighted scoring table focused on my request:</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Scoring weights of my certain application scenario, for your reference.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:list --></p>
+<ul class="wp-block-list">
+<!-- wp:list-item --></p>
+<li>
+<strong>Small footprint: 30 pts</strong> — smaller RAM/storage gets higher score.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>GitHub stars: 20 pts</strong> — higher current stars get higher score.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Skills support: 30 pts</strong> — hard requirement; downloadable + usable skills score highest.</li>
+<p><!-- /wp:list-item --></p>
+<p><!-- wp:list-item --></p>
+<li>
+<strong>Container + persistence: 20 pts</strong> — can fully run in container and preserve state via mounted folder/volume.</li>
+<p><!-- /wp:list-item -->
+</ul>
+<p><!-- /wp:list --></p>
+<p><!-- wp:table {"hasFixedLayout":false} --></p>
+<figure class="wp-block-table">
+<table>
+<tbody>
+<tr>
+<th><strong>Rank</strong></th>
+<th><strong>Project</strong></th>
+<th><strong>Footprint score /30</strong></th>
+<th><strong>GitHub stars score /20</strong></th>
+<th><strong>Skills score /30</strong></th>
+<th><strong>Container + persistence score /20</strong></th>
+<th><strong>Total /100</strong></th>
+<th><strong>Why</strong></th>
+</tr>
+<tr>
+<td><strong>1</strong></td>
+<td><strong>ZeroClaw</strong></td>
+<td><strong>30</strong></td>
+<td>12</td>
+<td><strong>28</strong></td>
+<td><strong>20</strong></td>
+<td><strong>90</strong></td>
+<td>Best balance. Very small Rust runtime, official site claims <strong>&lt;5 MB RAM</strong>, GitHub shows <strong>31.6k stars</strong>, repo has .claude/skills, marketplace/plugins, Dockerfiles, and Compose. Best fit for “small + skills + container persistence.”  </td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>PicoClaw</strong></td>
+<td><strong>28</strong></td>
+<td>11</td>
+<td>23</td>
+<td>18</td>
+<td><strong>80</strong></td>
+<td>Very small footprint: public docs/repo describe <strong>$10 hardware / &lt;10 MB RAM</strong>, and docs support Docker Compose. Skills exist, but the skill ecosystem looks less mature than OpenClaw/ZeroClaw.  </td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>OpenClaw</strong></td>
+<td>10</td>
+<td><strong>20</strong></td>
+<td><strong>30</strong></td>
+<td><strong>19</strong></td>
+<td><strong>79</strong></td>
+<td>By far strongest stars and skills ecosystem: Star History reports <strong>374.3k stars</strong>, and OpenClaw skills can be bundled, global, workspace-scoped, and marketplace-installed. But footprint is much heavier; VPS guidance recommends <strong>2 vCPU/4 GB RAM dev</strong> and <strong>4 vCPU/8 GB RAM + 20 GB SSD prod</strong>. Docker and mounted extra volumes are supported.  </td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>NanoClaw</strong></td>
+<td>24</td>
+<td>11</td>
+<td>20</td>
+<td>16</td>
+<td><strong>71</strong></td>
+<td>Lightweight and container-first; GitHub shows <strong>29.5k stars</strong> and says agents run securely in their own containers. It has .claude/skills and skill-related tests, but public evidence suggests Anthropic/Claude-first and less mature marketplace-style skill download.  </td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><strong>Nanobot</strong></td>
+<td>18</td>
+<td>14</td>
+<td>18</td>
+<td>17</td>
+<td><strong>67</strong></td>
+<td>Good lightweight agent with <strong>43.3k stars</strong>, memory, MCP, chat channels, and deployment paths. Container deployment exists, but skills appear more local/built-in than a hard marketplace. Article benchmark says around <strong>191 MB RAM</strong>.  </td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td><strong>IronClaw</strong></td>
+<td>26</td>
+<td>8</td>
+<td>25</td>
+<td>12</td>
+<td><strong>71 → adjusted to 66</strong></td>
+<td>Small/security-focused and supports many LLM providers, including OpenAI-compatible services and Ollama. Skills are strong conceptually, but deployment is less like “single container + mounted folder”; Docker appears more central to sandbox/worker architecture than simple all-in-one persistence. GitHub traction is lower at around <strong>12.4k stars</strong>.  </td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:heading {"level":3} --></p>
+<h3 class="wp-block-heading"><strong>Recommended shortlist for my application criteria</strong></h3>
+<p><!-- /wp:heading --></p>
+<p><!-- wp:table --></p>
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<tbody>
+<tr>
+<th><strong>Use case</strong></th>
+<th><strong>Best choice</strong></th>
+<th><strong>Reason</strong></th>
+</tr>
+<tr>
+<td><strong>Best overall for small device + real skills + container persistence</strong></td>
+<td><strong>ZeroClaw</strong></td>
+<td>Smallest practical footprint, strong skill story, and clearest containerized deployment direction.</td>
+</tr>
+<tr>
+<td><strong>Smallest experimental embedded-style option</strong></td>
+<td><strong>PicoClaw</strong></td>
+<td>Great if footprint is the top priority and skill marketplace maturity is less critical.</td>
+</tr>
+<tr>
+<td><strong>Best ecosystem / highest confidence skills support</strong></td>
+<td><strong>OpenClaw</strong></td>
+<td>Strongest skills ecosystem and stars, but much heavier.</td>
+</tr>
+<tr>
+<td><strong>Container-first Claude assistant</strong></td>
+<td><strong>NanoClaw</strong></td>
+<td>Good if you accept Anthropic-first architecture.</td>
+</tr>
+<tr>
+<td><strong>Security-hardened runtime</strong></td>
+<td><strong>IronClaw</strong></td>
+<td>Interesting for isolation/security, but less ideal for simple mounted-folder persistence.</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<p><!-- /wp:table --></p>
+<p><!-- wp:paragraph --></p>
+<p>Finally, I've run the zeroclaw container on my Yocto based linux box for demo application. It is also a tough journey, especially on migrating from openclaw for zeroclaw, it requires a lot of work to explore and adapt the security principle. If you have interest, I can make another post to share.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:paragraph --></p>
+<p>Hope this could also help.</p>
+<p><!-- /wp:paragraph --></p>
+<p><!-- wp:html --><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="{{site.baseurl}}/assets/2026/06/88x31.png"></a><br />
+This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />
+<!-- /wp:html --></p>
+<p><!-- wp:paragraph --></p>
+<p><!-- /wp:paragraph --><br />
+</body></html></p>
