@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$#" -eq 0 ]; then
+  echo "Usage:"
+  echo "  bin/newpost \"Post Title\""
+  echo
+  echo "Example:"
+  echo "  bin/newpost \"Use Legacy SCP Protocol\""
+  exit 1
+fi
+
+title="$*"
+
+slug=$(
+  printf "%s" "$title" |
+  tr '[:upper:]' '[:lower:]' |
+  sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//'
+)
+
+if [ -z "$slug" ]; then
+  echo "Error: could not generate a slug from title."
+  exit 1
+fi
+
+year=$(date +%Y)
+month=$(date +%m)
+day=$(date +%d)
+date_prefix=$(date +%Y-%m-%d)
+datetime=$(date "+%Y-%m-%d %H:%M:%S %z")
+
+post="_posts/${date_prefix}-${slug}.md"
+imgdir="assets/images/${year}/${month}/${slug}"
+
+if [ -e "$post" ]; then
+  echo "Error: post already exists:"
+  echo "  $post"
+  exit 1
+fi
+
+mkdir -p _posts
+mkdir -p "$imgdir"
+
+cat > "$post" <<POST
+---
+layout: post
+title: "$title"
+date: $datetime
+categories: [notes]
+author: "Xiao Bo Jiang"
+render_with_liquid: false
+---
+
+Write a short introduction here.
+
+## Background
+
+Explain the context or problem.
+
+## Steps
+
+\`\`\`bash
+echo "example command"
+\`\`\`
+
+## Images
+
+Put images in:
+
+\`\`\`text
+$imgdir/
+\`\`\`
+
+Then reference them like this:
+
+\`\`\`markdown
+![Screenshot](/$imgdir/screenshot.png)
+\`\`\`
+
+## Takeaway
+
+Summarize the main point.
+POST
+
+echo "Created post:"
+echo "  $post"
+echo
+echo "Created image folder:"
+echo "  $imgdir"
+echo
+echo "Next:"
+echo "  1. Edit $post"
+echo "  2. Copy images into $imgdir/"
+echo "  3. Run: bundle exec jekyll serve"
