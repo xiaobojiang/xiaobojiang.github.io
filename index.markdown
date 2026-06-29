@@ -52,13 +52,6 @@ permalink: /
     font-size: clamp(1.5rem, 3vw, 2rem);
   }
 
-  .home-notes__section-header p {
-    margin: 6px 0 0;
-    max-width: 58ch;
-    color: var(--muted);
-    line-height: 1.65;
-  }
-
   .home-notes__featured {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -298,7 +291,6 @@ permalink: /
         <div class="home-notes__section-header">
           <div>
             <h2 id="latest-notes-title">Latest Notes</h2>
-            <p>Fresh write-ups from the notebook, shown first so the homepage stays useful without becoming a wall of links.</p>
           </div>
         </div>
         <div class="home-notes__featured">
@@ -325,7 +317,6 @@ permalink: /
         <div class="home-notes__section-header">
           <div>
             <h2 id="post-search-title">Find a Note</h2>
-            <p>Search {{ site.posts | size }} posts by title.</p>
           </div>
         </div>
         <input class="home-notes__search-input" id="post-title-search" type="search" aria-label="Search post titles" placeholder="Search titles, for example: podman, ansible, python" autocomplete="off">
@@ -346,7 +337,6 @@ permalink: /
     <div class="home-notes__section-header">
       <div>
         <h2 id="topics-title">Browse by Topic</h2>
-        <p>Jump into the recurring themes across the archive.</p>
       </div>
     </div>
     <nav class="home-notes__topic-nav" aria-label="Topic shortcuts">
@@ -361,7 +351,6 @@ permalink: /
     <div class="home-notes__section-header">
       <div>
         <h2 id="topic-shelves-title">Topic Shelves</h2>
-        <p>Each shelf keeps the newest notes close at hand while the full archive remains available below.</p>
       </div>
     </div>
     <div class="home-notes__topics">
@@ -389,7 +378,6 @@ permalink: /
     <div class="home-notes__section-header">
       <div>
         <h2 id="archive-title">Full Archive</h2>
-        <p>The complete article list is still here, grouped by year so it is easier to scan.</p>
       </div>
     </div>
     <div class="home-notes__archive">
