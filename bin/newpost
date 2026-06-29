@@ -46,7 +46,22 @@ cat > "$post" <<POST
 layout: post
 title: "$title"
 date: $datetime
-categories: [notes]
+categories:
+  # Enable applicable categories by uncommenting one or more lines below.
+  # - AI
+  # - Cloud
+  # - Devops
+  # - Internet of Things
+  # - IoT
+  # - Kubernetes
+  # - Life
+  # - Linux
+  # - One Line Tip
+  # - Product
+  # - Python
+  # - Robotics
+  # - Technology
+  # - Web
 author: "Xiao Bo Jiang"
 render_with_liquid: false
 ---
