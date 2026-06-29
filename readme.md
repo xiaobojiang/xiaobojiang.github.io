@@ -103,6 +103,7 @@ Because technical posts use `render_with_liquid: false`, prefer direct image pat
 Run:
 
 ```bash
+source ~/.zshrc
 bundle exec jekyll clean
 bundle exec jekyll serve
 ```
@@ -195,6 +196,7 @@ nano _posts/YYYY-MM-DD-article-title.md
 cp ~/Downloads/image.png assets/images/YYYY/MM/article-title/
 
 # Preview
+source ~/.zshrc
 bundle exec jekyll serve
 
 # Publish

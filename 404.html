@@ -4,22 +4,169 @@ layout: page
 ---
 
 <style type="text/css" media="screen">
-  .container {
-    margin: 10px auto;
-    max-width: 600px;
-    text-align: center;
+  .not-found {
+    --ink: #1d2939;
+    --muted: #667085;
+    --line: #d0d5dd;
+    --paper: #ffffff;
+    --accent: #0f766e;
+    --accent-strong: #115e59;
+
+    margin: 24px auto 56px;
+    max-width: 920px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at top left, rgba(15, 118, 110, 0.16), transparent 34%),
+      linear-gradient(135deg, #f8fafc 0%, #ffffff 54%, #ecfeff 100%);
+    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.1);
+    color: var(--ink);
   }
-  h1 {
-    margin: 30px 0;
-    font-size: 4em;
+
+  .not-found__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 40px;
+    align-items: center;
+    padding: clamp(28px, 6vw, 64px);
+  }
+
+  .not-found__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 18px;
+    color: var(--accent-strong);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .not-found__eyebrow::before {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--accent);
+    content: "";
+  }
+
+  .not-found h1 {
+    margin: 0;
+    max-width: 11ch;
+    font-size: clamp(2.7rem, 8vw, 5.8rem);
+    line-height: 0.95;
+    letter-spacing: 0;
+  }
+
+  .not-found__copy {
+    margin: 24px 0 0;
+    max-width: 58ch;
+    color: var(--muted);
+    font-size: 1.08rem;
+    line-height: 1.7;
+  }
+
+  .not-found__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  .not-found__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  }
+
+  .not-found__button:hover,
+  .not-found__button:focus {
+    border-color: var(--accent);
+    box-shadow: 0 10px 24px rgba(15, 118, 110, 0.14);
+    color: var(--accent-strong);
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  .not-found__button--primary {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #ffffff;
+  }
+
+  .not-found__button--primary:hover,
+  .not-found__button--primary:focus {
+    background: var(--accent-strong);
+    color: #ffffff;
+  }
+
+  .not-found__code {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 260px;
+    border-radius: 8px;
+    background:
+      linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(255, 255, 255, 0.72)),
+      repeating-linear-gradient(0deg, rgba(15, 23, 42, 0.08) 0 1px, transparent 1px 24px),
+      repeating-linear-gradient(90deg, rgba(15, 23, 42, 0.08) 0 1px, transparent 1px 24px);
+    color: rgba(15, 118, 110, 0.2);
+    font-size: clamp(5rem, 18vw, 9rem);
+    font-weight: 900;
     line-height: 1;
-    letter-spacing: -1px;
+  }
+
+  .not-found__code::after {
+    position: absolute;
+    inset: 24px;
+    border: 1px solid rgba(15, 118, 110, 0.28);
+    border-radius: 8px;
+    content: "";
+  }
+
+  @media (max-width: 720px) {
+    .not-found {
+      margin-top: 8px;
+      border-radius: 12px;
+    }
+
+    .not-found__inner {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+
+    .not-found__code {
+      order: -1;
+      min-height: 160px;
+      font-size: clamp(4.5rem, 28vw, 7rem);
+    }
   }
 </style>
 
-<div class="container">
-  <h1>404</h1>
-
-  <p><strong>Page not found :(</strong></p>
-  <p>The requested page could not be found.</p>
+<div class="not-found">
+  <div class="not-found__inner">
+    <section aria-labelledby="not-found-title">
+      <p class="not-found__eyebrow">404 - Page not found</p>
+      <h1 id="not-found-title">This note wandered off.</h1>
+      <p class="not-found__copy">
+        The page you opened may have moved, been renamed, or no longer exists. Try returning home or browsing the notes from the start.
+      </p>
+      <div class="not-found__actions" aria-label="Helpful links">
+        <a class="not-found__button not-found__button--primary" href="{{ '/' | relative_url }}">Back to home</a>
+        <a class="not-found__button" href="{{ '/about/' | relative_url }}">About this site</a>
+      </div>
+    </section>
+    <div class="not-found__code" aria-hidden="true">404</div>
+  </div>
 </div>
