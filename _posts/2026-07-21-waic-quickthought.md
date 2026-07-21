@@ -37,6 +37,8 @@ It is like early phase of EV cars.
 
 There are still few years to go, need to resolve computation capacity, power consumption and model breakthrough.
 
+Long trip, challenges and opportunites ahead. 
+
 ![Screenshot](/assets/images/2026/07/waic-quickthought/humanoid.jpg)
 Figure: humanoid assemble a small chair
 
